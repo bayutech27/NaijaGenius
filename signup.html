@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NaijaGenius • Sign Up</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="glass-card fade-in-up">
+            <!-- Branding -->
+            <div class="brand-header">
+                <h1 class="logo"><span class="naija">Naija</span><span class="genius">Genius</span></h1>
+                <p class="tagline">Join the smartest trivia community</p>
+            </div>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form">
+                <!-- Username field (required, unique) -->
+                <div class="input-group">
+                    <i class="fas fa-at input-icon"></i>
+                    <input type="text" id="username" placeholder="Username (unique nickname)" autocomplete="off" required>
+                    <span id="usernameStatus" class="username-status"></span>
+                </div>
+
+                <!-- Email field -->
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="signupEmail" placeholder="Email address" autocomplete="email" required>
+                </div>
+
+                <!-- Phone number field with +234 prefix and auto-formatting -->
+                <div class="input-group">
+                    <i class="fas fa-phone-alt input-icon"></i>
+                    <input type="tel" id="phoneNumber" placeholder="+234 801 234 5678" autocomplete="tel" required>
+                </div>
+
+                <!-- State field (searchable datalist) -->
+                <div class="input-group">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                    <input type="text" id="state" list="stateList" placeholder="Search your state" autocomplete="off" required>
+                    <datalist id="stateList">
+                        <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option>
+                        <option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option>
+                        <option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option>
+                        <option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option><option>Gombe</option>
+                        <option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option>
+                        <option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+                        <option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option>
+                        <option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option>
+                        <option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+                        <option>Zamfara</option>
+                    </datalist>
+                </div>
+
+                <!-- Password field -->
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password" required>
+                    <i class="fas fa-eye-slash toggle-password" data-target="signupPassword"></i>
+                </div>
+
+                <!-- Confirm Password field -->
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" autocomplete="off" required>
+                    <i class="fas fa-eye-slash toggle-password" data-target="confirmPassword"></i>
+                </div>
+
+                <button type="submit" id="signupBtn" class="auth-btn">
+                    <span>Create Account</span>
+                    <i class="fas fa-user-plus"></i>
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <p>Already registered? <a href="login.html" class="highlight-link">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+    <script type="module" src="/js/auth.js"></script>
+</body>
+</html>

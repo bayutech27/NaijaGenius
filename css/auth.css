@@ -1,0 +1,377 @@
+/* GLOBAL & THEME */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at 10% 20%, #0a0f1e, #03060c);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+/* Container uses flex to center */
+.auth-container {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+    background: rgba(20, 25, 40, 0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 2rem;
+    padding: 2rem 1.8rem;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(62, 214, 183, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s;
+    border: 1px solid rgba(62, 214, 183, 0.3);
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 55px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(62, 214, 183, 0.4);
+}
+
+/* Branding */
+.brand-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    font-size: 2.3rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.naija {
+    color: #ffffff;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.genius {
+    color: #3ED6B7;
+    text-shadow: 0 0 6px rgba(62,214,183,0.5);
+}
+
+.tagline {
+    color: #b9c7d9;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+/* Form elements */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #3ED6B7;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+input, select {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 2.8rem;
+    background: rgba(10, 14, 23, 0.7);
+    border: 1.5px solid #2a3448;
+    border-radius: 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    color: #f0f3fa;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+/* FIX: Give password inputs extra right padding so they don't overlap the eye icon */
+.input-group input[type="password"] {
+    padding-right: 2.8rem;
+}
+
+select {
+    padding-right: 2rem;
+    appearance: none;
+    cursor: pointer;
+}
+
+input:focus, select:focus {
+    border-color: #3ED6B7;
+    box-shadow: 0 0 0 3px rgba(62, 214, 183, 0.25);
+    background: rgba(18, 24, 38, 0.9);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    color: #a0b3d9;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: #3ED6B7;
+}
+
+/* username status */
+.username-status {
+    position: absolute;
+    right: 1rem;
+    bottom: -1.4rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: rgba(0,0,0,0.6);
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.username-status.available {
+    color: #3ED6B7;
+}
+
+.username-status.taken {
+    color: #ffb347;
+}
+
+/* Button */
+.auth-btn {
+    background: linear-gradient(135deg, #3ED6B7, #259c84);
+    border: none;
+    padding: 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    color: #0a0f1e;
+    border-radius: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    margin-top: 0.5rem;
+}
+
+.auth-btn i {
+    font-size: 1rem;
+    transition: transform 0.2s;
+}
+
+.auth-btn:hover {
+    transform: scale(1.02);
+    background: linear-gradient(135deg, #4be5c4, #2cb292);
+    box-shadow: 0 10px 22px rgba(62,214,183,0.3);
+}
+
+.auth-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-btn:disabled {
+    opacity: 0.6;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* Links */
+.auth-links {
+    margin-top: 1.8rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #bfcbe0;
+}
+
+.auth-links p {
+    margin: 0.6rem 0;
+}
+
+.highlight-link {
+    color: #FFD700;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.highlight-link:hover {
+    color: #3ED6B7;
+    text-decoration: underline;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast {
+    background: #1e2a3a;
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 0.9rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-left: 5px solid #3ED6B7;
+    pointer-events: auto;
+    animation: slideInRight 0.3s ease forwards;
+}
+
+.toast.error {
+    border-left-color: #FFD966;
+    background: #2c2416;
+}
+
+.toast.success {
+    border-left-color: #3ED6B7;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Modal for reset */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-card {
+    background: #111827;
+    border-radius: 2rem;
+    max-width: 400px;
+    width: 90%;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid #3ED6B7;
+    animation: fadeInUp 0.3s;
+}
+
+.modal-icon {
+    font-size: 3.5rem;
+    color: #3ED6B7;
+    margin-bottom: 1rem;
+}
+
+.modal-card h3 {
+    color: white;
+    margin-bottom: 0.8rem;
+}
+
+.modal-card p {
+    color: #cbd5e6;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-btn {
+    background: #3ED6B7;
+    color: #0a0f1e;
+    margin-top: 0;
+    width: 100%;
+}
+
+/* Loading spinner inside button */
+.loading-spinner {
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top: 2px solid #0a0f1e;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 1.5rem;
+    }
+    .logo {
+        font-size: 1.9rem;
+    }
+    input, select {
+        padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    }
+    .input-group input[type="password"] {
+        padding-right: 2.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .glass-card {
+        padding: 1.2rem;
+    }
+    .auth-btn {
+        padding: 0.7rem;
+    }
+}
+
+/* entrance animation */
+.fade-in-up {
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

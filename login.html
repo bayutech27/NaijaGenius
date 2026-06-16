@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NaijaGenius • Login</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+     <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="glass-card fade-in-up">
+            <!-- Branding Header -->
+            <div class="brand-header">
+                <h1 class="logo"><span class="naija">Naija</span><span class="genius">Genius</span></h1>
+                <p class="tagline">Welcome back, trivia champion</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="loginEmail" placeholder="Email address" autocomplete="email" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+                    <i class="fas fa-eye-slash toggle-password" data-target="loginPassword"></i>
+                </div>
+
+                <button type="submit" id="loginBtn" class="auth-btn">
+                    <span>Login</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <p>Not registered? <a href="signup.html" class="highlight-link">Signup here</a></p>
+                <p>Forgot password? <a href="reset-password.html" class="highlight-link">Reset here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="/js/auth.js"></script>
+</body>
+</html>

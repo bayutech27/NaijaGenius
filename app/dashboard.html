@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0A0A0F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>NaijaGenius • Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-wrapper">
+                <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge"></span>
+                </button>
+                <div class="user-avatar" id="userAvatarBtn">
+                    <span id="userInitials">NG</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content" id="mainContent">
+        <!-- HOME SECTION -->
+        <section id="homeSection" class="page-section active-section">
+            <div class="balance-card-compact fade-in-up">
+                <p class="balance-label">Wallet Balance</p>
+                <div class="balance-row">
+                    <div class="balance-amount-compact">
+                        <span class="currency-symbol">₦</span>
+                        <span id="walletBalance">0</span>
+                    </div>
+                    <button class="btn-outline-mint-compact" id="withdrawBtn">
+                        <i class="fas fa-arrow-down"></i> Withdraw
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
+                    <i class="fas fa-gamepad stat-icon"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalGamesPlayed">0</span>
+                        <span class="stat-label">Games Played</span>
+                    </div>
+                </div>
+                <div class="stat-card fade-in-up" style="animation-delay: 0.1s">
+                    <i class="fas fa-chart-line stat-icon"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="winRate">0%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                </div>
+                <div class="stat-card fade-in-up" style="animation-delay: 0.15s">
+                    <i class="fas fa-star stat-icon"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="bestScoreValue">0</span>
+                        <span class="stat-label">Best Score</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title">Active Challenges</h2>
+                <a href="games.html" class="section-link" data-nav="play">View All</a>
+            </div>
+            <div class="horizontal-scroll" id="activeChallenges">
+                <div class="loading-skeleton">Loading challenges...</div>
+                <div class="empty-placeholder" style="display: none;">No challenges available. Check back soon!</div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title">Top Players</h2>
+                <button class="section-link" data-nav="leaderboard">Full Leaderboard</button>
+            </div>
+            <div class="leaderboard-preview" id="leaderboardPreview">
+                <div class="loading-skeleton">Loading leaderboard...</div>
+                <div class="empty-placeholder" style="display: none;">No leaderboard data yet. Be the first to play!</div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title">Recent Transactions</h2>
+                <button class="section-link" data-nav="earnings">View All</button>
+            </div>
+            <div class="transactions-placeholder">
+                <i class="fas fa-receipt"></i>
+                <p>No transactions yet.<br>Play tournaments to win cash!</p>
+            </div>
+
+            <div class="refer-banner-compact">
+                <div class="refer-content-compact">
+                    <i class="fas fa-ticket-alt refer-icon-compact"></i>
+                    <div class="refer-text-compact">
+                        <h3>Refer & get free tournament rounds</h3>
+                        <p>Share your code and earn rewards!</p>
+                    </div>
+                </div>
+                <div class="refer-code-wrapper-compact">
+                    <code id="referralCode" class="referral-code">LOADING</code>
+                    <button class="copy-btn" id="copyReferralBtn"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD SECTION -->
+        <section id="leaderboardSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title">Global Leaderboard</h2>
+                <select id="leaderboardFilter" class="filter-select">
+                    <option value="all">All Time</option>
+                    <option value="monthly">This Month</option>
+                    <option value="weekly">This Week</option>
+                </select>
+            </div>
+            <div class="leaderboard-full" id="fullLeaderboard">
+                <div class="loading-skeleton">Loading leaderboard...</div>
+            </div>
+        </section>
+
+        <!-- EARNINGS SECTION -->
+        <section id="earningsSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title">Transaction History</h2>
+            </div>
+            <div class="earnings-stats">
+                <div class="earnings-stat-card">
+                    <span class="earnings-label">Total Withdrawn</span>
+                    <span class="earnings-amount" id="totalWithdrawn">₦0</span>
+                </div>
+                <div class="earnings-stat-card">
+                    <span class="earnings-label">Total Deposited</span>
+                    <span class="earnings-amount" id="totalDeposited">₦0</span>
+                </div>
+            </div>
+            <div class="transactions-list full-list" id="allTransactions">
+                <div class="loading-skeleton">Loading transactions...</div>
+            </div>
+        </section>
+
+        <!-- PROFILE SECTION -->
+        <section id="profileSection" class="page-section">
+            <div class="profile-header">
+                <div class="profile-avatar-large">
+                    <span id="profileInitials">NG</span>
+                </div>
+                <h2 id="profileName" class="profile-name">Loading...</h2>
+                <p id="profileUsername" class="profile-username">@username</p>
+            </div>
+            <div class="profile-stats-grid">
+                <div class="profile-stat">
+                    <span class="profile-stat-value" id="profileGamesPlayed">0</span>
+                    <span class="profile-stat-label">Games Played</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-value" id="profileWinRate">0%</span>
+                    <span class="profile-stat-label">Win Rate</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-value" id="profileStreak">0</span>
+                    <span class="profile-stat-label">Day Streak</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-value" id="profileBestScore">0</span>
+                    <span class="profile-stat-label">Best Score</span>
+                </div>
+            </div>
+            <div class="profile-info-card">
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-envelope"></i> Email</span>
+                    <span id="profileEmail" class="info-value">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-phone"></i> Phone</span>
+                    <span id="profilePhone" class="info-value">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-map-marker-alt"></i> State</span>
+                    <span id="profileState" class="info-value">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-code-branch"></i> Referral Code</span>
+                    <span id="profileReferralCode" class="info-value code-value">-</span>
+                    <button class="copy-mini-btn" id="copyProfileReferral"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-nav="home"><i class="fas fa-house"></i><span class="nav-dot"></span></button>
+        <a href="games.html" class="nav-item"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></a>
+        <button class="nav-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span class="nav-dot"></span></button>
+        <button class="nav-item" data-nav="earnings"><i class="fas fa-coins"></i><span class="nav-dot"></span></button>
+        <button class="nav-item" data-nav="profile"><i class="fas fa-user"></i><span class="nav-dot"></span></button>
+    </nav>
+
+    <!-- Desktop Sidebar -->
+    <aside class="desktop-sidebar" id="desktopSidebar">
+        <div class="sidebar-nav">
+            <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
+            <a href="games.html" class="sidebar-item"><i class="fas fa-gamepad"></i><span>Play</span></a>
+            <button class="sidebar-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span>Leaderboard</span></button>
+            <button class="sidebar-item" data-nav="earnings"><i class="fas fa-coins"></i><span>Earnings</span></button>
+            <button class="sidebar-item" data-nav="profile"><i class="fas fa-user"></i><span>Profile</span></button>
+        </div>
+    </aside>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Internal Navigation Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sections = {
+                home: document.getElementById("homeSection"),
+                leaderboard: document.getElementById("leaderboardSection"),
+                earnings: document.getElementById("earningsSection"),
+                profile: document.getElementById("profileSection")
+            };
+            const navButtons = document.querySelectorAll("[data-nav]");
+            function switchSection(sectionId) {
+                Object.keys(sections).forEach(id => sections[id].classList.remove("active-section"));
+                sections[sectionId].classList.add("active-section");
+                navButtons.forEach(btn => {
+                    if (btn.getAttribute("data-nav") === sectionId) btn.classList.add("active");
+                    else btn.classList.remove("active");
+                });
+            }
+            navButtons.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const target = btn.getAttribute("data-nav");
+                    if (target && sections[target]) {
+                        e.preventDefault();
+                        switchSection(target);
+                    }
+                });
+            });
+            // Placeholder data
+            document.getElementById("walletBalance").innerText = "0";
+        });
+    </script>
+
+    <!-- Dashboard JS (handles auth, data loading, and logout) -->
+    <script type="module" src="/js/dashboard.js"></script>
+</body>
+</html>
