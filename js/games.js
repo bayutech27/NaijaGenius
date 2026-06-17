@@ -254,7 +254,8 @@ async function loadRandomQuestions() {
     if (currentQuestions.length < TOTAL_QUESTIONS) {
       showToast(`Only ${currentQuestions.length} questions available. Starting game.`, 'warning');
     }
-    loadQuestion(0);
+    // Show countdown before first question
+    showCountdown(() => loadQuestion(0));
     return;
   }
 
@@ -297,12 +298,94 @@ async function fetchQuestionsFromFirestore() {
     if (questionType === 'regular') {
       localStorage.setItem(cacheKeyIndex, TOTAL_QUESTIONS.toString());
     }
-    loadQuestion(0);
+    // Show countdown before first question
+    showCountdown(() => loadQuestion(0));
   } catch (err) {
     console.error('Error loading questions:', err);
     showToast('Failed to load questions. Please try again.', 'error');
     setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
   }
+}
+
+// ========== COUNTDOWN OVERLAY ==========
+function showCountdown(callback) {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'countdownOverlay';
+  overlay.style.cssText = `
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10001;
+    font-family: 'Orbitron', monospace;
+  `;
+
+  // Container for the number
+  const numberContainer = document.createElement('div');
+  numberContainer.style.cssText = `
+    font-size: 8rem;
+    font-weight: 800;
+    color: #FFD700;
+    text-shadow: 0 0 40px rgba(255,215,0,0.3);
+    animation: countPulse 1s ease-in-out;
+  `;
+  // Add keyframe animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes countPulse {
+      0% { transform: scale(1.5); opacity: 0; }
+      50% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.1); opacity: 0.8; }
+    }
+    @keyframes goPulse {
+      0% { transform: scale(1.2); opacity: 0; }
+      50% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.1); opacity: 0.9; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  overlay.appendChild(numberContainer);
+
+  // Optional small label
+  const label = document.createElement('div');
+  label.style.cssText = `
+    color: #a0b3d9;
+    font-size: 1.2rem;
+    font-weight: 400;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 1rem;
+    letter-spacing: 0.15em;
+  `;
+  label.textContent = 'Get ready!';
+  overlay.appendChild(label);
+
+  document.body.appendChild(overlay);
+
+  let count = 3;
+  const interval = setInterval(() => {
+    if (count > 0) {
+      numberContainer.textContent = count;
+      // Re-trigger animation
+      numberContainer.style.animation = 'none';
+      void numberContainer.offsetHeight; // reflow
+      numberContainer.style.animation = 'countPulse 1s ease-in-out';
+      count--;
+    } else {
+      clearInterval(interval);
+      // Show "GO!" quickly
+      numberContainer.textContent = 'GO!';
+      numberContainer.style.color = '#3ED6B7';
+      numberContainer.style.textShadow = '0 0 40px rgba(62,214,183,0.3)';
+      numberContainer.style.animation = 'goPulse 0.8s ease-in-out';
+      label.textContent = 'Let\'s go!';
+      setTimeout(() => {
+        overlay.remove();
+        // Remove injected style if desired (optional)
+        if (typeof callback === 'function') callback();
+      }, 800);
+    }
+  }, 1000);
 }
 
 // ========== LOAD QUESTION ==========
