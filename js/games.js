@@ -27,6 +27,7 @@ let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, skip: 0 };
 let currentStreak = 0;
 let streakDirection = null; // 'win' or 'loss'
 let roundEnded = false;
+let isNewBest = false;          // track if current round set a new best
 
 const MAX_SCORE_PER_QUESTION = 12;
 const TOTAL_QUESTIONS = 10;
@@ -177,6 +178,7 @@ async function loadRandomQuestions() {
   roundScore = 0;
   currentStreak = 0;
   streakDirection = null;
+  isNewBest = false;
 
   // Reset lifelines to 1 each for regular (tournament already loaded)
   if (questionType === 'regular') {
@@ -747,6 +749,21 @@ async function endRound() {
   // Show loader
   showLoader('Calculating your score... Please wait.');
 
+  // Determine if new best before updating
+  let previousBest = 0;
+  try {
+    const userRef = doc(db, 'users', currentUserUID);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      const catStats = data.categoryStats || {};
+      const catKey = category;
+      previousBest = catStats[catKey]?.bestScore || 0;
+    }
+  } catch (err) {
+    console.warn('Could not read previous best:', err);
+  }
+
   try {
     const pointRef = collection(db, 'regular_points');
     await addDoc(pointRef, {
@@ -769,10 +786,15 @@ async function endRound() {
       if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0, mastery: 0 };
       const currentBest = catStats[catKey].bestScore || 0;
       const newBest = roundScore > currentBest ? roundScore : currentBest;
+      // Update best score
       await updateDoc(userRef, {
         [`categoryStats.${catKey}.played`]: increment(1),
         [`categoryStats.${catKey}.bestScore`]: newBest
       });
+      // Set new best flag if roundScore > previousBest (strictly greater)
+      if (roundScore > previousBest) {
+        isNewBest = true;
+      }
     }
   } catch (err) {
     console.error('Error saving round data:', err);
@@ -781,7 +803,7 @@ async function endRound() {
 
   // Hide loader and show modal
   hideLoader();
-  showRoundEndModal();
+  showRoundEndModal(isNewBest);
 }
 
 // ========== SHOW COMMENT MODAL ==========
@@ -825,8 +847,104 @@ function showCommentModal(comment, onClose) {
   document.body.appendChild(overlay);
 }
 
-// ========== ROUND END MODAL ==========
-function showRoundEndModal() {
+// ========== FIREWORKS ANIMATION ==========
+function showFireworks() {
+  // Create canvas overlay
+  const canvas = document.createElement('canvas');
+  canvas.id = 'fireworksCanvas';
+  canvas.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9998;
+  `;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+
+  // Particle class
+  class Particle {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.color = color;
+      const angle = Math.random() * 2 * Math.PI;
+      const speed = Math.random() * 8 + 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.alpha = 1;
+      this.decay = 0.015 + Math.random() * 0.02;
+      this.size = 4 + Math.random() * 6;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vx *= 0.98;
+      this.vy *= 0.98;
+      this.alpha -= this.decay;
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  let particles = [];
+  const colors = ['#FFD700', '#3ED6B7', '#FFFFFF', '#FF6B6B', '#FFA94D', '#A29BFE', '#FFEAA7'];
+
+  // Create multiple explosions
+  const explosions = 6;
+  for (let e = 0; e < explosions; e++) {
+    const cx = Math.random() * w * 0.6 + w * 0.2;
+    const cy = Math.random() * h * 0.5 + h * 0.1;
+    const count = 80 + Math.floor(Math.random() * 60);
+    for (let i = 0; i < count; i++) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particles.push(new Particle(cx, cy, color));
+    }
+  }
+
+  // Animation loop
+  let frameId = null;
+  let startTime = performance.now();
+  const duration = 3000; // 3 seconds
+
+  function animate(timestamp) {
+    const elapsed = timestamp - startTime;
+    if (elapsed > duration) {
+      // Remove canvas and stop
+      if (frameId) cancelAnimationFrame(frameId);
+      canvas.remove();
+      return;
+    }
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.update();
+      p.draw(ctx);
+    });
+    // Remove dead particles
+    particles = particles.filter(p => p.alpha > 0);
+    if (particles.length === 0) {
+      canvas.remove();
+      return;
+    }
+    frameId = requestAnimationFrame(animate);
+  }
+  frameId = requestAnimationFrame(animate);
+
+  // Clean up on resize
+  window.addEventListener('resize', () => {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+}
+
+// ========== ROUND END MODAL (with new best detection) ==========
+function showRoundEndModal(newBest = false) {
   const overlay = document.createElement('div');
   overlay.id = 'roundEndModal';
   overlay.style.cssText = `
@@ -862,6 +980,26 @@ function showRoundEndModal() {
   logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
   card.appendChild(logo);
 
+  // New Best Badge
+  if (newBest) {
+    const badge = document.createElement('div');
+    badge.textContent = '🏆 New Best Score!';
+    badge.style.cssText = `
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #FFD700;
+      background: rgba(255,215,0,0.12);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 40px;
+      padding: 0.4rem 1.2rem;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 0 30px rgba(255,215,0,0.15);
+    `;
+    card.appendChild(badge);
+  }
+
   const title = document.createElement('h2');
   title.textContent = `Round Complete!`;
   title.style.cssText = `font-size:1.8rem;color:#FFD700;margin:0.5rem 0 0.8rem;`;
@@ -894,6 +1032,7 @@ function showRoundEndModal() {
   playAgainBtn.addEventListener('click', () => {
     overlay.remove();
     roundEnded = false;
+    isNewBest = false;
     loadRandomQuestions();
   });
   btnContainer.appendChild(playAgainBtn);
@@ -915,4 +1054,9 @@ function showRoundEndModal() {
   card.appendChild(btnContainer);
   overlay.appendChild(card);
   document.body.appendChild(overlay);
+
+  // If new best, trigger fireworks after a short delay
+  if (newBest) {
+    setTimeout(() => showFireworks(), 300);
+  }
 }
