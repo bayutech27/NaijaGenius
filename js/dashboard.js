@@ -2,6 +2,7 @@
 import { auth, db } from "/js/firebase.config.js";
 import { doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { showFunFactModal } from './fun-fact.js';
 
 // ========== DOM ELEMENTS ==========
 const walletBalance = document.getElementById("walletBalance");
@@ -27,12 +28,10 @@ const userInitials = document.getElementById("userInitials");
 // ========== AUTH GUARD & DATA LOADING ==========
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        // Not logged in → redirect to login page
         window.location.href = "/login.html";
         return;
     }
 
-    // User is logged in – load their data
     try {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
@@ -45,21 +44,17 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userSnap.data();
 
         // ===== POPULATE DASHBOARD =====
-        // Balance
         if (walletBalance) {
             walletBalance.textContent = userData.balance || 0;
         }
 
-        // Stats
         if (totalGamesPlayed) {
             totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
         }
         if (winRate) {
-            // Calculate win rate (placeholder – you can compute from categoryStats)
             winRate.textContent = "0%";
         }
 
-        // Find highest bestScore across categories (used for both dashboard and profile)
         let best = 0;
         if (bestScoreValue) {
             const categories = userData.categoryStats || {};
@@ -69,13 +64,11 @@ onAuthStateChanged(auth, async (user) => {
             bestScoreValue.textContent = best;
         }
 
-        // Referral code
         if (referralCode) {
             referralCode.textContent = userData.referralCode || "N/A";
         }
 
         // ===== POPULATE PROFILE =====
-        // Avatar initials
         const displayName = userData.displayName || "User";
         const initials = displayName.slice(0, 2).toUpperCase();
         if (profileInitials) profileInitials.textContent = initials;
@@ -83,27 +76,28 @@ onAuthStateChanged(auth, async (user) => {
         if (profileName) profileName.textContent = displayName;
         if (profileUsername) profileUsername.textContent = `@${displayName.toLowerCase().replace(/\s/g, "")}`;
 
-        // Contact info
         if (profileEmail) profileEmail.textContent = userData.email || "-";
         if (profilePhone) profilePhone.textContent = userData.phone || "-";
         if (profileState) profileState.textContent = userData.state || "-";
         if (profileReferralCode) profileReferralCode.textContent = userData.referralCode || "-";
 
-        // Profile stats
         if (profileGamesPlayed) profileGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
         if (profileWinRate) profileWinRate.textContent = "0%";
         if (profileStreak) profileStreak.textContent = userData.loginStreak || 0;
         if (profileBestScore) profileBestScore.textContent = best;
 
-        // ===== SET UP REAL‑TIME UPDATES (optional) =====
-        // Listen for changes to the user document (balance, streak, etc.)
+        // Show fun fact modal after a short delay
+        setTimeout(() => {
+            showFunFactModal(displayName, true);
+        }, 1500);
+
+        // ===== SET UP REAL‑TIME UPDATES =====
         onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
                 const updated = docSnap.data();
                 if (walletBalance) walletBalance.textContent = updated.balance || 0;
                 if (totalGamesPlayed) totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
                 if (profileStreak) profileStreak.textContent = updated.loginStreak || 0;
-                // Recalculate best score
                 let newBest = 0;
                 const cats = updated.categoryStats || {};
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
