@@ -13,6 +13,7 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
+import { showFunFactModal } from './fun-fact.js';
 
 // ========== MODULE STATE ==========
 let currentUserUID = null;
@@ -25,9 +26,12 @@ let timerInterval = null;
 let timeLeft = 12;
 let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, skip: 0 };
 let currentStreak = 0;
-let streakDirection = null; // 'win' or 'loss'
+let streakDirection = null;
 let roundEnded = false;
-let isNewBest = false;          // track if current round set a new best
+let isNewBest = false;
+let funFactTimer = null;
+let funFactPending = false;
+let gameRoundActive = false;
 
 const MAX_SCORE_PER_QUESTION = 12;
 const TOTAL_QUESTIONS = 10;
@@ -99,6 +103,19 @@ function fisherYatesShuffle(array) {
   return array;
 }
 
+// ========== START FUN FACT TIMER ==========
+function startFunFactTimer() {
+  clearInterval(funFactTimer);
+  funFactTimer = setInterval(() => {
+    if (gameRoundActive) {
+      funFactPending = true;
+    } else {
+      showFunFactModal('', false);
+      funFactPending = false;
+    }
+  }, 600000); // 10 minutes
+}
+
 // ========== AUTH VALIDATION ==========
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -109,6 +126,7 @@ onAuthStateChanged(auth, async (user) => {
   try {
     await loadLifelines();
     await readParamsFromURL();
+    startFunFactTimer();
   } catch (err) {
     console.error('Init error:', err);
     showToast('Failed to start game. Please try again.', 'error');
@@ -116,16 +134,13 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ========== LOAD LIFELINES (regular always 1 each, tournament from Firestore) ==========
+// ========== LOAD LIFELINES ==========
 async function loadLifelines() {
-  // For regular game, always reset lifelines to 1 each
   if (questionType === 'regular') {
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
     updateLifelineUI();
     return;
   }
-
-  // For tournament, read from Firestore
   const userRef = doc(db, 'users', currentUserUID);
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
@@ -164,42 +179,37 @@ function readParamsFromURL() {
   const displayName = formatCategoryName(category);
   if (gameCategory) gameCategory.textContent = displayName;
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
-
-  // Reset lifelines based on type (already done in loadLifelines, but ensure)
   loadLifelines();
   loadRandomQuestions();
 }
 
-// ========== LOAD RANDOM QUESTIONS (with localStorage caching for regular) ==========
+// ========== LOAD RANDOM QUESTIONS ==========
 async function loadRandomQuestions() {
-  // Reset round state
   roundEnded = false;
   currentQuestionIndex = 0;
   roundScore = 0;
   currentStreak = 0;
   streakDirection = null;
   isNewBest = false;
+  funFactPending = false;
 
-  // Reset lifelines to 1 each for regular (tournament already loaded)
   if (questionType === 'regular') {
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
     updateLifelineUI();
   }
 
-  // For tournament, always fetch fresh from Firestore
   if (questionType === 'tournament') {
     await fetchQuestionsFromFirestore();
     return;
   }
 
-  // Regular game: try localStorage cache
   const cacheKeyQueue = `ng_queue_${category}`;
   const cacheKeyIndex = `ng_queue_${category}_index`;
   const cacheKeyCachedAt = `ng_queue_${category}_cached_at`;
 
   const cachedAt = localStorage.getItem(cacheKeyCachedAt);
   const now = Date.now();
-  const expiry = 86400000; // 24 hours
+  const expiry = 86400000;
 
   let useCache = false;
   let queue = null;
@@ -220,7 +230,6 @@ async function loadRandomQuestions() {
         } catch (e) { /* ignore */ }
       }
     } else {
-      // Cache expired: remove all keys
       localStorage.removeItem(cacheKeyQueue);
       localStorage.removeItem(cacheKeyIndex);
       localStorage.removeItem(cacheKeyCachedAt);
@@ -228,24 +237,19 @@ async function loadRandomQuestions() {
   }
 
   if (useCache && queue && queue.length > 0) {
-    // Use cached queue
     let selected = [];
     if (index + TOTAL_QUESTIONS <= queue.length) {
       selected = queue.slice(index, index + TOTAL_QUESTIONS);
       index += TOTAL_QUESTIONS;
     } else {
-      // Wrap around: take remaining from end, then reshuffle and take the rest
       const remaining = queue.slice(index);
       const needed = TOTAL_QUESTIONS - remaining.length;
-      // Reshuffle the entire queue
       queue = fisherYatesShuffle(queue);
       const firstPart = queue.slice(0, needed);
       selected = remaining.concat(firstPart);
-      index = needed; // after taking firstPart, we've consumed 'needed' from the beginning
+      index = needed;
     }
-    // Update localStorage with new index and reshuffled queue if we wrapped
     if (index >= queue.length) {
-      // If we've reached end, reshuffle and reset index
       queue = fisherYatesShuffle(queue);
       index = 0;
     }
@@ -256,16 +260,14 @@ async function loadRandomQuestions() {
     if (currentQuestions.length < TOTAL_QUESTIONS) {
       showToast(`Only ${currentQuestions.length} questions available. Starting game.`, 'warning');
     }
-    // Show countdown before first question
     showCountdown(() => loadQuestion(0));
     return;
   }
 
-  // No cache or expired: fetch from Firestore
   await fetchQuestionsFromFirestore();
 }
 
-// ========== FETCH QUESTIONS FROM FIRESTORE AND CACHE FOR REGULAR ==========
+// ========== FETCH QUESTIONS FROM FIRESTORE ==========
 async function fetchQuestionsFromFirestore() {
   const collectionName = questionType === 'regular' ? 'questions_regular' : 'questions_tournament';
   try {
@@ -277,10 +279,8 @@ async function fetchQuestionsFromFirestore() {
       return;
     }
     const allQuestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    // Shuffle
     const shuffled = fisherYatesShuffle(allQuestions);
 
-    // If regular, cache the full shuffled array
     if (questionType === 'regular') {
       const cacheKeyQueue = `ng_queue_${category}`;
       const cacheKeyIndex = `ng_queue_${category}_index`;
@@ -290,17 +290,14 @@ async function fetchQuestionsFromFirestore() {
       localStorage.setItem(cacheKeyCachedAt, Date.now().toString());
     }
 
-    // Take first 10
     const selected = shuffled.slice(0, TOTAL_QUESTIONS);
     if (selected.length < TOTAL_QUESTIONS) {
       showToast(`Only ${selected.length} questions available. Starting game.`, 'warning');
     }
     currentQuestions = selected;
-    // Update index if cached
     if (questionType === 'regular') {
       localStorage.setItem(cacheKeyIndex, TOTAL_QUESTIONS.toString());
     }
-    // Show countdown before first question
     showCountdown(() => loadQuestion(0));
   } catch (err) {
     console.error('Error loading questions:', err);
@@ -311,7 +308,6 @@ async function fetchQuestionsFromFirestore() {
 
 // ========== COUNTDOWN OVERLAY ==========
 function showCountdown(callback) {
-  // Create overlay
   const overlay = document.createElement('div');
   overlay.id = 'countdownOverlay';
   overlay.style.cssText = `
@@ -321,8 +317,6 @@ function showCountdown(callback) {
     z-index: 10001;
     font-family: 'Orbitron', monospace;
   `;
-
-  // Container for the number
   const numberContainer = document.createElement('div');
   numberContainer.style.cssText = `
     font-size: 8rem;
@@ -331,7 +325,6 @@ function showCountdown(callback) {
     text-shadow: 0 0 40px rgba(255,215,0,0.3);
     animation: countPulse 1s ease-in-out;
   `;
-  // Add keyframe animation
   const style = document.createElement('style');
   style.textContent = `
     @keyframes countPulse {
@@ -346,10 +339,7 @@ function showCountdown(callback) {
     }
   `;
   document.head.appendChild(style);
-
   overlay.appendChild(numberContainer);
-
-  // Optional small label
   const label = document.createElement('div');
   label.style.cssText = `
     color: #a0b3d9;
@@ -361,21 +351,18 @@ function showCountdown(callback) {
   `;
   label.textContent = 'Get ready!';
   overlay.appendChild(label);
-
   document.body.appendChild(overlay);
 
   let count = 3;
   const interval = setInterval(() => {
     if (count > 0) {
       numberContainer.textContent = count;
-      // Re-trigger animation
       numberContainer.style.animation = 'none';
-      void numberContainer.offsetHeight; // reflow
+      void numberContainer.offsetHeight;
       numberContainer.style.animation = 'countPulse 1s ease-in-out';
       count--;
     } else {
       clearInterval(interval);
-      // Show "GO!" quickly
       numberContainer.textContent = 'GO!';
       numberContainer.style.color = '#3ED6B7';
       numberContainer.style.textShadow = '0 0 40px rgba(62,214,183,0.3)';
@@ -383,7 +370,6 @@ function showCountdown(callback) {
       label.textContent = 'Let\'s go!';
       setTimeout(() => {
         overlay.remove();
-        // Remove injected style if desired (optional)
         if (typeof callback === 'function') callback();
       }, 800);
     }
@@ -392,6 +378,7 @@ function showCountdown(callback) {
 
 // ========== LOAD QUESTION ==========
 function loadQuestion(index) {
+  gameRoundActive = true;
   if (!currentQuestions || index >= currentQuestions.length) {
     endRound();
     return;
@@ -406,7 +393,6 @@ function loadQuestion(index) {
   const progress = ((index + 1) / TOTAL_QUESTIONS * 100);
   if (progressBar) progressBar.style.width = progress + '%';
   if (progressLabel) progressLabel.textContent = `Question ${index + 1} of ${TOTAL_QUESTIONS}`;
-  // Reset option buttons: remove classes and inline styles
   ['A', 'B', 'C', 'D'].forEach(letter => {
     const btn = optionBtns[letter];
     if (btn) {
@@ -441,7 +427,6 @@ function startTimer() {
     }
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      // Disable all options
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const btn = optionBtns[letter];
         if (btn) {
@@ -449,7 +434,6 @@ function startTimer() {
           btn.classList.add('disabled');
         }
       });
-      // Show correct answer with inline styles
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
       if (correctAns && optionBtns[correctAns]) {
         const correctBtn = optionBtns[correctAns];
@@ -472,10 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!btn) return;
       if (btn.disabled || btn.classList.contains('disabled')) return;
 
-      // Stop timer immediately
       clearInterval(timerInterval);
 
-      // Disable all options
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const b = optionBtns[letter];
         if (b) {
@@ -490,24 +472,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const correct = currentQ.correctAnswer;
       const pointsEarned = Math.max(0, timeLeft);
 
-      // Determine if correct
       const isCorrect = (selectedLetter === correct);
 
-      // Apply visual highlights
       if (isCorrect) {
-        // Correct button
         btn.classList.add('correct');
         btn.style.background = '#3ED6B7';
         btn.style.color = '#ffffff';
         btn.style.borderColor = '#3ED6B7';
         roundScore += pointsEarned;
       } else {
-        // Wrong button
         btn.classList.add('wrong');
         btn.style.background = 'rgba(255,92,92,0.25)';
         btn.style.color = '#ff5c5c';
         btn.style.borderColor = '#ff5c5c';
-        // Show correct answer
         if (optionBtns[correct]) {
           const correctBtn = optionBtns[correct];
           correctBtn.classList.add('correct');
@@ -517,9 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // ---- Streak Tracking & Comment Modal ----
       const handleNext = () => {
-        // after modal closes or no modal
         if (!commentTriggered) {
           setTimeout(() => nextQuestion(), 1500);
         }
@@ -527,16 +502,13 @@ document.addEventListener('DOMContentLoaded', () => {
       let commentTriggered = false;
 
       if (isCorrect) {
-        // Correct streak logic
         if (streakDirection === 'loss') {
-          // Came back from loss
           const lossCount = Math.abs(currentStreak);
           if (lossCount >= 3) {
             const comment = onCorrectAfterStreak();
             showCommentModal(comment, nextQuestion);
             commentTriggered = true;
           }
-          // Reset streak to 1 win
           currentStreak = 1;
           streakDirection = 'win';
         } else if (streakDirection === 'win') {
@@ -551,12 +523,10 @@ document.addEventListener('DOMContentLoaded', () => {
             commentTriggered = true;
           }
         } else {
-          // first correct
           currentStreak = 1;
           streakDirection = 'win';
         }
       } else {
-        // Wrong streak logic
         if (streakDirection === 'win') {
           currentStreak = -1;
           streakDirection = 'loss';
@@ -573,13 +543,11 @@ document.addEventListener('DOMContentLoaded', () => {
             commentTriggered = true;
           }
         } else {
-          // first wrong
           currentStreak = -1;
           streakDirection = 'loss';
         }
       }
 
-      // If no comment triggered, schedule next question with delay
       if (!commentTriggered) {
         setTimeout(() => nextQuestion(), 1500);
       }
@@ -613,7 +581,6 @@ lifelineFifty?.addEventListener('click', async () => {
   lifelineCounts.fifty_fifty--;
   if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
   if (lifelineCounts.fifty_fifty <= 0) lifelineFifty.classList.add('disabled');
-  // Only update Firestore for tournament
   if (questionType !== 'regular') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
@@ -689,10 +656,10 @@ lifelineSkip?.addEventListener('click', async () => {
   setTimeout(() => nextQuestion(), 500);
 });
 
-// ========== SHOW LOADER OVERLAY ==========
+// ========== SHOW LOADER ==========
 function showLoader(message = 'Wait a moment. Calculating your score...') {
   let overlay = document.getElementById('scoreLoader');
-  if (overlay) return; // already exists
+  if (overlay) return;
   overlay = document.createElement('div');
   overlay.id = 'scoreLoader';
   overlay.style.cssText = `
@@ -702,7 +669,6 @@ function showLoader(message = 'Wait a moment. Calculating your score...') {
     z-index: 10000;
     font-family: 'Poppins', sans-serif;
   `;
-  // Circular loader (Windows style)
   const spinner = document.createElement('div');
   spinner.style.cssText = `
     width: 60px; height: 60px;
@@ -718,7 +684,6 @@ function showLoader(message = 'Wait a moment. Calculating your score...') {
     }
   `;
   document.head.appendChild(style);
-
   const text = document.createElement('p');
   text.textContent = message;
   text.style.cssText = `
@@ -729,7 +694,6 @@ function showLoader(message = 'Wait a moment. Calculating your score...') {
     text-align: center;
     max-width: 300px;
   `;
-
   overlay.appendChild(spinner);
   overlay.appendChild(text);
   document.body.appendChild(overlay);
@@ -745,11 +709,20 @@ async function endRound() {
   if (roundEnded) return;
   roundEnded = true;
   clearInterval(timerInterval);
+  gameRoundActive = false;
 
-  // Show loader
+  // If a fun fact was pending, show it after the round end modal
+  if (funFactPending) {
+    funFactPending = false;
+    clearInterval(funFactTimer);
+    setTimeout(() => {
+      showFunFactModal('', false);
+      startFunFactTimer();
+    }, 2000);
+  }
+
   showLoader('Calculating your score... Please wait.');
 
-  // Determine if new best before updating
   let previousBest = 0;
   try {
     const userRef = doc(db, 'users', currentUserUID);
@@ -786,12 +759,10 @@ async function endRound() {
       if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0, mastery: 0 };
       const currentBest = catStats[catKey].bestScore || 0;
       const newBest = roundScore > currentBest ? roundScore : currentBest;
-      // Update best score
       await updateDoc(userRef, {
         [`categoryStats.${catKey}.played`]: increment(1),
         [`categoryStats.${catKey}.bestScore`]: newBest
       });
-      // Set new best flag if roundScore > previousBest (strictly greater)
       if (roundScore > previousBest) {
         isNewBest = true;
       }
@@ -801,12 +772,11 @@ async function endRound() {
     showToast('Some data could not be saved, but your round is complete.', 'warning');
   }
 
-  // Hide loader and show modal
   hideLoader();
   showRoundEndModal(isNewBest);
 }
 
-// ========== SHOW COMMENT MODAL ==========
+// ========== COMMENT MODAL ==========
 function showCommentModal(comment, onClose) {
   const overlay = document.createElement('div');
   overlay.id = 'commentModal';
@@ -816,19 +786,16 @@ function showCommentModal(comment, onClose) {
     display: flex; align-items: center; justify-content: center;
     z-index: 8888; padding: 1rem;
   `;
-
   const card = document.createElement('div');
   card.style.cssText = `
     background: rgba(20,25,40,0.95); border: 1px solid rgba(62,214,183,0.3);
     border-radius: 1.5rem; padding: 2rem; max-width: 420px; width: 100%;
     text-align: center; font-family: 'Poppins', sans-serif;
   `;
-
   const textP = document.createElement('p');
   textP.style.cssText = `font-size: 1.3rem; font-weight: 600; color: #f0f3fa; line-height: 1.6; margin-bottom: 1.5rem;`;
   textP.textContent = comment;
   card.appendChild(textP);
-
   const btn = document.createElement('button');
   btn.textContent = 'Got it! 👊';
   btn.style.cssText = `
@@ -842,14 +809,12 @@ function showCommentModal(comment, onClose) {
     if (typeof onClose === 'function') onClose();
   });
   card.appendChild(btn);
-
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 }
 
-// ========== FIREWORKS ANIMATION ==========
+// ========== FIREWORKS ==========
 function showFireworks() {
-  // Create canvas overlay
   const canvas = document.createElement('canvas');
   canvas.id = 'fireworksCanvas';
   canvas.style.cssText = `
@@ -861,7 +826,6 @@ function showFireworks() {
   let w = canvas.width = window.innerWidth;
   let h = canvas.height = window.innerHeight;
 
-  // Particle class
   class Particle {
     constructor(x, y, color) {
       this.x = x;
@@ -895,8 +859,6 @@ function showFireworks() {
 
   let particles = [];
   const colors = ['#FFD700', '#3ED6B7', '#FFFFFF', '#FF6B6B', '#FFA94D', '#A29BFE', '#FFEAA7'];
-
-  // Create multiple explosions
   const explosions = 6;
   for (let e = 0; e < explosions; e++) {
     const cx = Math.random() * w * 0.6 + w * 0.2;
@@ -908,15 +870,13 @@ function showFireworks() {
     }
   }
 
-  // Animation loop
   let frameId = null;
   let startTime = performance.now();
-  const duration = 3000; // 3 seconds
+  const duration = 3000;
 
   function animate(timestamp) {
     const elapsed = timestamp - startTime;
     if (elapsed > duration) {
-      // Remove canvas and stop
       if (frameId) cancelAnimationFrame(frameId);
       canvas.remove();
       return;
@@ -926,7 +886,6 @@ function showFireworks() {
       p.update();
       p.draw(ctx);
     });
-    // Remove dead particles
     particles = particles.filter(p => p.alpha > 0);
     if (particles.length === 0) {
       canvas.remove();
@@ -936,14 +895,13 @@ function showFireworks() {
   }
   frameId = requestAnimationFrame(animate);
 
-  // Clean up on resize
   window.addEventListener('resize', () => {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
   });
 }
 
-// ========== ROUND END MODAL (with new best detection) ==========
+// ========== ROUND END MODAL ==========
 function showRoundEndModal(newBest = false) {
   const overlay = document.createElement('div');
   overlay.id = 'roundEndModal';
@@ -980,7 +938,6 @@ function showRoundEndModal(newBest = false) {
   logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
   card.appendChild(logo);
 
-  // New Best Badge
   if (newBest) {
     const badge = document.createElement('div');
     badge.textContent = '🏆 New Best Score!';
@@ -1001,7 +958,7 @@ function showRoundEndModal(newBest = false) {
   }
 
   const title = document.createElement('h2');
-  title.textContent = `Round Complete!`;
+  title.textContent = 'Round Complete!';
   title.style.cssText = `font-size:1.8rem;color:#FFD700;margin:0.5rem 0 0.8rem;`;
   card.appendChild(title);
 
@@ -1010,7 +967,6 @@ function showRoundEndModal(newBest = false) {
   scoreDiv.textContent = roundScore + ' / 120';
   card.appendChild(scoreDiv);
 
-  // Use comments.js for end-of-round comment
   const endComment = getEndOfRoundComment(roundScore);
   const msgP = document.createElement('p');
   msgP.textContent = endComment;
@@ -1055,7 +1011,6 @@ function showRoundEndModal(newBest = false) {
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 
-  // If new best, trigger fireworks after a short delay
   if (newBest) {
     setTimeout(() => showFireworks(), 300);
   }
