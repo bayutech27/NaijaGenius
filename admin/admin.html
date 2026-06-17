@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NaijaGenius • Admin</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDK (compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="naija">Naija</span><span class="genius">Genius</span>
+                <span class="admin-badge">Admin</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" data-tab="questions">Questions Uploader</button>
+        <button class="tab-btn" data-tab="tournaments">Tournament Table</button>
+        <button class="tab-btn" data-tab="withdrawals">Withdrawals</button>
+    </nav>
+
+    <!-- Content Area -->
+    <main class="admin-content">
+        <!-- Tab 1: Questions Uploader -->
+        <section id="tab-questions" class="tab-panel active">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Upload Questions</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Question Type Dropdown -->
+                    <div class="form-group">
+                        <label for="questionType">Question Type</label>
+                        <select id="questionType" class="form-control">
+                            <option value="regular">Regular</option>
+                            <option value="tournament">Tournament</option>
+                        </select>
+                    </div>
+
+                    <!-- Drag & Drop Zone -->
+                    <div class="drop-zone" id="dropZone">
+                        <i class="icon-upload">⬆</i>
+                        <p>Drag &amp; drop your CSV here, or click to browse</p>
+                        <input type="file" id="fileInput" accept=".csv" style="display:none;" />
+                    </div>
+
+                    <!-- Sample Download -->
+                    <div class="sample-download">
+                        <button id="sampleBtn" class="btn secondary">⬇ Download Sample CSV</button>
+                    </div>
+
+                    <!-- Summary / Errors -->
+                    <div id="uploadSummary" class="upload-summary" style="display:none;"></div>
+
+                    <!-- Upload Button -->
+                    <button id="uploadBtn" class="btn primary" disabled>Upload Questions to Firestore</button>
+                    <div id="uploadProgress" class="upload-progress" style="display:none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Tournament Table -->
+        <section id="tab-tournaments" class="tab-panel">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Tournament Leaderboard</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tournamentType">Tournament Type</label>
+                            <select id="tournamentType" class="form-control">
+                                <option value="Naija Pikin">Naija Pikin</option>
+                                <option value="Ogbonge Naija">Ogbonge Naija</option>
+                                <option value="Oga Patapata">Oga Patapata</option>
+                                <option value="De Genius">De Genius</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="gameNumber">Game Number</label>
+                            <select id="gameNumber" class="form-control">
+                                <option value="">Loading games...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper" id="tournamentTableWrapper">
+                        <div class="loading-spinner" id="tournamentSpinner">Loading...</div>
+                        <table id="tournamentTable" style="display:none;">
+                            <thead>
+                                <tr><th>#</th><th>Username</th><th>Points</th><th>Position</th></tr>
+                            </thead>
+                            <tbody id="tournamentTbody"></tbody>
+                        </table>
+                        <div id="tournamentEmpty" class="empty-state" style="display:none;">No data found for this game.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: Withdrawals -->
+        <section id="tab-withdrawals" class="tab-panel">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Withdrawal Requests</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper" id="withdrawalsTableWrapper">
+                        <div class="loading-spinner" id="withdrawalsSpinner">Loading...</div>
+                        <table id="withdrawalsTable" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
+                                    <th>Tournament</th>
+                                    <th>Date</th>
+                                    <th>Winning Points</th>
+                                    <th>Position</th>
+                                    <th>Amount</th>
+                                    <th>Bank Details</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawalsTbody"></tbody>
+                        </table>
+                        <div id="withdrawalsEmpty" class="empty-state" style="display:none;">No withdrawal requests yet.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin JS -->
+    <script src="/js/admin.js"></script>
+</body>
+</html>

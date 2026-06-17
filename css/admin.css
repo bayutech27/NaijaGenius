@@ -1,0 +1,382 @@
+/* ------------------------------------------------------------------
+   Reset & Base
+------------------------------------------------------------------ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0B1120;
+    color: #CBD5E1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ------------------------------------------------------------------
+   Header
+------------------------------------------------------------------ */
+.admin-header {
+    background: #0B1120;
+    border-bottom: 1px solid #1C2A45;
+    padding: 0 2rem;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+}
+.logo .naija { color: #FFFFFF; }
+.logo .genius { color: #F5C518; }
+.admin-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #F5C518;
+    color: #0B1120;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    margin-left: 0.6rem;
+    vertical-align: middle;
+}
+
+.logout-btn {
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: 1px solid #F5C518;
+    color: #F5C518;
+    padding: 0.4rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.logout-btn:hover {
+    background: #F5C51820;
+}
+
+/* ------------------------------------------------------------------
+   Tab Bar
+------------------------------------------------------------------ */
+.tab-bar {
+    background: #0B1120;
+    border-bottom: 1px solid #1C2A45;
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    position: sticky;
+    top: 70px;
+    z-index: 99;
+    background: #0B1120;
+}
+
+.tab-btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    background: transparent;
+    border: none;
+    padding: 0.9rem 1.8rem;
+    color: #CBD5E1;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+.tab-btn:hover { color: #FFFFFF; }
+.tab-btn.active {
+    color: #F5C518;
+}
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 1.8rem;
+    right: 1.8rem;
+    height: 3px;
+    background: #F5C518;
+    border-radius: 2px;
+    animation: pulseGlow 1.5s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ------------------------------------------------------------------
+   Content
+------------------------------------------------------------------ */
+.admin-content {
+    flex: 1;
+    padding: 2rem 2rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tab-panel {
+    display: none;
+}
+.tab-panel.active {
+    display: block;
+}
+
+/* ------------------------------------------------------------------
+   Cards
+------------------------------------------------------------------ */
+.panel-card {
+    background: #1C2A45;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+.card-header {
+    margin-bottom: 1.5rem;
+}
+.card-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #FFFFFF;
+}
+
+/* ------------------------------------------------------------------
+   Forms & Controls
+------------------------------------------------------------------ */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #CBD5E1;
+    margin-bottom: 0.3rem;
+}
+.form-control {
+    width: 100%;
+    max-width: 400px;
+    background: #0B1120;
+    border: 1px solid #2a3a5a;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+.form-control:focus {
+    outline: none;
+    border-color: #F5C518;
+}
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.2rem;
+}
+.form-row .form-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+/* ------------------------------------------------------------------
+   Drop Zone
+------------------------------------------------------------------ */
+.drop-zone {
+    border: 2px dashed #2a3a5a;
+    border-radius: 16px;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+    margin-bottom: 1rem;
+}
+.drop-zone:hover {
+    border-color: #F5C518;
+    background: #0B112060;
+}
+.drop-zone.dragover {
+    border-color: #00C853;
+    background: #00C85310;
+}
+.drop-zone .icon-upload {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.drop-zone p {
+    font-size: 0.95rem;
+    color: #CBD5E1;
+}
+
+.sample-download {
+    margin-bottom: 1rem;
+}
+
+/* ------------------------------------------------------------------
+   Buttons
+------------------------------------------------------------------ */
+.btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 0.6rem 1.6rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s, transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn.primary {
+    background: #F5C518;
+    color: #0B1120;
+}
+.btn.primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.btn.secondary {
+    background: transparent;
+    border: 1px solid #F5C518;
+    color: #F5C518;
+}
+.btn.danger {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* ------------------------------------------------------------------
+   Upload Summary & Progress
+------------------------------------------------------------------ */
+.upload-summary {
+    background: #0B1120;
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    border-left: 4px solid #00C853;
+}
+.upload-summary.error {
+    border-left-color: #e74c3c;
+}
+.upload-progress {
+    margin-top: 0.8rem;
+    font-weight: 500;
+    color: #F5C518;
+}
+
+/* ------------------------------------------------------------------
+   Tables
+------------------------------------------------------------------ */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+table thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+table th {
+    background: #0B1120;
+    color: #F5C518;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.7rem 0.8rem;
+    border-bottom: 2px solid #2a3a5a;
+}
+table td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #1C2A45;
+    vertical-align: middle;
+}
+table tbody tr:hover {
+    background: #0B112060;
+}
+table tbody tr:nth-child(even) {
+    background: #0B112030;
+}
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #CBD5E1;
+    font-style: italic;
+}
+
+/* ------------------------------------------------------------------
+   Status Dropdown
+------------------------------------------------------------------ */
+.status-select {
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: #2a3a5a;
+    color: #CBD5E1;
+    cursor: pointer;
+}
+.status-select.Pending { background: #b45309; color: #fff; }
+.status-select.Paid { background: #00C853; color: #fff; }
+.status-select.Cancelled { background: #e74c3c; color: #fff; }
+
+/* ------------------------------------------------------------------
+   Loading Spinner
+------------------------------------------------------------------ */
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: #CBD5E1;
+}
+.loading-spinner::after {
+    content: '...';
+    animation: dots 1.2s steps(4) infinite;
+}
+@keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+}
+
+/* ------------------------------------------------------------------
+   Responsive
+------------------------------------------------------------------ */
+@media (max-width: 768px) {
+    .admin-header { padding: 0 1rem; }
+    .tab-bar { padding: 0 1rem; overflow-x: auto; }
+    .tab-btn { padding: 0.7rem 1rem; font-size: 0.85rem; white-space: nowrap; }
+    .admin-content { padding: 1rem; }
+    .panel-card { padding: 1rem; }
+    .form-row { flex-direction: column; gap: 0.5rem; }
+    .form-control { max-width: 100%; }
+}
+@media (max-width: 480px) {
+    .logo { font-size: 1.2rem; }
+    .admin-badge { font-size: 0.6rem; }
+}

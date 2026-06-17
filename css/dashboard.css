@@ -28,7 +28,7 @@ body {
 .naija-white { color: #FFFFFF; }
 .genius-mint { color: #00E5A0; }
 
-h1, h2, h3, .section-title, .balance-amount-compact {
+h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .tournament-name {
     font-family: 'Exo 2', sans-serif;
 }
 .section-title {
@@ -128,7 +128,7 @@ h1, h2, h3, .section-title, .balance-amount-compact {
     opacity: 0;
 }
 
-/* Balance Card (original compact style) */
+/* Balance Card */
 .balance-card-compact {
     background: linear-gradient(135deg, #12151E 0%, #1A1D2E 100%);
     border-radius: 20px;
@@ -502,7 +502,7 @@ h1, h2, h3, .section-title, .balance-amount-compact {
     width: 100%;
 }
 
-/* Bottom Navigation */
+/* ===== BOTTOM NAVIGATION (ORIGINAL - ICONS ONLY) ===== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -634,4 +634,222 @@ html { scroll-behavior: smooth; }
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== PLAY SECTION STYLES ========== */
+.hero-section { text-align: center; margin-bottom: 1.5rem; }
+.page-title {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FFF, #00E5A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.page-subtitle { color: #B0B8C8; font-size: 0.9rem; margin-top: 0.5rem; }
+
+.tab-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 0.5rem;
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #B0B8C8;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    border-radius: 40px;
+    transition: all 0.3s;
+}
+.tab-btn:hover { color: #FFF; }
+.tab-btn.active { color: #00E5A0; background: rgba(0,229,160,0.1); }
+
+.tab-content { display: none; animation: fadeUp 0.3s ease; }
+.tab-content.active { display: block; }
+
+/* Categories Grid */
+.categories-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.category-card {
+    background: #12151E;
+    border-radius: 20px;
+    padding: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: transform 0.2s, border-color 0.2s;
+}
+.category-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,229,160,0.4);
+}
+.cat-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.cat-name {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+}
+.cat-desc {
+    font-size: 0.8rem;
+    color: #B0B8C8;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+.play-btn {
+    background: linear-gradient(135deg, #00E5A0, #009e70);
+    border: none;
+    color: #0A0A0F;
+    padding: 0.6rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+}
+.play-btn:hover { transform: scale(1.02); }
+
+/* Tournament Grid */
+.tournament-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.tournament-card {
+    background: #12151E;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+}
+.free-tournament {
+    border-color: rgba(0,229,160,0.3);
+    background: linear-gradient(135deg, rgba(0,229,160,0.05), #12151E);
+}
+.tournament-card.coming-soon {
+    opacity: 0.7;
+    pointer-events: none;
+    border-color: rgba(255,255,255,0.05);
+}
+.tournament-card.coming-soon .tournament-btn {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tournament-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.7rem;
+    border-radius: 40px;
+    margin-bottom: 0.5rem;
+}
+.free { background: rgba(0,229,160,0.15); color: #00E5A0; }
+.paid { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+.tournament-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.tournament-name {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+}
+.tournament-desc {
+    font-size: 0.85rem;
+    color: #B0B8C8;
+    margin-bottom: 0.5rem;
+}
+.tournament-prize {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #FFD700;
+    margin-bottom: 1rem;
+}
+.tournament-prize span {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+}
+
+.tournament-btn {
+    background: linear-gradient(135deg, #FFD700, #f5a623);
+    border: none;
+    color: #0A0A0F;
+    padding: 0.6rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+}
+.free-tournament .tournament-btn {
+    background: linear-gradient(135deg, #00E5A0, #009e70);
+}
+.tournament-btn:hover { transform: scale(1.02); }
+.tournament-btn.disabled {
+    background: #2a3448;
+    color: #B0B8C8;
+    cursor: not-allowed;
+}
+.tournament-btn.disabled:hover { transform: none; }
+
+@media (min-width: 768px) {
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    .tournament-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* ========== MOBILE CARD HEIGHT REDUCTION ========== */
+@media (max-width: 600px) {
+    .category-card {
+        padding: 0.6rem;
+        border-radius: 16px;
+    }
+    .cat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .cat-name {
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+    }
+    .cat-desc {
+        font-size: 0.65rem;
+        margin-bottom: 0.6rem;
+        line-height: 1.3;
+    }
+    .play-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+        border-radius: 30px;
+    }
+    .play-btn i {
+        font-size: 0.7rem;
+    }
+    .categories-grid {
+        gap: 0.6rem;
+    }
 }
