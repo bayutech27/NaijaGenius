@@ -452,13 +452,8 @@ export function showFunFactModal(username = '', isLogin = false) {
     font-family: 'Poppins', sans-serif;
     box-shadow: 0 25px 45px rgba(0,0,0,0.5);
     color: #f0f3fa;
+    text-align: center;
   `;
-
-  // Logo
-  const logo = document.createElement('div');
-  logo.style.cssText = 'font-size:1.4rem;margin-bottom:1rem;font-family:Orbitron,monospace;font-weight:800;';
-  logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
-  card.appendChild(logo);
 
   // Close button
   const closeBtn = document.createElement('button');
@@ -469,7 +464,7 @@ export function showFunFactModal(username = '', isLogin = false) {
     right: 1.2rem;
     background: none;
     border: none;
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: #a0b3d9;
     cursor: pointer;
     line-height: 1;
@@ -482,7 +477,7 @@ export function showFunFactModal(username = '', isLogin = false) {
   if (isLogin && username) {
     const greeting = document.createElement('p');
     greeting.style.cssText = `
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 500;
       color: #b9c7d9;
       margin-bottom: 0.8rem;
@@ -495,11 +490,11 @@ export function showFunFactModal(username = '', isLogin = false) {
   const sub = document.createElement('span');
   sub.style.cssText = `
     color: #3ED6B7;
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
     display: block;
   `;
   sub.textContent = 'Did you know?';
@@ -509,8 +504,8 @@ export function showFunFactModal(username = '', isLogin = false) {
   const fact = document.createElement('p');
   fact.style.cssText = `
     color: #f0f3fa;
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 1.2rem;
+    line-height: 1.8;
     font-weight: 400;
     margin-bottom: 0;
   `;
@@ -526,7 +521,7 @@ export function showFunFactModal(username = '', isLogin = false) {
     padding: 0.7rem 2rem;
     border-radius: 40px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #0a0f1e;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
