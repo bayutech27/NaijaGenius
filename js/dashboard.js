@@ -58,10 +58,11 @@ onAuthStateChanged(auth, async (user) => {
             // Calculate win rate (placeholder – you can compute from categoryStats)
             winRate.textContent = "0%";
         }
+
+        // Find highest bestScore across categories (used for both dashboard and profile)
+        let best = 0;
         if (bestScoreValue) {
-            // Find the highest bestScore across categories
             const categories = userData.categoryStats || {};
-            let best = 0;
             Object.values(categories).forEach(cat => {
                 if (cat.bestScore > best) best = cat.bestScore;
             });
@@ -137,10 +138,8 @@ if (copyBtn) {
         const code = document.getElementById("referralCode")?.textContent;
         if (code && code !== "LOADING") {
             navigator.clipboard?.writeText(code).then(() => {
-                // Show toast or feedback
                 alert("Referral code copied!");
             }).catch(() => {
-                // Fallback
                 const textarea = document.createElement("textarea");
                 textarea.value = code;
                 document.body.appendChild(textarea);

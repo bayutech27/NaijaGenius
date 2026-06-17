@@ -296,7 +296,7 @@ async function handleSignup(e) {
     }, 1500);
 }
 
-// ========== HANDLE LOGIN (with admin redirection to /admin/admin.html) ==========
+// ========== HANDLE LOGIN (with admin redirection) ==========
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById("loginEmail")?.value.trim();
@@ -330,17 +330,17 @@ async function handleLogin(e) {
 
                 // Redirect based on admin status
                 if (isAdmin) {
-                    // Admin page is inside the 'admin' folder
                     window.location.href = "/admin/admin.html";
                 } else {
-                    window.location.href = "/index.html";
+                    // Regular user → dashboard
+                    window.location.href = "/app/dashboard.html";
                 }
             } else {
-                // User document not found – fallback to index
-                window.location.href = "/index.html";
+                // User document not found – fallback to login
+                window.location.href = "/login.html";
             }
         } else {
-            window.location.href = "/index.html";
+            window.location.href = "/login.html";
         }
     } catch (err) {
         let msg = "Invalid email or password";

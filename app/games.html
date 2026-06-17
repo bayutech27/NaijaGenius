@@ -3,160 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>NaijaGenius • Play</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>NaijaGenius • Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/css/games.css">
 </head>
 <body>
+    <!-- Header -->
     <header class="app-header">
         <div class="header-container">
             <div class="logo-wrapper">
                 <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
             </div>
             <div class="header-actions">
-                <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <a href="/app/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
             </div>
         </div>
     </header>
 
-    <main class="main-content">
-        <div class="hero-section">
-            <h2 class="page-title">Choose Your Challenge</h2>
-            <p class="page-subtitle">Test your knowledge across Naija's finest categories</p>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-            <button class="tab-btn active" data-tab="regular">Regular</button>
-            <button class="tab-btn" data-tab="tournament">Tournament</button>
-        </div>
-
-        <!-- Regular Categories -->
-        <div id="regularTab" class="tab-content active">
-            <div class="categories-grid">
-                <div class="category-card">
-                    <div class="cat-icon">🎵</div>
-                    <div class="cat-name">Afrobeats</div>
-                    <div class="cat-desc">From Fela to Burna Boy – lyrics, artists, albums.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">🎬</div>
-                    <div class="cat-name">Nollywood</div>
-                    <div class="cat-desc">Movies, actors, iconic lines. E go shock you.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">🗣️</div>
-                    <div class="cat-name">Lagos Slang</div>
-                    <div class="cat-desc">Street language, pidgin, and pure Naija vibes.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">⚽</div>
-                    <div class="cat-name">Super Eagles</div>
-                    <div class="cat-desc">History, players, World Cup moments, legends.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">📖</div>
-                    <div class="cat-name">Naija Proverbs</div>
-                    <div class="cat-desc">Yoruba, Igbo, Hausa wisdom. Deep culture only.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">🏛️</div>
-                    <div class="cat-name">Naija History</div>
-                    <div class="cat-desc">Independence, leaders, events that shaped Nigeria.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon">🍲</div>
-                    <div class="cat-name">Nigerian Food</div>
-                    <div class="cat-desc">Dishes, ingredients, street food. You sabi eat?</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
-                </div>
-                <!-- NEW: Naija Geography -->
-                <div class="category-card">
-                    <div class="cat-icon">🌍</div>
-                    <div class="cat-name">Naija Geography</div>
-                    <div class="cat-desc">States, capitals, rivers, mountains – know your Naija land.</div>
-                    <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+    <!-- Main Game Area -->
+    <main class="game-container">
+        <!-- Meta Bar -->
+        <div class="game-meta-bar">
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
+                <span id="gameType" class="meta-value">Regular</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-list"></i> Category</span>
+                <span id="gameCategory" class="meta-value">Afrobeats</span>
+            </div>
+            <div class="meta-item timer-wrapper">
+                <span class="meta-label"><i class="fas fa-hourglass-half"></i> Time</span>
+                <div class="circular-timer" id="timerDisplay">
+                    <svg viewBox="0 0 36 36" class="timer-svg">
+                        <path class="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="timer-progress" id="timerPath" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <span class="timer-seconds" id="timerSeconds">12</span>
                 </div>
             </div>
         </div>
 
-        <!-- Tournament Tab -->
-        <div id="tournamentTab" class="tab-content">
-            <div class="tournament-grid">
-                <!-- Free Tournament -->
-                <div class="tournament-card free-tournament">
-                    <div class="tournament-badge free">🆓 Free</div>
-                    <div class="tournament-icon">🏆</div>
-                    <div class="tournament-name">Naija Pikin</div>
-                    <div class="tournament-desc">Weekly free tournament. Win real cash!</div>
-                    <div class="tournament-prize">Prize: <span>₦5,000</span></div>
-                    <button class="tournament-btn">Enter Tournament <i class="fas fa-arrow-right"></i></button>
-                </div>
+        <!-- Progress Bar -->
+        <div class="progress-wrapper">
+            <div class="progress-bar" id="progressBar" style="width: 10%;"></div>
+            <span class="progress-label" id="progressLabel">Question 1 of 10</span>
+        </div>
 
-                <!-- Paid Tournament (Coming Soon) -->
-                <div class="tournament-card coming-soon">
-                    <div class="tournament-badge paid">⏳ Coming Soon</div>
-                    <div class="tournament-icon">🔥</div>
-                    <div class="tournament-name">Ogbonge Naija</div>
-                    <div class="tournament-desc">Paid tier. Bigger prizes, tougher questions.</div>
-                    <div class="tournament-prize">Prize Pool: <span>₦150,000</span></div>
-                    <button class="tournament-btn disabled" disabled>Coming Soon <i class="fas fa-lock"></i></button>
+        <!-- Question Box -->
+        <div class="question-box glass-card">
+            <div class="question-number" id="questionNumber">Question 1</div>
+            <p class="question-text" id="questionText">What is the capital of Nigeria?</p>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="options-grid">
+            <button class="option-btn" id="optionA" data-option="A">
+                <span class="option-letter">A</span>
+                <span class="option-text" id="optionAText">Abuja</span>
+            </button>
+            <button class="option-btn" id="optionB" data-option="B">
+                <span class="option-letter">B</span>
+                <span class="option-text" id="optionBText">Lagos</span>
+            </button>
+            <button class="option-btn" id="optionC" data-option="C">
+                <span class="option-letter">C</span>
+                <span class="option-text" id="optionCText">Kano</span>
+            </button>
+            <button class="option-btn" id="optionD" data-option="D">
+                <span class="option-letter">D</span>
+                <span class="option-text" id="optionDText">Ibadan</span>
+            </button>
+        </div>
+
+        <!-- Lifelines Row -->
+        <div class="lifelines-row">
+            <button class="lifeline-btn" id="lifelineFiftyFifty">
+                <i class="fas fa-percent"></i>
+                <span class="lifeline-label">50:50</span>
+                <span class="lifeline-count" id="countFiftyFifty">1</span>
+            </button>
+            <button class="lifeline-btn" id="lifelineAskCrowd">
+                <i class="fas fa-users"></i>
+                <span class="lifeline-label">Ask Crowd</span>
+                <span class="lifeline-count" id="countAskCrowd">1</span>
+            </button>
+            <button class="lifeline-btn" id="lifelineSkip">
+                <i class="fas fa-forward-step"></i>
+                <span class="lifeline-label">Skip</span>
+                <span class="lifeline-count" id="countSkip">1</span>
+            </button>
+        </div>
+
+        <!-- Ask Crowd Panel -->
+        <div class="crowd-panel" id="crowdPanel">
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">A</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarA" style="width: 0%;"></div>
                 </div>
+                <span class="crowd-percent" id="crowdPercentA">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">B</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarB" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentB">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">C</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarC" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentC">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">D</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarD" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentD">0%</span>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Navigation (consistent with dashboard) -->
+    <!-- Bottom Navigation - ORIGINAL ICONS ONLY -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item"><i class="fas fa-house"></i><span class="nav-dot"></span></a>
-        <a href="games.html" class="nav-item active"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></a>
-        <a href="dashboard.html#leaderboard" class="nav-item"><i class="fas fa-trophy"></i><span class="nav-dot"></span></a>
-        <a href="dashboard.html#earnings" class="nav-item"><i class="fas fa-coins"></i><span class="nav-dot"></span></a>
-        <a href="dashboard.html#profile" class="nav-item"><i class="fas fa-user"></i><span class="nav-dot"></span></a>
+        <a href="/app/dashboard.html#home" class="nav-item"><i class="fas fa-house"></i><span class="nav-dot"></span></a>
+        <a href="/app/dashboard.html#play" class="nav-item active"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></a>
+        <a href="/app/dashboard.html#leaderboard" class="nav-item"><i class="fas fa-trophy"></i><span class="nav-dot"></span></a>
+        <a href="/app/dashboard.html#earnings" class="nav-item"><i class="fas fa-coins"></i><span class="nav-dot"></span></a>
+        <a href="/app/dashboard.html#profile" class="nav-item"><i class="fas fa-user"></i><span class="nav-dot"></span></a>
     </nav>
 
-    <!-- Desktop Sidebar -->
-    <aside class="desktop-sidebar">
-        <div class="sidebar-nav">
-            <a href="dashboard.html" class="sidebar-item"><i class="fas fa-house"></i><span>Home</span></a>
-            <a href="games.html" class="sidebar-item active"><i class="fas fa-gamepad"></i><span>Play</span></a>
-            <a href="dashboard.html#leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i><span>Leaderboard</span></a>
-            <a href="dashboard.html#earnings" class="sidebar-item"><i class="fas fa-coins"></i><span>Earnings</span></a>
-            <a href="dashboard.html#profile" class="sidebar-item"><i class="fas fa-user"></i><span>Profile</span></a>
-        </div>
-    </aside>
+    <!-- Toast Container (now present) -->
+    <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Tab Switching Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tabs = document.querySelectorAll(".tab-btn");
-            const contents = {
-                regular: document.getElementById("regularTab"),
-                tournament: document.getElementById("tournamentTab")
-            };
-
-            tabs.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    // Update active tab button
-                    tabs.forEach(b => b.classList.remove("active"));
-                    btn.classList.add("active");
-
-                    // Show corresponding content
-                    const tabId = btn.getAttribute("data-tab");
-                    Object.keys(contents).forEach(key => {
-                        contents[key].classList.toggle("active", key === tabId);
-                    });
-                });
-            });
-        });
-    </script>
+    <script type="module" src="/js/games.js"></script>
 </body>
 </html>

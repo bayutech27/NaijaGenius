@@ -2,10 +2,9 @@
 // admin.js — NaijaGenius Admin Panel (Modular Firebase v12.14.0)
 // ==================================================================
 
-// ---------- Imports from firebase.config.js ----------
+// ---------- Imports ----------
 import { auth, db } from '/js/firebase.config.js';
 
-// ---------- Direct CDN imports (v12.14.0) ----------
 import {
     collection,
     doc,
@@ -37,12 +36,11 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = '/login.html';
         return;
     }
-    // Optionally check admin role (isAdmin) – we rely on Firestore rules for admin access
     initApp();
 });
 
 // ==================================================================
-// TAB SWITCHING
+// TAB SWITCHING (lazy‑load data only when tab is clicked)
 // ==================================================================
 function initApp() {
     const tabs = document.querySelectorAll('.tab-btn');
@@ -60,13 +58,12 @@ function initApp() {
             Object.keys(panels).forEach((key) => {
                 panels[key].classList.toggle('active', key === target);
             });
-            // Refresh data when switching to tournament or withdrawals tab
+            // Load data only when the tab is first activated
             if (target === 'tournaments') loadTournaments();
             if (target === 'withdrawals') loadWithdrawals();
         });
     });
 
-    // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
         signOut(auth)
             .then(() => {
@@ -75,12 +72,42 @@ function initApp() {
             .catch(() => {});
     });
 
-    // Init uploader
+    // Initialise uploader (always available)
     initUploader();
 
-    // Load tournaments and withdrawals initially
-    loadTournaments();
-    loadWithdrawals();
+    // Do NOT auto‑load tournaments or withdrawals – they load when tab is clicked.
+}
+
+// ==================================================================
+// TOAST HELPER
+// ==================================================================
+function showToast(message, type = 'success') {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        `;
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background: #1C2A45; color: #fff; padding: 12px 20px;
+        border-radius: 8px; border-left: 4px solid ${type === 'success' ? '#00C853' : '#F5C518'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 
 // ==================================================================
@@ -97,10 +124,25 @@ function initUploader() {
 
     let parsedData = null; // { headers: [], rows: [], errors: [] }
 
-    // Click to browse
+    // Create preview container if not exists
+    let previewContainer = document.getElementById('previewContainer');
+    if (!previewContainer) {
+        previewContainer = document.createElement('div');
+        previewContainer.id = 'previewContainer';
+        previewContainer.style.cssText = `
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #0B1120;
+            border-radius: 8px;
+            padding: 1rem;
+            display: none;
+        `;
+        dropZone.parentNode.insertBefore(previewContainer, dropZone.nextSibling);
+    }
+
     dropZone.addEventListener('click', () => fileInput.click());
 
-    // Drag events
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('dragover');
@@ -141,11 +183,11 @@ function initUploader() {
 
         const headerLine = lines[0];
         const headers = headerLine.split(',').map((h) => h.trim().toLowerCase());
-        const expected = ['question', 'optiona', 'optionb', 'optionc', 'optiond', 'correctanswer', 'category'];
+        const expected = ['question', 'optiona', 'optionb', 'optionc', 'optiond', 'correctanswer', 'category', 'difficulty'];
         const valid = expected.every((h) => headers.includes(h));
         if (!valid) {
             showSummary(
-                'Invalid CSV format. Headers must be: question, optionA, optionB, optionC, optionD, correctAnswer, category',
+                'Invalid CSV format. Headers must be: question, optionA, optionB, optionC, optionD, correctAnswer, category, difficulty',
                 true
             );
             return;
@@ -171,6 +213,7 @@ function initUploader() {
         if (cleanCount === 0) {
             showSummary(`⚠️ No valid rows. All ${rows.length} rows have missing fields.`, true);
             uploadBtn.disabled = true;
+            previewContainer.style.display = 'none';
             return;
         }
 
@@ -181,6 +224,9 @@ function initUploader() {
         showSummary(msg, false);
         uploadBtn.disabled = false;
         uploadBtn.dataset.valid = 'true';
+
+        // Show preview (first 10 rows)
+        showPreview(rows, errors);
     }
 
     function showSummary(msg, isError) {
@@ -189,9 +235,38 @@ function initUploader() {
         summaryDiv.className = 'upload-summary' + (isError ? ' error' : '');
     }
 
+    function showPreview(rows, errors) {
+        const preview = document.getElementById('previewContainer');
+        if (!preview) return;
+        preview.style.display = 'block';
+        let html = `<p><strong>Total questions:</strong> ${rows.length}</p>`;
+        html += `<table style="width:100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 0.5rem;">
+            <thead><tr>`;
+        const displayHeaders = ['question', 'optionA', 'optionB', 'optionC', 'optionD', 'correctAnswer', 'category', 'difficulty'];
+        displayHeaders.forEach(h => {
+            html += `<th style="text-align:left; padding:0.3rem; border-bottom:1px solid #2a3a5a; color:#F5C518;">${h}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+        const showRows = rows.slice(0, 10);
+        showRows.forEach((row, idx) => {
+            const isError = errors.includes(idx + 2);
+            html += `<tr style="${isError ? 'background: #b4530920;' : ''}">`;
+            displayHeaders.forEach(h => {
+                const val = row[h] || '';
+                html += `<td style="padding:0.3rem; border-bottom:1px solid #1C2A45;">${val.substring(0, 30)}${val.length > 30 ? '…' : ''}</td>`;
+            });
+            html += `</tr>`;
+        });
+        if (rows.length > 10) {
+            html += `<tr><td colspan="8" style="padding:0.5rem; text-align:center; color:#CBD5E1;">... and ${rows.length - 10} more rows</td></tr>`;
+        }
+        html += `</tbody></table>`;
+        preview.innerHTML = html;
+    }
+
     // Sample CSV download
     sampleBtn.addEventListener('click', () => {
-        const headers = ['question', 'optionA', 'optionB', 'optionC', 'optionD', 'correctAnswer', 'category'];
+        const headers = ['question', 'optionA', 'optionB', 'optionC', 'optionD', 'correctAnswer', 'category', 'difficulty'];
         const rows = [
             [
                 'Who was the first president of Nigeria?',
@@ -201,6 +276,7 @@ function initUploader() {
                 'Olusegun Obasanjo',
                 'Nnamdi Azikiwe',
                 'History',
+                'medium'
             ],
             [
                 'What is the capital of Lagos State?',
@@ -210,7 +286,8 @@ function initUploader() {
                 'Lekki',
                 'Ikeja',
                 'Geography',
-            ],
+                'easy'
+            ]
         ];
         let csv = headers.join(',') + '\n';
         rows.forEach((r) => (csv += r.join(',') + '\n'));
@@ -258,6 +335,7 @@ function initUploader() {
                         optionD: row.optiond,
                         correctAnswer: row.correctanswer,
                         category: row.category,
+                        difficulty: row.difficulty || 'medium',
                         uploadedAt: serverTimestamp(),
                     });
                 });
@@ -267,30 +345,55 @@ function initUploader() {
             }
             progressDiv.textContent = `✅ Upload complete — ${cleanRows.length} questions added.`;
             uploadBtn.disabled = false;
+            showToast(`✅ ${cleanRows.length} questions uploaded to ${collectionName} successfully!`, 'success');
+            // Clear preview and form
+            const preview = document.getElementById('previewContainer');
+            if (preview) preview.style.display = 'none';
+            fileInput.value = '';
+            parsedData = null;
+            summaryDiv.style.display = 'none';
+
+            // Optional: verify by reading a few documents
+            try {
+                const q = query(collection(db, collectionName), limit(3));
+                const snap = await getDocs(q);
+                console.log(`Verification: ${snap.size} documents found in ${collectionName}`);
+            } catch (err) {
+                console.warn('Could not verify upload:', err);
+            }
         } catch (err) {
             progressDiv.textContent = `❌ Upload failed: ${err.message}`;
             uploadBtn.disabled = false;
+            showToast(`❌ Upload failed: ${err.message}`, 'error');
         }
     });
 }
 
 // ==================================================================
-// 2. TOURNAMENT LEADERBOARD
+// 2. TOURNAMENT LEADERBOARD (lazy‑loaded)
 // ==================================================================
 let tournamentType = 'Naija Pikin';
 let currentGameNumber = null;
 
 function loadTournaments() {
+    // Only set up once
     const typeSelect = document.getElementById('tournamentType');
     const gameSelect = document.getElementById('gameNumber');
 
-    typeSelect.addEventListener('change', () => {
-        tournamentType = typeSelect.value;
+    // Remove previous listeners to avoid duplicates
+    typeSelect.replaceWith(typeSelect.cloneNode(true));
+    gameSelect.replaceWith(gameSelect.cloneNode(true));
+
+    const newTypeSelect = document.getElementById('tournamentType');
+    const newGameSelect = document.getElementById('gameNumber');
+
+    newTypeSelect.addEventListener('change', () => {
+        tournamentType = newTypeSelect.value;
         populateGameNumbers(tournamentType);
     });
 
-    gameSelect.addEventListener('change', () => {
-        currentGameNumber = parseInt(gameSelect.value);
+    newGameSelect.addEventListener('change', () => {
+        currentGameNumber = parseInt(newGameSelect.value);
         if (!isNaN(currentGameNumber)) {
             loadLeaderboard(tournamentType, currentGameNumber);
         }
@@ -311,6 +414,8 @@ async function populateGameNumbers(type) {
     spinner.style.display = 'block';
 
     try {
+        // This query requires a composite index on `tournaments`:
+        // Fields: type (ascending), gameNumber (descending)
         const q = query(
             collection(db, 'tournaments'),
             where('type', '==', type),
@@ -357,7 +462,6 @@ function loadLeaderboard(type, gameNumber) {
     spinner.style.display = 'block';
     tbody.innerHTML = '';
 
-    // Find tournament doc by type + gameNumber
     const q = query(
         collection(db, 'tournaments'),
         where('type', '==', type),
@@ -372,7 +476,6 @@ function loadLeaderboard(type, gameNumber) {
                 return;
             }
             const docId = snapshot.docs[0].id;
-            // Now get leaderboard subcollection
             return getDocs(
                 query(collection(db, 'tournaments', docId, 'leaderboard'), orderBy('position', 'asc'))
             );
@@ -406,9 +509,17 @@ function loadLeaderboard(type, gameNumber) {
 }
 
 // ==================================================================
-// 3. WITHDRAWALS (real‑time listener)
+// 3. WITHDRAWALS (lazy‑loaded, real‑time)
 // ==================================================================
+let withdrawalsUnsubscribe = null;
+
 function loadWithdrawals() {
+    // If already listening, detach to avoid duplicates
+    if (withdrawalsUnsubscribe) {
+        withdrawalsUnsubscribe();
+        withdrawalsUnsubscribe = null;
+    }
+
     const tbody = document.getElementById('withdrawalsTbody');
     const table = document.getElementById('withdrawalsTable');
     const spinner = document.getElementById('withdrawalsSpinner');
@@ -419,10 +530,9 @@ function loadWithdrawals() {
     spinner.style.display = 'block';
     tbody.innerHTML = '';
 
-    // Real‑time listener
     const q = query(collection(db, 'withdrawals'), orderBy('date', 'desc'));
 
-    onSnapshot(
+    withdrawalsUnsubscribe = onSnapshot(
         q,
         (snapshot) => {
             spinner.style.display = 'none';
@@ -468,7 +578,6 @@ function loadWithdrawals() {
             });
             tbody.innerHTML = html;
 
-            // Attach change events to status selects
             document.querySelectorAll('.status-select').forEach((sel) => {
                 sel.addEventListener('change', function () {
                     const docId = this.dataset.docid;
