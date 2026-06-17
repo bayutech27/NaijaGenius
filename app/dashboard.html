@@ -72,7 +72,7 @@
 
             <div class="section-header">
                 <h2 class="section-title">Active Challenges</h2>
-                <a href="games.html" class="section-link" data-nav="play">View All</a>
+                <button class="section-link" data-nav="play">View All</button>
             </div>
             <div class="horizontal-scroll" id="activeChallenges">
                 <div class="loading-skeleton">Loading challenges...</div>
@@ -108,6 +108,99 @@
                 <div class="refer-code-wrapper-compact">
                     <code id="referralCode" class="referral-code">LOADING</code>
                     <button class="copy-btn" id="copyReferralBtn"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLAY SECTION -->
+        <section id="playSection" class="page-section">
+            <div class="hero-section">
+                <h2 class="page-title">Choose Your Challenge</h2>
+                <p class="page-subtitle">Test your knowledge across Naija's finest categories</p>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="regular">Regular</button>
+                <button class="tab-btn" data-tab="tournament">Tournament</button>
+            </div>
+
+            <div id="regularTab" class="tab-content active">
+                <div class="categories-grid" id="categoriesGrid">
+                    <div class="category-card" data-category="afrobeats">
+                        <div class="cat-icon">🎵</div>
+                        <div class="cat-name">Afrobeats</div>
+                        <div class="cat-desc">From Fela to Burna Boy – lyrics, artists, albums.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nollywood">
+                        <div class="cat-icon">🎬</div>
+                        <div class="cat-name">Nollywood</div>
+                        <div class="cat-desc">Movies, actors, iconic lines. E go shock you.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="lagos_slang">
+                        <div class="cat-icon">🗣️</div>
+                        <div class="cat-name">Lagos Slang</div>
+                        <div class="cat-desc">Street language, pidgin, and pure Naija vibes.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="super_eagles">
+                        <div class="cat-icon">⚽</div>
+                        <div class="cat-name">Super Eagles</div>
+                        <div class="cat-desc">History, players, World Cup moments, legends.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nigeria_proverbs">
+                        <div class="cat-icon">📖</div>
+                        <div class="cat-name">Naija Proverbs</div>
+                        <div class="cat-desc">Yoruba, Igbo, Hausa wisdom. Deep culture only.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nigeria_history">
+                        <div class="cat-icon">🏛️</div>
+                        <div class="cat-name">Naija History</div>
+                        <div class="cat-desc">Independence, leaders, events that shaped Nigeria.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nigeria_food">
+                        <div class="cat-icon">🍲</div>
+                        <div class="cat-name">Naija Food</div>
+                        <div class="cat-desc">Dishes, ingredients, street food. You sabi eat?</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nigeria_geography">
+                        <div class="cat-icon">🌍</div>
+                        <div class="cat-name">Naija Geography</div>
+                        <div class="cat-desc">States, capitals, rivers, mountains – know your Naija land.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="category-card" data-category="nigeria_culture">
+                        <div class="cat-icon">🎭</div>
+                        <div class="cat-name">Naija Culture</div>
+                        <div class="cat-desc">Festivals, traditions, and the vibrant Naija spirit.</div>
+                        <button class="play-btn">Play Now <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tournamentTab" class="tab-content">
+                <div class="tournament-grid">
+                    <div class="tournament-card free-tournament">
+                        <div class="tournament-badge free">🆓 Free</div>
+                        <div class="tournament-icon">🏆</div>
+                        <div class="tournament-name">Naija Pikin</div>
+                        <div class="tournament-desc">Weekly free tournament. Win real cash!</div>
+                        <div class="tournament-prize">Prize: <span>₦5,000</span></div>
+                        <button class="tournament-btn">Enter Tournament <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="tournament-card coming-soon">
+                        <div class="tournament-badge paid">⏳ Coming Soon</div>
+                        <div class="tournament-icon">🔥</div>
+                        <div class="tournament-name">Ogbonge Naija</div>
+                        <div class="tournament-desc">Paid tier. Bigger prizes, tougher questions.</div>
+                        <div class="tournament-prize">Prize Pool: <span>₦150,000</span></div>
+                        <button class="tournament-btn disabled" disabled>Coming Soon <i class="fas fa-lock"></i></button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -197,10 +290,10 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation (Mobile) -->
+    <!-- Bottom Navigation (Mobile) - ORIGINAL ICONS ONLY -->
     <nav class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-nav="home"><i class="fas fa-house"></i><span class="nav-dot"></span></button>
-        <a href="games.html" class="nav-item"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></a>
+        <button class="nav-item" data-nav="play"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></button>
         <button class="nav-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span class="nav-dot"></span></button>
         <button class="nav-item" data-nav="earnings"><i class="fas fa-coins"></i><span class="nav-dot"></span></button>
         <button class="nav-item" data-nav="profile"><i class="fas fa-user"></i><span class="nav-dot"></span></button>
@@ -210,7 +303,7 @@
     <aside class="desktop-sidebar" id="desktopSidebar">
         <div class="sidebar-nav">
             <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
-            <a href="games.html" class="sidebar-item"><i class="fas fa-gamepad"></i><span>Play</span></a>
+            <button class="sidebar-item" data-nav="play"><i class="fas fa-gamepad"></i><span>Play</span></button>
             <button class="sidebar-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span>Leaderboard</span></button>
             <button class="sidebar-item" data-nav="earnings"><i class="fas fa-coins"></i><span>Earnings</span></button>
             <button class="sidebar-item" data-nav="profile"><i class="fas fa-user"></i><span>Profile</span></button>
@@ -219,24 +312,27 @@
 
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Internal Navigation Script -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const sections = {
                 home: document.getElementById("homeSection"),
+                play: document.getElementById("playSection"),
                 leaderboard: document.getElementById("leaderboardSection"),
                 earnings: document.getElementById("earningsSection"),
                 profile: document.getElementById("profileSection")
             };
             const navButtons = document.querySelectorAll("[data-nav]");
+
             function switchSection(sectionId) {
-                Object.keys(sections).forEach(id => sections[id].classList.remove("active-section"));
-                sections[sectionId].classList.add("active-section");
+                Object.keys(sections).forEach(id => {
+                    sections[id].classList.toggle("active-section", id === sectionId);
+                });
                 navButtons.forEach(btn => {
-                    if (btn.getAttribute("data-nav") === sectionId) btn.classList.add("active");
-                    else btn.classList.remove("active");
+                    const isActive = btn.getAttribute("data-nav") === sectionId;
+                    btn.classList.toggle("active", isActive);
                 });
             }
+
             navButtons.forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const target = btn.getAttribute("data-nav");
@@ -246,12 +342,40 @@
                     }
                 });
             });
-            // Placeholder data
+
+            const tabs = document.querySelectorAll(".tab-btn");
+            const tabContents = {
+                regular: document.getElementById("regularTab"),
+                tournament: document.getElementById("tournamentTab")
+            };
+
+            tabs.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    tabs.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    const tabId = btn.getAttribute("data-tab");
+                    Object.keys(tabContents).forEach(key => {
+                        tabContents[key].classList.toggle("active", key === tabId);
+                    });
+                });
+            });
+
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            if (categoriesGrid) {
+                categoriesGrid.addEventListener('click', (e) => {
+                    const card = e.target.closest('.category-card');
+                    if (!card) return;
+                    const category = card.dataset.category;
+                    if (category) {
+                        window.location.href = `games.html?category=${category}`;
+                    }
+                });
+            }
+
             document.getElementById("walletBalance").innerText = "0";
         });
     </script>
 
-    <!-- Dashboard JS (handles auth, data loading, and logout) -->
     <script type="module" src="/js/dashboard.js"></script>
 </body>
 </html>
