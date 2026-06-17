@@ -274,8 +274,43 @@ async function fetchQuestionsFromFirestore() {
     const q = query(collection(db, collectionName), where('category', '==', category));
     const snapshot = await getDocs(q);
     if (snapshot.empty) {
-      showToast('No questions found for this category.', 'error');
-      setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+      // MODIFIED: Show message on screen instead of redirecting to dashboard
+      showToast('No questions found for this category. Please upload questions first.', 'error');
+      // Display a friendly message in the question box
+      if (questionText) {
+        questionText.textContent = '😅 Oops! No questions yet.';
+      }
+      if (questionNumber) {
+        questionNumber.textContent = 'Category: ' + formatCategoryName(category);
+      }
+      // Show a "Go Back" button
+      const goBackBtn = document.createElement('button');
+      goBackBtn.textContent = '← Go Back';
+      goBackBtn.style.cssText = `
+        background: linear-gradient(135deg, #3ED6B7, #259c84);
+        border: none;
+        padding: 0.7rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #0a0f1e;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        margin-top: 1rem;
+        display: inline-block;
+      `;
+      goBackBtn.addEventListener('click', () => {
+        window.location.href = '/app/dashboard.html';
+      });
+      // Remove any existing go-back button
+      const existingBtn = document.querySelector('.go-back-btn');
+      if (existingBtn) existingBtn.remove();
+      goBackBtn.className = 'go-back-btn';
+      // Insert after question box
+      const container = document.querySelector('.question-box');
+      if (container) {
+        container.appendChild(goBackBtn);
+      }
       return;
     }
     const allQuestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -711,7 +746,6 @@ async function endRound() {
   clearInterval(timerInterval);
   gameRoundActive = false;
 
-  // If a fun fact was pending, show it after the round end modal
   if (funFactPending) {
     funFactPending = false;
     clearInterval(funFactTimer);
