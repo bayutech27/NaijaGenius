@@ -604,11 +604,65 @@ lifelineSkip?.addEventListener('click', async () => {
   setTimeout(() => nextQuestion(), 500);
 });
 
+// ========== SHOW LOADER OVERLAY ==========
+function showLoader(message = 'Wait a moment. Calculating your score...') {
+  let overlay = document.getElementById('scoreLoader');
+  if (overlay) return; // already exists
+  overlay = document.createElement('div');
+  overlay.id = 'scoreLoader';
+  overlay.style.cssText = `
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10000;
+    font-family: 'Poppins', sans-serif;
+  `;
+  // Circular loader (Windows style)
+  const spinner = document.createElement('div');
+  spinner.style.cssText = `
+    width: 60px; height: 60px;
+    border: 6px solid rgba(255,255,255,0.1);
+    border-top-color: #3ED6B7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  `;
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const text = document.createElement('p');
+  text.textContent = message;
+  text.style.cssText = `
+    color: #f0f3fa;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 1.5rem;
+    text-align: center;
+    max-width: 300px;
+  `;
+
+  overlay.appendChild(spinner);
+  overlay.appendChild(text);
+  document.body.appendChild(overlay);
+}
+
+function hideLoader() {
+  const overlay = document.getElementById('scoreLoader');
+  if (overlay) overlay.remove();
+}
+
 // ========== END ROUND ==========
 async function endRound() {
   if (roundEnded) return;
   roundEnded = true;
   clearInterval(timerInterval);
+
+  // Show loader
+  showLoader('Calculating your score... Please wait.');
 
   try {
     const pointRef = collection(db, 'regular_points');
@@ -641,6 +695,9 @@ async function endRound() {
     console.error('Error saving round data:', err);
     showToast('Some data could not be saved, but your round is complete.', 'warning');
   }
+
+  // Hide loader and show modal
+  hideLoader();
   showRoundEndModal();
 }
 
@@ -712,7 +769,6 @@ function showRoundEndModal() {
     background: none; border: none; font-size: 2rem;
     color: #a0b3d9; cursor: pointer; font-family: 'Poppins', sans-serif;
   `;
-  // ---- FIX: redirect to dashboard play section when X is clicked ----
   closeBtn.addEventListener('click', () => {
     window.location.href = '/app/dashboard.html#play';
   });
