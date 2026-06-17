@@ -712,7 +712,10 @@ function showRoundEndModal() {
     background: none; border: none; font-size: 2rem;
     color: #a0b3d9; cursor: pointer; font-family: 'Poppins', sans-serif;
   `;
-  closeBtn.addEventListener('click', () => overlay.remove());
+  // ---- FIX: redirect to dashboard play section when X is clicked ----
+  closeBtn.addEventListener('click', () => {
+    window.location.href = '/app/dashboard.html#play';
+  });
   card.appendChild(closeBtn);
 
   const logo = document.createElement('div');
