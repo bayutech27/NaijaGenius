@@ -120,7 +120,6 @@ function initUploader() {
     const uploadBtn = document.getElementById('uploadBtn');
     const summaryDiv = document.getElementById('uploadSummary');
     const progressDiv = document.getElementById('uploadProgress');
-    const typeSelect = document.getElementById('questionType');
 
     let parsedData = null; // { headers: [], rows: [], errors: [] }
 
@@ -302,10 +301,11 @@ function initUploader() {
         URL.revokeObjectURL(url);
     });
 
-    // Upload to Firestore
+    // Upload to Firestore – always to the "questions" collection
     uploadBtn.addEventListener('click', async () => {
         if (uploadBtn.disabled) return;
-        const collectionName = typeSelect.value === 'regular' ? 'questions_regular' : 'questions_tournament';
+        // 🔁 Always upload to the single "questions" collection
+        const collectionName = 'questions';
         const cleanRows = parsedData.rows.filter((row, idx) => {
             return !parsedData.errors.includes(idx + 2);
         });
