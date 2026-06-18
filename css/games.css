@@ -91,7 +91,7 @@ body {
     align-items: center;
     text-align: center;
     flex: 1;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 .meta-label {
@@ -107,7 +107,7 @@ body {
 
 .meta-value {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #f0f3fa;
     margin-top: 2px;
 }
@@ -188,7 +188,8 @@ body {
     padding: 2rem 1.5rem;
     width: 100%;
     text-align: center;
-    box-shadow: 0 0 40px rgba(62, 214, 183, 0.15);
+    /* NEW: inset shadow for 3D hollow effect */
+    box-shadow: inset 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 40px rgba(62, 214, 183, 0.15);
     position: relative;
 }
 
@@ -222,10 +223,10 @@ body {
     margin: 0;
 }
 
-/* ========== OPTIONS GRID ========== */
+/* ========== OPTIONS GRID – SINGLE COLUMN ========== */
 .options-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;   /* changed from 1fr 1fr */
     gap: 0.75rem;
     width: 100%;
 }
@@ -235,7 +236,7 @@ body {
     backdrop-filter: blur(8px);
     border: 1.5px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 1rem 0.75rem;
+    padding: 1rem 1rem;           /* increased horizontal padding */
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -246,11 +247,13 @@ body {
     font-family: 'Poppins', sans-serif;
     font-size: 0.95rem;
     font-weight: 500;
+    /* NEW: inset shadow for 3D hollow effect */
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .option-btn:hover {
     border-color: #3ED6B7;
-    box-shadow: 0 0 20px rgba(62, 214, 183, 0.15);
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(62, 214, 183, 0.15);
 }
 
 .option-btn .option-letter {
@@ -276,13 +279,13 @@ body {
 .option-btn.correct {
     border-color: #3ED6B7;
     background: rgba(62, 214, 183, 0.15);
-    box-shadow: 0 0 30px rgba(62, 214, 183, 0.2);
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(62, 214, 183, 0.2);
 }
 
 .option-btn.wrong {
     border-color: #ff6b6b;
     background: rgba(255, 107, 107, 0.15);
-    box-shadow: 0 0 30px rgba(255, 107, 107, 0.2);
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 107, 0.2);
 }
 
 .option-btn.disabled {
@@ -290,11 +293,12 @@ body {
     pointer-events: none;
 }
 
-/* ========== LIFELINES ROW ========== */
+/* ========== LIFELINES ROW + NEXT BUTTON ========== */
 .lifelines-row {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.8rem;
     width: 100%;
     flex-wrap: wrap;
 }
@@ -353,6 +357,48 @@ body {
 .lifeline-btn:hover:not(.disabled) {
     border-color: #FFD700;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+/* NEW: Next Button – mint green with animation */
+.next-btn {
+    background: linear-gradient(135deg, #3ED6B7, #259c84);
+    border: none;
+    border-radius: 12px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0a0f1e;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-width: 80px;
+    justify-content: center;
+    /* animation: pulse-glow 2s infinite; */
+}
+
+/* Animation for next button */
+.next-btn:not(:disabled) {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(62,214,183,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(62,214,183,0); }
+    100% { box-shadow: 0 0 0 0 rgba(62,214,183,0); }
+}
+
+.next-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(62,214,183,0.4);
+}
+
+.next-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    animation: none;
 }
 
 /* ========== ASK CROWD PANEL ========== */
@@ -458,27 +504,50 @@ body {
 
 .nav-item.active .nav-dot { opacity: 1; }
 
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVE (320px – 768px) ========== */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 75px 0.8rem 70px;
+        gap: 1.2rem;
+    }
+
+    .question-text {
+        font-size: 1.3rem;
+    }
+
+    .option-btn {
+        font-size: 0.9rem;
+        padding: 0.8rem 1rem;
+        min-height: 54px;
+    }
+
+    .lifeline-btn {
+        min-width: 60px;
+        padding: 0.4rem 0.7rem;
+    }
+    .lifeline-btn i { font-size: 1.3rem; }
+    .next-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+}
+
 @media (max-width: 520px) {
     .game-container {
-        padding: 75px 0.6rem 70px;
+        padding: 70px 0.6rem 65px;
         gap: 1rem;
     }
 
     .question-text {
-        font-size: 1.2rem;
-    }
-
-    .options-grid {
-        gap: 0.5rem;
+        font-size: 1.1rem;
     }
 
     .option-btn {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.85rem;
-        min-height: 50px;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.8rem;
+        min-height: 48px;
     }
-
     .option-btn .option-letter {
         width: 28px;
         height: 28px;
@@ -486,13 +555,22 @@ body {
     }
 
     .lifeline-btn {
-        min-width: 60px;
-        padding: 0.4rem 0.6rem;
+        min-width: 50px;
+        padding: 0.3rem 0.5rem;
     }
-    .lifeline-btn i { font-size: 1.2rem; }
+    .lifeline-btn i { font-size: 1.1rem; }
+    .lifeline-label { font-size: 0.55rem; }
+    .lifeline-count { width: 16px; height: 16px; font-size: 0.5rem; top: -4px; right: -4px; }
 
-    .meta-item { min-width: 60px; }
-    .meta-value { font-size: 0.8rem; }
+    .next-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+        min-width: 60px;
+    }
+
+    .meta-item { min-width: 50px; }
+    .meta-value { font-size: 0.7rem; }
+    .meta-label { font-size: 0.5rem; }
 
     .circular-timer { width: 34px; height: 34px; }
     .timer-svg { width: 34px; height: 34px; }
@@ -500,18 +578,32 @@ body {
 }
 
 @media (max-width: 400px) {
-    .question-box { padding: 1.5rem 1rem; }
-    .question-text { font-size: 1rem; }
+    .question-box { padding: 1.5rem 0.8rem; }
+    .question-text { font-size: 0.95rem; }
 
-    .option-btn { font-size: 0.75rem; padding: 0.5rem 0.4rem; min-height: 44px; }
-    .option-btn .option-letter { width: 24px; height: 24px; font-size: 0.7rem; }
+    .option-btn {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.6rem;
+        min-height: 42px;
+    }
+    .option-btn .option-letter {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+    }
 
-    .lifeline-btn { min-width: 50px; padding: 0.3rem 0.4rem; }
-    .lifeline-btn i { font-size: 1rem; }
-    .lifeline-label { font-size: 0.55rem; }
-    .lifeline-count { width: 16px; height: 16px; font-size: 0.5rem; top: -4px; right: -4px; }
+    .lifeline-btn { min-width: 44px; padding: 0.2rem 0.3rem; }
+    .lifeline-btn i { font-size: 0.9rem; }
+    .lifeline-label { font-size: 0.5rem; }
+
+    .next-btn {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.65rem;
+        min-width: 50px;
+    }
 
     .game-meta-bar { gap: 0.2rem; }
+    .meta-item { min-width: 40px; }
 }
 
 /* ========== UTILITIES ========== */
