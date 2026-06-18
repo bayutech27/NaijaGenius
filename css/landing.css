@@ -1,4 +1,3 @@
-
 /* RESET & BASE */
 * {
   margin: 0;
@@ -21,16 +20,22 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', 'Inter', sans-serif;  /* changed to Poppins */
   background: var(--deep);
   color: var(--text);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography */
+/* Typography – keep Orbitron for logo only */
 h1, h2, h3, .logo, .section-title, .tier-name, .q-text {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+}
+.logo {
+  font-family: 'Orbitron', monospace;  /* keep for NaijaGenius */
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
 }
 
 /* NAV */
@@ -49,17 +54,9 @@ nav {
   border-bottom: 1px solid var(--border);
 }
 
-.logo {
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
-}
-
 .naija-white {
   color: #FFFFFF;
 }
-
 .genius-mint {
   color: var(--mint);
 }
@@ -74,7 +71,6 @@ nav {
   text-decoration: none;
   transition: transform 0.15s, opacity 0.15s;
 }
-
 .nav-cta:hover {
   opacity: 0.85;
   transform: translateY(-1px);
@@ -135,7 +131,7 @@ nav {
 }
 
 .hero h1 {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Orbitron', monospace;  /* keep for main heading */
   font-weight: 800;
   font-size: clamp(2.6rem, 8vw, 5rem);
   line-height: 1.05;
@@ -197,7 +193,6 @@ nav {
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 0 40px rgba(0, 229, 160, 0.3);
 }
-
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 60px rgba(0, 229, 160, 0.45);
@@ -277,7 +272,7 @@ nav {
 }
 
 .section-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
   font-weight: 800;
   font-size: clamp(1.8rem, 5vw, 2.6rem);
   letter-spacing: -0.8px;
@@ -303,7 +298,6 @@ nav {
   transition: border-color 0.2s, transform 0.2s;
   cursor: default;
 }
-
 .cat-card:hover {
   border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
@@ -322,7 +316,7 @@ nav {
 }
 
 .cat-name {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
   font-weight: 700;
   font-size: 0.95rem;
   margin-bottom: 4px;
@@ -360,7 +354,6 @@ nav {
   padding-bottom: 36px;
   position: relative;
 }
-
 .step:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -389,7 +382,7 @@ nav {
 }
 
 .step-title {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
   font-weight: 700;
   font-size: 1.05rem;
   margin-bottom: 6px;
@@ -428,7 +421,6 @@ nav {
   transition: border-color 0.2s;
 }
 
-/* Live tournament */
 .live-tournament {
   border-color: rgba(0, 229, 160, 0.5);
   background: linear-gradient(135deg, rgba(0, 229, 160, 0.05), var(--card));
@@ -443,13 +435,11 @@ nav {
   margin-right: 6px;
   animation: blink 1s infinite;
 }
-
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
 
-/* Coming soon tournaments */
 .coming-soon {
   cursor: default;
   opacity: 0.85;
@@ -459,10 +449,6 @@ nav {
 .coming-soon-badge {
   background: rgba(255, 77, 109, 0.15);
   color: var(--danger) !important;
-}
-
-.tier-badge.coming-soon-badge {
-  color: var(--danger);
 }
 
 .tier-left {
@@ -484,12 +470,10 @@ nav {
   width: fit-content;
   margin-bottom: 6px;
 }
-
 .tier-badge.free {
   background: rgba(0, 229, 160, 0.15);
   color: var(--mint);
 }
-
 .tier-badge.basic,
 .tier-badge.mid,
 .tier-badge.elite {
@@ -498,7 +482,7 @@ nav {
 }
 
 .tier-name {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
   font-weight: 800;
   font-size: 1.15rem;
 }
@@ -590,14 +574,13 @@ nav {
   border-radius: 2px;
   animation: drain 12s linear infinite;
 }
-
 @keyframes drain {
   from { width: 100%; }
   to { width: 0%; }
 }
 
 .q-text {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Poppins', sans-serif;  /* changed to Poppins */
   font-weight: 700;
   font-size: 1.05rem;
   line-height: 1.4;
@@ -623,12 +606,10 @@ nav {
   transition: border-color 0.15s, background 0.15s;
   cursor: default;
 }
-
 .option:hover {
   border-color: rgba(0, 229, 160, 0.3);
   background: rgba(0, 229, 160, 0.05);
 }
-
 .option.correct {
   border-color: var(--mint);
   background: rgba(0, 229, 160, 0.12);
@@ -647,7 +628,6 @@ nav {
   font-size: 0.75rem;
   flex-shrink: 0;
 }
-
 .option.correct .opt-letter {
   background: var(--mint);
   color: #000;
@@ -680,7 +660,7 @@ nav {
 }
 
 .cta-banner h2 {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Orbitron', monospace;  /* keep for the CTA title */
   font-weight: 800;
   font-size: clamp(1.8rem, 5vw, 2.4rem);
   letter-spacing: -0.8px;
@@ -724,14 +704,12 @@ footer {
   gap: 20px;
   margin-bottom: 20px;
 }
-
 .footer-links a {
   color: var(--muted);
   text-decoration: none;
   font-size: 0.82rem;
   transition: color 0.15s;
 }
-
 .footer-links a:hover {
   color: var(--text);
 }
