@@ -12,7 +12,7 @@ html, body {
 }
 
 body {
-    font-family: 'Inter', 'DM Sans', sans-serif;
+    font-family: 'Poppins', 'Inter', 'DM Sans', sans-serif;  /* changed to Poppins */
     color: #FFFFFF;
     min-height: 100vh;
     position: relative;
@@ -20,7 +20,7 @@ body {
 
 /* Typography */
 .brand-logo {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep Orbitron for NaijaGenius */
     font-weight: 800;
     font-size: 1.5rem;
     letter-spacing: -0.5px;
@@ -29,7 +29,7 @@ body {
 .genius-mint { color: #00E5A0; }
 
 h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .tournament-name {
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Poppins', sans-serif;  /* changed to Poppins */
 }
 .section-title {
     font-size: 1.25rem;
@@ -153,7 +153,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
     gap: 0.75rem;
 }
 .balance-amount-compact {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep for amounts */
     font-size: 1.4rem;
     font-weight: 800;
     color: #FFD700;
@@ -214,11 +214,12 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
     flex: 1;
 }
 .stat-value {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep for numbers */
     font-size: 1.125rem;
     font-weight: 700;
     color: #FFFFFF;
     word-break: break-word;
+    overflow-wrap: break-word;
 }
 .stat-label {
     font-size: 0.7rem;
@@ -351,7 +352,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
 }
 .referral-code {
     flex: 1;
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep for code */
     font-size: 0.75rem;
     background: transparent;
     border: none;
@@ -390,7 +391,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
     margin-bottom: 0.25rem;
 }
 .earnings-amount {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep for numbers */
     font-size: 1.25rem;
     font-weight: 700;
     color: #FFD700;
@@ -416,7 +417,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
     font-weight: 800;
     color: #0A0A0F;
 }
-.profile-name { font-family: 'Exo 2', sans-serif; font-size: 1.5rem; margin-bottom: 0.25rem; }
+.profile-name { font-family: 'Poppins', sans-serif; font-size: 1.5rem; margin-bottom: 0.25rem; }
 .profile-username { color: #00E5A0; }
 .profile-stats-grid {
     display: grid;
@@ -433,7 +434,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
 }
 .profile-stat-value {
     display: block;
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', monospace;  /* keep for numbers */
     font-size: 1.25rem;
     font-weight: 700;
     color: #FFD700;
@@ -581,7 +582,7 @@ h1, h2, h3, .section-title, .balance-amount-compact, .page-title, .cat-name, .to
         font-size: 1rem;
         cursor: pointer;
         transition: all 0.2s;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Poppins', sans-serif;
         text-decoration: none;
         width: 100%;
         text-align: left;
@@ -639,7 +640,7 @@ html { scroll-behavior: smooth; }
 /* ========== PLAY SECTION STYLES ========== */
 .hero-section { text-align: center; margin-bottom: 1.5rem; }
 .page-title {
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Poppins', sans-serif;  /* changed to Poppins */
     font-size: 1.8rem;
     font-weight: 800;
     background: linear-gradient(135deg, #FFF, #00E5A0);
@@ -660,7 +661,7 @@ html { scroll-behavior: smooth; }
     background: transparent;
     border: none;
     color: #B0B8C8;
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Poppins', sans-serif;  /* changed to Poppins */
     font-weight: 600;
     font-size: 1rem;
     padding: 0.5rem 1.2rem;
@@ -693,7 +694,7 @@ html { scroll-behavior: smooth; }
 }
 .cat-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
 .cat-name {
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Poppins', sans-serif;  /* changed to Poppins */
     font-weight: 700;
     font-size: 1.2rem;
     margin-bottom: 0.3rem;
@@ -763,7 +764,7 @@ html { scroll-behavior: smooth; }
 
 .tournament-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
 .tournament-name {
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Poppins', sans-serif;  /* changed to Poppins */
     font-weight: 700;
     font-size: 1.3rem;
     margin-bottom: 0.3rem;
@@ -851,5 +852,22 @@ html { scroll-behavior: smooth; }
     }
     .categories-grid {
         gap: 0.6rem;
+    }
+
+    /* ===== HIDE STAT ICONS ON MOBILE ===== */
+    .stat-icon {
+        display: none;
+    }
+    .stat-card {
+        gap: 0.3rem;
+        padding: 0.75rem;
+    }
+    .stat-value {
+        font-size: 1rem;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+    .stat-label {
+        font-size: 0.6rem;
     }
 }
