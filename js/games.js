@@ -23,7 +23,7 @@ let currentQuestions = [];
 let currentQuestionIndex = 0;
 let roundScore = 0;
 let timerInterval = null;
-let timeLeft = 15;                         // ✅ changed from 12 to 15
+let timeLeft = 15;
 let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, skip: 0 };
 let currentStreak = 0;
 let streakDirection = null;
@@ -33,8 +33,9 @@ let funFactTimer = null;
 let funFactPending = false;
 let gameRoundActive = false;
 let questionAnswered = false;
+let lifelinesDisabled = false;                    // ← NEW: flag to disable all lifelines
 
-const MAX_SCORE_PER_QUESTION = 15;          // ✅ changed from 12 to 15
+const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
 
 // ========== DOM REFS ==========
@@ -158,13 +159,23 @@ async function loadLifelines() {
   updateLifelineUI();
 }
 
+// ========== UPDATE LIFELINE UI (MODIFIED) ==========
 function updateLifelineUI() {
+  // First, apply count-based disabling
+  const fiftyDisabled = lifelineCounts.fifty_fifty <= 0;
+  const askDisabled = lifelineCounts.ask_crowd <= 0;
+  const skipDisabled = lifelineCounts.skip <= 0;
+
+  // Then force disable all if lifelinesDisabled flag is true
+  const forceDisable = lifelinesDisabled;
+
   if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
   if (countAskCrowd) countAskCrowd.textContent = lifelineCounts.ask_crowd;
   if (countSkip) countSkip.textContent = lifelineCounts.skip;
-  lifelineFifty.classList.toggle('disabled', lifelineCounts.fifty_fifty <= 0);
-  lifelineAsk.classList.toggle('disabled', lifelineCounts.ask_crowd <= 0);
-  lifelineSkip.classList.toggle('disabled', lifelineCounts.skip <= 0);
+
+  lifelineFifty.classList.toggle('disabled', fiftyDisabled || forceDisable);
+  lifelineAsk.classList.toggle('disabled', askDisabled || forceDisable);
+  lifelineSkip.classList.toggle('disabled', skipDisabled || forceDisable);
 }
 
 // ========== READ PARAMS FROM URL ==========
@@ -196,6 +207,7 @@ async function loadRandomQuestions() {
   isNewBest = false;
   funFactPending = false;
   questionAnswered = false;
+  lifelinesDisabled = false;                     // reset flag
 
   if (questionType === 'regular') {
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
@@ -410,12 +422,14 @@ function showCountdown(callback) {
   }, 1000);
 }
 
-// ========== LOAD QUESTION ==========
+// ========== LOAD QUESTION (MODIFIED) ==========
 function loadQuestion(index) {
   gameRoundActive = true;
   questionAnswered = false;
+  lifelinesDisabled = false;                     // enable lifelines for new question
   nextBtn.disabled = true;
 
+  // Set button label based on question index
   if (index === TOTAL_QUESTIONS - 1) {
     nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
   } else {
@@ -429,8 +443,10 @@ function loadQuestion(index) {
   const q = currentQuestions[index];
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
   if (questionText) questionText.textContent = q.question;
+  // Display difficulty – capitalise first letter
   if (gameDifficulty) {
-    gameDifficulty.textContent = q.difficulty || 'Easy';
+    const rawDifficulty = q.difficulty || 'Easy';
+    gameDifficulty.textContent = rawDifficulty.charAt(0).toUpperCase() + rawDifficulty.slice(1).toLowerCase();
   }
   if (optionTexts.A) optionTexts.A.textContent = q.optionA;
   if (optionTexts.B) optionTexts.B.textContent = q.optionB;
@@ -451,13 +467,15 @@ function loadQuestion(index) {
     }
   });
   if (crowdPanel) crowdPanel.classList.remove('show');
+  // Enable lifelines based on counts (flag false)
+  updateLifelineUI();
   startTimer();
 }
 
-// ========== TIMER ==========
+// ========== TIMER (MODIFIED: disables lifelines on timeout) ==========
 function startTimer() {
   clearInterval(timerInterval);
-  timeLeft = MAX_SCORE_PER_QUESTION;      // now 15
+  timeLeft = MAX_SCORE_PER_QUESTION;
   if (timerSeconds) timerSeconds.textContent = timeLeft;
   const circumference = 2 * Math.PI * 18;
   if (timerPath) {
@@ -473,7 +491,10 @@ function startTimer() {
     }
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
+      // Timeout: mark answered, disable lifelines, enable next
       questionAnswered = true;
+      lifelinesDisabled = true;                  // disable lifelines
+      updateLifelineUI();
       nextBtn.disabled = false;
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const btn = optionBtns[letter];
@@ -494,7 +515,7 @@ function startTimer() {
   }, 1000);
 }
 
-// ========== ANSWER SELECTION ==========
+// ========== ANSWER SELECTION (MODIFIED) ==========
 document.addEventListener('DOMContentLoaded', () => {
   const optionsGrid = document.querySelector('.options-grid');
   if (optionsGrid) {
@@ -542,9 +563,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Mark answered, disable lifelines, enable Next/Finish
       questionAnswered = true;
+      lifelinesDisabled = true;
+      updateLifelineUI();
       nextBtn.disabled = false;
 
+      // Streak and comment logic (unchanged)
       let commentTriggered = false;
       if (isCorrect) {
         if (streakDirection === 'loss') {
@@ -615,7 +640,7 @@ function nextQuestion() {
   }
 }
 
-// ========== LIFELINES ==========
+// ========== LIFELINES (SKIP MODIFIED) ==========
 lifelineFifty?.addEventListener('click', async () => {
   if (lifelineFifty.classList.contains('disabled')) return;
   const currentQ = currentQuestions[currentQuestionIndex];
@@ -640,6 +665,7 @@ lifelineFifty?.addEventListener('click', async () => {
       showToast('Could not save lifeline usage.', 'error');
     }
   }
+  // After using 50:50, we do NOT disable lifelines globally; keep them enabled.
 });
 
 lifelineAsk?.addEventListener('click', async () => {
@@ -688,6 +714,7 @@ lifelineAsk?.addEventListener('click', async () => {
   }
 });
 
+// ========== SKIP LIFELINE (MODIFIED: auto-advance) ==========
 lifelineSkip?.addEventListener('click', async () => {
   if (lifelineSkip.classList.contains('disabled')) return;
   clearInterval(timerInterval);
@@ -703,8 +730,12 @@ lifelineSkip?.addEventListener('click', async () => {
       showToast('Could not save lifeline usage.', 'error');
     }
   }
+  // Mark as answered, disable lifelines, and immediately go to next question
   questionAnswered = true;
-  nextBtn.disabled = false;
+  lifelinesDisabled = true;
+  updateLifelineUI();
+  // No need to enable Next – we skip automatically
+  nextQuestion();   // ← auto-advance without waiting for Next
 });
 
 // ========== SHOW LOADER ==========
@@ -1014,7 +1045,7 @@ function showRoundEndModal(newBest = false) {
 
   const scoreDiv = document.createElement('div');
   scoreDiv.style.cssText = `font-family:'Orbitron',monospace;font-size:3rem;font-weight:800;color:#3ED6B7;margin:0.5rem 0;`;
-  scoreDiv.textContent = roundScore + ' / 150';   // ✅ updated from 120 to 150
+  scoreDiv.textContent = roundScore + ' / 150';
   card.appendChild(scoreDiv);
 
   const endComment = getEndOfRoundComment(roundScore);
