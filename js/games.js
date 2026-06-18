@@ -269,21 +269,19 @@ async function loadRandomQuestions() {
 
 // ========== FETCH QUESTIONS FROM FIRESTORE ==========
 async function fetchQuestionsFromFirestore() {
-  const collectionName = questionType === 'regular' ? 'questions_regular' : 'questions_tournament';
+  // 🔁 CHANGED: both game types now fetch from the same 'questions' collection
+  const collectionName = 'questions';
   try {
     const q = query(collection(db, collectionName), where('category', '==', category));
     const snapshot = await getDocs(q);
     if (snapshot.empty) {
-      // MODIFIED: Show message on screen instead of redirecting to dashboard
       showToast('No questions found for this category. Please upload questions first.', 'error');
-      // Display a friendly message in the question box
       if (questionText) {
         questionText.textContent = '😅 Oops! No questions yet.';
       }
       if (questionNumber) {
         questionNumber.textContent = 'Category: ' + formatCategoryName(category);
       }
-      // Show a "Go Back" button
       const goBackBtn = document.createElement('button');
       goBackBtn.textContent = '← Go Back';
       goBackBtn.style.cssText = `
@@ -302,11 +300,9 @@ async function fetchQuestionsFromFirestore() {
       goBackBtn.addEventListener('click', () => {
         window.location.href = '/app/dashboard.html';
       });
-      // Remove any existing go-back button
       const existingBtn = document.querySelector('.go-back-btn');
       if (existingBtn) existingBtn.remove();
       goBackBtn.className = 'go-back-btn';
-      // Insert after question box
       const container = document.querySelector('.question-box');
       if (container) {
         container.appendChild(goBackBtn);
@@ -316,6 +312,7 @@ async function fetchQuestionsFromFirestore() {
     const allQuestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     const shuffled = fisherYatesShuffle(allQuestions);
 
+    // Cache only for regular games (tournament is NOT cached)
     if (questionType === 'regular') {
       const cacheKeyQueue = `ng_queue_${category}`;
       const cacheKeyIndex = `ng_queue_${category}_index`;
