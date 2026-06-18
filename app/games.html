@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>NaijaGenius • Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/css/games.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="/css/games.css" />
 </head>
 <body>
     <!-- Header -->
@@ -23,7 +23,7 @@
 
     <!-- Main Game Area -->
     <main class="game-container">
-        <!-- Meta Bar -->
+        <!-- Meta Bar – added Difficulty row -->
         <div class="game-meta-bar">
             <div class="meta-item">
                 <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
@@ -32,6 +32,11 @@
             <div class="meta-item">
                 <span class="meta-label"><i class="fas fa-list"></i> Category</span>
                 <span id="gameCategory" class="meta-value">Afrobeats</span>
+            </div>
+            <!-- NEW: Difficulty -->
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-signal"></i> Difficulty</span>
+                <span id="gameDifficulty" class="meta-value">Easy</span>
             </div>
             <div class="meta-item timer-wrapper">
                 <span class="meta-label"><i class="fas fa-hourglass-half"></i> Time</span>
@@ -51,13 +56,13 @@
             <span class="progress-label" id="progressLabel">Question 1 of 10</span>
         </div>
 
-        <!-- Question Box -->
+        <!-- Question Box (inset shadow applied via CSS) -->
         <div class="question-box glass-card">
             <div class="question-number" id="questionNumber">Loading…</div>
             <p class="question-text" id="questionText">Loading question…</p>
         </div>
 
-        <!-- Options Grid -->
+        <!-- Options Grid – single column (class .single-column added via CSS) -->
         <div class="options-grid">
             <button class="option-btn" id="optionA" data-option="A">
                 <span class="option-letter">A</span>
@@ -77,7 +82,7 @@
             </button>
         </div>
 
-        <!-- Lifelines Row -->
+        <!-- Lifelines Row + NEW Next Button -->
         <div class="lifelines-row">
             <button class="lifeline-btn" id="lifelineFiftyFifty">
                 <i class="fas fa-percent"></i>
@@ -93,6 +98,10 @@
                 <i class="fas fa-forward-step"></i>
                 <span class="lifeline-label">Skip</span>
                 <span class="lifeline-count" id="countSkip">1</span>
+            </button>
+            <!-- NEW: Next Button -->
+            <button class="next-btn" id="nextBtn" disabled>
+                <i class="fas fa-forward"></i> Next
             </button>
         </div>
 
@@ -129,7 +138,7 @@
         </div>
     </main>
 
-    <!-- Bottom Navigation - ORIGINAL ICONS ONLY -->
+    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="/app/dashboard.html#home" class="nav-item"><i class="fas fa-house"></i><span class="nav-dot"></span></a>
         <a href="/app/dashboard.html#play" class="nav-item active"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></a>
@@ -138,7 +147,7 @@
         <a href="/app/dashboard.html#profile" class="nav-item"><i class="fas fa-user"></i><span class="nav-dot"></span></a>
     </nav>
 
-    <!-- Toast Container (now present) -->
+    <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
     <script type="module" src="/js/games.js"></script>
