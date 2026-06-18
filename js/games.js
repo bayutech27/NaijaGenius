@@ -32,6 +32,7 @@ let isNewBest = false;
 let funFactTimer = null;
 let funFactPending = false;
 let gameRoundActive = false;
+let questionAnswered = false;   // track if current question has been answered
 
 const MAX_SCORE_PER_QUESTION = 12;
 const TOTAL_QUESTIONS = 10;
@@ -40,6 +41,7 @@ const TOTAL_QUESTIONS = 10;
 const $ = (id) => document.getElementById(id);
 const gameType = $('gameType');
 const gameCategory = $('gameCategory');
+const gameDifficulty = $('gameDifficulty');
 const timerSeconds = $('timerSeconds');
 const timerPath = $('timerPath');
 const progressBar = $('progressBar');
@@ -54,6 +56,7 @@ const countSkip = $('countSkip');
 const lifelineFifty = $('lifelineFiftyFifty');
 const lifelineAsk = $('lifelineAskCrowd');
 const lifelineSkip = $('lifelineSkip');
+const nextBtn = $('nextBtn');
 const crowdPanel = $('crowdPanel');
 const crowdBarA = $('crowdBarA'); const crowdBarB = $('crowdBarB');
 const crowdBarC = $('crowdBarC'); const crowdBarD = $('crowdBarD');
@@ -179,6 +182,7 @@ function readParamsFromURL() {
   const displayName = formatCategoryName(category);
   if (gameCategory) gameCategory.textContent = displayName;
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
+  // Difficulty will be set per question later
   loadLifelines();
   loadRandomQuestions();
 }
@@ -192,6 +196,7 @@ async function loadRandomQuestions() {
   streakDirection = null;
   isNewBest = false;
   funFactPending = false;
+  questionAnswered = false;
 
   if (questionType === 'regular') {
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
@@ -269,7 +274,6 @@ async function loadRandomQuestions() {
 
 // ========== FETCH QUESTIONS FROM FIRESTORE ==========
 async function fetchQuestionsFromFirestore() {
-  // 🔁 CHANGED: both game types now fetch from the same 'questions' collection
   const collectionName = 'questions';
   try {
     const q = query(collection(db, collectionName), where('category', '==', category));
@@ -312,7 +316,6 @@ async function fetchQuestionsFromFirestore() {
     const allQuestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     const shuffled = fisherYatesShuffle(allQuestions);
 
-    // Cache only for regular games (tournament is NOT cached)
     if (questionType === 'regular') {
       const cacheKeyQueue = `ng_queue_${category}`;
       const cacheKeyIndex = `ng_queue_${category}_index`;
@@ -411,6 +414,16 @@ function showCountdown(callback) {
 // ========== LOAD QUESTION ==========
 function loadQuestion(index) {
   gameRoundActive = true;
+  questionAnswered = false;
+  nextBtn.disabled = true;
+
+  // Set button label based on question index
+  if (index === TOTAL_QUESTIONS - 1) {
+    nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
+  } else {
+    nextBtn.innerHTML = '<i class="fas fa-forward"></i> Next';
+  }
+
   if (!currentQuestions || index >= currentQuestions.length) {
     endRound();
     return;
@@ -418,6 +431,10 @@ function loadQuestion(index) {
   const q = currentQuestions[index];
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
   if (questionText) questionText.textContent = q.question;
+  // Display difficulty
+  if (gameDifficulty) {
+    gameDifficulty.textContent = q.difficulty || 'Easy';
+  }
   if (optionTexts.A) optionTexts.A.textContent = q.optionA;
   if (optionTexts.B) optionTexts.B.textContent = q.optionB;
   if (optionTexts.C) optionTexts.C.textContent = q.optionC;
@@ -459,6 +476,9 @@ function startTimer() {
     }
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
+      // Timeout: mark answered, enable next
+      questionAnswered = true;
+      nextBtn.disabled = false;
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const btn = optionBtns[letter];
         if (btn) {
@@ -474,7 +494,7 @@ function startTimer() {
         correctBtn.style.color = '#ffffff';
         correctBtn.style.borderColor = '#3ED6B7';
       }
-      setTimeout(() => nextQuestion(), 1500);
+      // do NOT auto-advance – user must click Next/Finish
     }
   }, 1000);
 }
@@ -487,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('.option-btn');
       if (!btn) return;
       if (btn.disabled || btn.classList.contains('disabled')) return;
+      if (questionAnswered) return;
 
       clearInterval(timerInterval);
 
@@ -526,19 +547,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const handleNext = () => {
-        if (!commentTriggered) {
-          setTimeout(() => nextQuestion(), 1500);
-        }
-      };
-      let commentTriggered = false;
+      // Mark answered and enable Next/Finish
+      questionAnswered = true;
+      nextBtn.disabled = false;
 
+      // Streak and comment logic
+      let commentTriggered = false;
       if (isCorrect) {
         if (streakDirection === 'loss') {
           const lossCount = Math.abs(currentStreak);
           if (lossCount >= 3) {
             const comment = onCorrectAfterStreak();
-            showCommentModal(comment, nextQuestion);
+            showCommentModal(comment, () => {});
             commentTriggered = true;
           }
           currentStreak = 1;
@@ -547,11 +567,11 @@ document.addEventListener('DOMContentLoaded', () => {
           currentStreak += 1;
           if (currentStreak === 2) {
             const comment = onTwoStreakWin();
-            showCommentModal(comment, nextQuestion);
+            showCommentModal(comment, () => {});
             commentTriggered = true;
           } else if (currentStreak === 5) {
             const comment = onFiveStreakWin();
-            showCommentModal(comment, nextQuestion);
+            showCommentModal(comment, () => {});
             commentTriggered = true;
           }
         } else {
@@ -567,11 +587,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const lossCount = Math.abs(currentStreak);
           if (lossCount === 3) {
             const comment = onThreeStreakLoss();
-            showCommentModal(comment, nextQuestion);
+            showCommentModal(comment, () => {});
             commentTriggered = true;
           } else if (lossCount === 5) {
             const comment = onFiveStreakLoss();
-            showCommentModal(comment, nextQuestion);
+            showCommentModal(comment, () => {});
             commentTriggered = true;
           }
         } else {
@@ -579,11 +599,15 @@ document.addEventListener('DOMContentLoaded', () => {
           streakDirection = 'loss';
         }
       }
-
-      if (!commentTriggered) {
-        setTimeout(() => nextQuestion(), 1500);
-      }
     });
+  }
+});
+
+// ========== NEXT BUTTON CLICK ==========
+nextBtn.addEventListener('click', () => {
+  if (nextBtn.disabled) return;
+  if (questionAnswered) {
+    nextQuestion();
   }
 });
 
@@ -593,6 +617,8 @@ function nextQuestion() {
   if (currentQuestionIndex < TOTAL_QUESTIONS) {
     loadQuestion(currentQuestionIndex);
   } else {
+    // End of round – disable next button and trigger scoring
+    nextBtn.disabled = true;
     endRound();
   }
 }
@@ -685,7 +711,10 @@ lifelineSkip?.addEventListener('click', async () => {
       showToast('Could not save lifeline usage.', 'error');
     }
   }
-  setTimeout(() => nextQuestion(), 500);
+  // Skip acts as answering – enable next
+  questionAnswered = true;
+  nextBtn.disabled = false;
+  // Do not auto-advance – user must click Next/Finish
 });
 
 // ========== SHOW LOADER ==========
