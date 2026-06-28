@@ -1,4 +1,4 @@
-```javascript
+
 // js/question/lagosSlangs.js
 
 /**
@@ -5019,4 +5019,3 @@ function lagosSlangs() {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { lagosSlangs };
 }
-``
