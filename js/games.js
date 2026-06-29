@@ -76,7 +76,74 @@ const crowdBarC = $('crowdBarC'); const crowdBarD = $('crowdBarD');
 const crowdPercentA = $('crowdPercentA'); const crowdPercentB = $('crowdPercentB');
 const crowdPercentC = $('crowdPercentC'); const crowdPercentD = $('crowdPercentD');
 
-// ========== ENHANCED TOAST ==========
+// ========== DEDICATED ERROR DISPLAY ==========
+function showErrorOnScreen(message) {
+  // Remove any existing error panel
+  const oldError = document.getElementById('gameErrorPanel');
+  if (oldError) oldError.remove();
+
+  // Create a new error panel
+  const panel = document.createElement('div');
+  panel.id = 'gameErrorPanel';
+  panel.style.cssText = `
+    background: rgba(255, 0, 0, 0.15);
+    border: 2px solid #ff4444;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    color: #ff6b6b;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  `;
+  panel.innerHTML = `
+    <span><i class="fas fa-exclamation-circle"></i> ${message}</span>
+    <button id="errorRetryBtn" style="
+      background: #ff4444;
+      border: none;
+      padding: 0.4rem 1.2rem;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    ">Retry</button>
+  `;
+
+  // Insert at the top of the game container
+  const container = document.querySelector('.game-container');
+  if (container) {
+    container.prepend(panel);
+  } else {
+    document.body.prepend(panel);
+  }
+
+  // Retry button reloads the page
+  document.getElementById('errorRetryBtn')?.addEventListener('click', () => {
+    window.location.reload();
+  });
+
+  // Also update the question card if it exists
+  if (questionText) {
+    questionText.textContent = '⚠️ ' + message;
+    questionText.style.color = '#ff6b6b';
+    questionText.style.fontWeight = '600';
+  }
+  if (questionNumber) {
+    questionNumber.textContent = 'Error';
+  }
+  // Hide options
+  ['A', 'B', 'C', 'D'].forEach(letter => {
+    const btn = optionBtns[letter];
+    if (btn) btn.style.display = 'none';
+  });
+}
+
+// ========== TOAST ==========
 function showToast(message, type = 'success', duration = 4000) {
   let container = document.getElementById('toastContainer');
   if (!container) {
@@ -90,68 +157,21 @@ function showToast(message, type = 'success', duration = 4000) {
   const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
   toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
   container.appendChild(toast);
-  
   setTimeout(() => {
     if (toast.parentNode) toast.remove();
   }, duration);
 }
 
-function displayErrorOnScreen(message) {
-  if (questionText) {
-    questionText.textContent = '⚠️ ' + message;
-    questionText.style.color = '#ff6b6b';
-    questionText.style.fontWeight = '600';
-  }
-  if (questionNumber) {
-    questionNumber.textContent = 'Error';
-  }
-  ['A', 'B', 'C', 'D'].forEach(letter => {
-    const btn = optionBtns[letter];
-    if (btn) {
-      btn.style.display = 'none';
-    }
-  });
-  const existingRetry = document.querySelector('.retry-btn');
-  if (!existingRetry) {
-    const retryBtn = document.createElement('button');
-    retryBtn.textContent = '🔄 Try Again';
-    retryBtn.className = 'retry-btn';
-    retryBtn.style.cssText = `
-      margin-top: 1.5rem;
-      padding: 0.8rem 2rem;
-      background: linear-gradient(135deg, #3ED6B7, #259c84);
-      border: none;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #0a0f1e;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-    `;
-    retryBtn.addEventListener('click', () => {
-      window.location.reload();
-    });
-    const parent = document.querySelector('.question-box');
-    if (parent) {
-      parent.appendChild(retryBtn);
-    }
-  }
-}
-
 // ========== GLOBAL ERROR HANDLING ==========
 window.onerror = function(message, source, lineno, colno, error) {
   console.error('Global error:', message, error);
-  const errorMsg = error?.message || message || 'Unknown error';
-  showToast('An unexpected error occurred. Please refresh.', 'error', 20000);
-  displayErrorOnScreen('Unexpected error: ' + errorMsg);
+  showErrorOnScreen('Unexpected error: ' + (error?.message || message));
   return true;
 };
 
 window.addEventListener('unhandledrejection', function(event) {
   console.error('Unhandled promise rejection:', event.reason);
-  const errorMsg = event.reason?.message || 'Unknown promise error';
-  showToast('Something went wrong. Please try again.', 'error', 20000);
-  displayErrorOnScreen('Error: ' + errorMsg);
+  showErrorOnScreen('Unhandled error: ' + (event.reason?.message || 'Unknown'));
   event.preventDefault();
 });
 
@@ -202,8 +222,7 @@ onAuthStateChanged(auth, async (user) => {
   console.log('🔐 Auth state changed (games):', user ? `User: ${user.uid}` : 'No user');
   
   if (!user) {
-    showToast('Please log in to play.', 'error', 20000);
-    displayErrorOnScreen('Please log in to play this game.');
+    showErrorOnScreen('Please log in to play.');
     setTimeout(() => window.location.href = '/login.html', 3000);
     return;
   }
@@ -211,14 +230,11 @@ onAuthStateChanged(auth, async (user) => {
   currentUserUID = user.uid;
   
   try {
-    // Get user data from Firestore
     const userRef = doc(db, 'users', user.uid);
     const userSnap = await getDoc(userRef);
     
     if (!userSnap.exists()) {
-      console.warn('User profile not found in Firestore.');
-      showToast('User profile not found. Please complete registration.', 'error', 20000);
-      displayErrorOnScreen('User profile not found. Please complete registration.');
+      showErrorOnScreen('User profile not found. Please complete registration.');
       setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
       return;
     }
@@ -230,9 +246,7 @@ onAuthStateChanged(auth, async (user) => {
       try {
         await import('./tournament.js');
       } catch (err) {
-        console.error('Failed to load tournament module:', err);
-        showToast('Tournament mode unavailable. Please try again.', 'error', 20000);
-        displayErrorOnScreen('Tournament mode unavailable.');
+        showErrorOnScreen('Tournament mode unavailable.');
         setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
       }
       return;
@@ -244,9 +258,7 @@ onAuthStateChanged(auth, async (user) => {
     
   } catch (err) {
     console.error('Init error:', err);
-    const msg = err.message || 'Failed to start game.';
-    showToast(msg, 'error', 20000);
-    displayErrorOnScreen(msg);
+    showErrorOnScreen('Failed to start game: ' + (err.message || 'Unknown error'));
     setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
   }
 });
@@ -259,16 +271,14 @@ async function loadLifelines() {
     return;
   }
   try {
-    if (!currentUserData) {
-      throw new Error('User data not loaded.');
-    }
+    if (!currentUserData) throw new Error('User data not loaded.');
     lifelineCounts.fifty_fifty = currentUserData.lifeline?.fifty_fifty ?? 3;
     lifelineCounts.ask_crowd = currentUserData.lifeline?.ask_crowd ?? 3;
     lifelineCounts.skip = currentUserData.lifeline?.skip ?? 3;
     updateLifelineUI();
   } catch (err) {
     console.error('Failed to load lifelines:', err);
-    showToast('Could not load lifelines. Please refresh.', 'error', 20000);
+    showErrorOnScreen('Could not load lifelines. Please refresh.');
     throw err;
   }
 }
@@ -299,11 +309,9 @@ function readParamsFromURL() {
   console.log('📖 Reading params:', { rawCategory, rawType, exportNameParam });
   
   if (!rawCategory) {
-    const err = new Error('No category selected.');
-    showToast(err.message, 'error', 20000);
-    displayErrorOnScreen('No category selected. Redirecting...');
+    showErrorOnScreen('No category selected. Redirecting...');
     setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
-    throw err;
+    throw new Error('Missing category');
   }
   
   category = rawCategory;
@@ -316,19 +324,18 @@ function readParamsFromURL() {
   if (exportNameParam) {
     loadQuestionsFromJS(exportNameParam);
   } else {
-    const err = new Error('No question bank specified.');
-    showToast(err.message, 'error', 20000);
-    displayErrorOnScreen('Missing question bank. Redirecting...');
+    showErrorOnScreen('Missing question bank. Redirecting...');
     setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
-    throw err;
+    throw new Error('Missing export parameter');
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK ==========
+// ========== LOAD QUESTIONS FROM JS BANK (with multiple fallbacks) ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
   try {
+    // Map export names to file names
     const exportMap = {
       'afrobeats': { file: 'afrobeats.js', export: 'afrobeats' },
       'nollywood': { file: 'nollywood.js', export: 'nollywood' },
@@ -347,21 +354,50 @@ async function loadQuestionsFromJS(exportNameParam) {
       throw new Error(`Question bank '${exportNameParam}' not found.`);
     }
     
-    const baseDir = new URL('.', import.meta.url).href;
-    const questionUrl = new URL(`questions/${mapping.file}`, baseDir).href;
-    console.log('📦 Importing from:', questionUrl);
+    let questionBank = null;
+    let lastError = null;
     
-    let module;
+    // Attempt 1: Absolute path from root
+    const path1 = `/js/questions/${mapping.file}`;
+    console.log('📦 Attempting import from:', path1);
     try {
-      module = await import(questionUrl);
-    } catch (primaryError) {
-      console.warn('Primary import failed, trying fallback:', primaryError);
-      const fallbackUrl = `./questions/${mapping.file}`;
-      console.log('📦 Fallback import from:', fallbackUrl);
-      module = await import(fallbackUrl);
+      const module = await import(path1);
+      questionBank = module[mapping.export] || module.default;
+    } catch (e) {
+      lastError = e;
+      console.warn('Attempt 1 failed:', e);
     }
     
-    const questionBank = module[mapping.export] || module.default;
+    // Attempt 2: Relative path from current script
+    if (!questionBank) {
+      const path2 = `./questions/${mapping.file}`;
+      console.log('📦 Attempting import from:', path2);
+      try {
+        const module = await import(path2);
+        questionBank = module[mapping.export] || module.default;
+      } catch (e) {
+        lastError = e;
+        console.warn('Attempt 2 failed:', e);
+      }
+    }
+    
+    // Attempt 3: Using import.meta.url to build full URL
+    if (!questionBank) {
+      try {
+        const baseDir = new URL('.', import.meta.url).href;
+        const path3 = new URL(`questions/${mapping.file}`, baseDir).href;
+        console.log('📦 Attempting import from:', path3);
+        const module = await import(path3);
+        questionBank = module[mapping.export] || module.default;
+      } catch (e) {
+        lastError = e;
+        console.warn('Attempt 3 failed:', e);
+      }
+    }
+    
+    if (!questionBank) {
+      throw new Error(`Failed to load question bank after multiple attempts. Last error: ${lastError?.message || 'Unknown'}`);
+    }
     
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
     
@@ -369,6 +405,7 @@ async function loadQuestionsFromJS(exportNameParam) {
       throw new Error('Question bank is empty or invalid.');
     }
     
+    // Shuffle and select 10 random questions
     const shuffled = fisherYatesShuffle([...questionBank]);
     const selected = shuffled.slice(0, Math.min(TOTAL_QUESTIONS, shuffled.length));
     
@@ -386,13 +423,14 @@ async function loadQuestionsFromJS(exportNameParam) {
       gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     }
     
+    // Start the game with countdown
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
     console.error('❌ Error loading question bank:', err);
     const msg = err.message || 'Failed to load questions.';
+    showErrorOnScreen(msg);
     showToast(msg, 'error', 20000);
-    displayErrorOnScreen(msg + ' Please refresh or go back.');
     setTimeout(() => {
       if (!roundEnded) {
         window.location.href = '/app/dashboard.html';
@@ -474,6 +512,10 @@ function showCountdown(callback) {
 // ========== LOAD QUESTION ==========
 function loadQuestion(index) {
   console.log('📝 Loading question', index + 1, 'of', currentQuestions.length);
+  
+  // Clear any error panel if present
+  const errorPanel = document.getElementById('gameErrorPanel');
+  if (errorPanel) errorPanel.remove();
   
   gameRoundActive = true;
   questionAnswered = false;
