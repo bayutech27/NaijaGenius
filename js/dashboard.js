@@ -23,6 +23,8 @@ function getGreeting() {
 
 // ========== AUTH GUARD & DATA LOADING ==========
 onAuthStateChanged(auth, async (user) => {
+    console.log('🔐 Auth state changed (dashboard):', user ? `User: ${user.uid}` : 'No user');
+    
     if (!user) {
         window.location.href = "/login.html";
         return;
@@ -34,13 +36,23 @@ onAuthStateChanged(auth, async (user) => {
 
         if (!userSnap.exists()) {
             console.warn("User profile not found in Firestore.");
+            // Use email as fallback
+            const displayName = user.email || "Player";
+            const greeting = getGreeting();
+            if (greetingText) greetingText.textContent = greeting + ",";
+            if (greetingName) greetingName.textContent = displayName;
+            
+            // Set initials from email
+            const initials = displayName.slice(0, 2).toUpperCase();
+            if (userInitials) userInitials.textContent = initials;
             return;
         }
 
         const userData = userSnap.data();
+        console.log('✅ User data loaded:', userData);
 
         // ===== GREETING =====
-        const displayName = userData.displayName || userData.username || "Player";
+        const displayName = userData.displayName || userData.username || user.email || "Player";
         const greeting = getGreeting();
         if (greetingText) greetingText.textContent = greeting + ",";
         if (greetingName) greetingName.textContent = displayName;
@@ -96,6 +108,9 @@ onAuthStateChanged(auth, async (user) => {
 
     } catch (error) {
         console.error("Error loading user data:", error);
+        // Fallback: show generic greeting
+        if (greetingText) greetingText.textContent = "Good Day,";
+        if (greetingName) greetingName.textContent = "Player";
     }
 });
 
@@ -112,6 +127,26 @@ document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
 });
 document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
     window.location.href = "choose-your-lane.html";
+});
+
+// ========== NAVIGATION ==========
+document.querySelectorAll("[data-nav]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        const target = btn.getAttribute("data-nav");
+        if (target) {
+            document.querySelectorAll(".page-section").forEach(section => {
+                section.classList.remove("active-section");
+            });
+            const targetSection = document.getElementById(target + "Section");
+            if (targetSection) {
+                targetSection.classList.add("active-section");
+            }
+            document.querySelectorAll(".nav-item, .sidebar-item").forEach(item => {
+                item.classList.remove("active");
+            });
+            btn.classList.add("active");
+        }
+    });
 });
 
 console.log("Dashboard initialized successfully.");
