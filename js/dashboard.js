@@ -1,29 +1,25 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
 import { auth, db } from "/js/firebase.config.js";
-import { doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { showFunFactModal } from './fun-facts.js';   // ✅ renamed import
+import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { showFunFactModal } from './fun-facts.js';
 
 // ========== DOM ELEMENTS ==========
 const walletBalance = document.getElementById("walletBalance");
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
-const winRate = document.getElementById("winRate");
+const correctAnswersEl = document.getElementById("correctAnswers");
 const bestScoreValue = document.getElementById("bestScoreValue");
-const referralCode = document.getElementById("referralCode");
-
-// Profile elements
-const profileInitials = document.getElementById("profileInitials");
-const profileName = document.getElementById("profileName");
-const profileUsername = document.getElementById("profileUsername");
-const profileEmail = document.getElementById("profileEmail");
-const profilePhone = document.getElementById("profilePhone");
-const profileState = document.getElementById("profileState");
-const profileReferralCode = document.getElementById("profileReferralCode");
-const profileGamesPlayed = document.getElementById("profileGamesPlayed");
-const profileWinRate = document.getElementById("profileWinRate");
-const profileStreak = document.getElementById("profileStreak");
-const profileBestScore = document.getElementById("profileBestScore");
 const userInitials = document.getElementById("userInitials");
+const greetingName = document.getElementById("greetingName");
+const greetingText = document.getElementById("greetingText");
+
+// ========== HELPER: TIME-BASED GREETING ==========
+function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 17) return "Good Afternoon";
+    return "Good Evening";
+}
 
 // ========== AUTH GUARD & DATA LOADING ==========
 onAuthStateChanged(auth, async (user) => {
@@ -43,18 +39,32 @@ onAuthStateChanged(auth, async (user) => {
 
         const userData = userSnap.data();
 
-        // ===== POPULATE DASHBOARD =====
+        // ===== GREETING =====
+        const displayName = userData.displayName || userData.username || "Player";
+        const greeting = getGreeting();
+        if (greetingText) greetingText.textContent = greeting + ",";
+        if (greetingName) greetingName.textContent = displayName;
+
+        // ===== USER INITIALS (header avatar) =====
+        const initials = displayName.slice(0, 2).toUpperCase();
+        if (userInitials) userInitials.textContent = initials;
+
+        // ===== WALLET BALANCE =====
         if (walletBalance) {
             walletBalance.textContent = userData.balance || 0;
         }
 
+        // ===== GAMES PLAYED =====
         if (totalGamesPlayed) {
             totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
         }
-        if (winRate) {
-            winRate.textContent = "0%";
+
+        // ===== CORRECT ANSWERS =====
+        if (correctAnswersEl) {
+            correctAnswersEl.textContent = userData.totalCorrectAnswers || 0;
         }
 
+        // ===== BEST SCORE =====
         let best = 0;
         if (bestScoreValue) {
             const categories = userData.categoryStats || {};
@@ -64,45 +74,23 @@ onAuthStateChanged(auth, async (user) => {
             bestScoreValue.textContent = best;
         }
 
-        if (referralCode) {
-            referralCode.textContent = userData.referralCode || "N/A";
-        }
-
-        // ===== POPULATE PROFILE =====
-        const displayName = userData.displayName || "User";
-        const initials = displayName.slice(0, 2).toUpperCase();
-        if (profileInitials) profileInitials.textContent = initials;
-        if (userInitials) userInitials.textContent = initials;
-        if (profileName) profileName.textContent = displayName;
-        if (profileUsername) profileUsername.textContent = `@${displayName.toLowerCase().replace(/\s/g, "")}`;
-
-        if (profileEmail) profileEmail.textContent = userData.email || "-";
-        if (profilePhone) profilePhone.textContent = userData.phone || "-";
-        if (profileState) profileState.textContent = userData.state || "-";
-        if (profileReferralCode) profileReferralCode.textContent = userData.referralCode || "-";
-
-        if (profileGamesPlayed) profileGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
-        if (profileWinRate) profileWinRate.textContent = "0%";
-        if (profileStreak) profileStreak.textContent = userData.loginStreak || 0;
-        if (profileBestScore) profileBestScore.textContent = best;
-
-        // Show fun fact modal after a short delay
+        // ===== SHOW FUN FACT MODAL =====
         setTimeout(() => {
             showFunFactModal(displayName, true);
         }, 1500);
 
-        // ===== SET UP REAL‑TIME UPDATES =====
+        // ===== REAL‑TIME UPDATES =====
         onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
                 const updated = docSnap.data();
                 if (walletBalance) walletBalance.textContent = updated.balance || 0;
                 if (totalGamesPlayed) totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
-                if (profileStreak) profileStreak.textContent = updated.loginStreak || 0;
+                if (correctAnswersEl) correctAnswersEl.textContent = updated.totalCorrectAnswers || 0;
+
                 let newBest = 0;
                 const cats = updated.categoryStats || {};
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
                 if (bestScoreValue) bestScoreValue.textContent = newBest;
-                if (profileBestScore) profileBestScore.textContent = newBest;
             }
         });
 
@@ -111,60 +99,19 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// ========== LOGOUT ==========
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "/index.html";
-        } catch (error) {
-            console.error("Logout error:", error);
-            alert("Failed to logout. Please try again.");
-        }
-    });
-}
+// ========== MODE BUTTON NAVIGATION ==========
+document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
+    window.location.href = "games.html";
+});
+document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
+    window.location.href = "games.html";
+});
 
-// ========== COPY REFERRAL CODE ==========
-const copyBtn = document.getElementById("copyReferralBtn");
-if (copyBtn) {
-    copyBtn.addEventListener("click", () => {
-        const code = document.getElementById("referralCode")?.textContent;
-        if (code && code !== "LOADING") {
-            navigator.clipboard?.writeText(code).then(() => {
-                alert("Referral code copied!");
-            }).catch(() => {
-                const textarea = document.createElement("textarea");
-                textarea.value = code;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand("copy");
-                textarea.remove();
-                alert("Referral code copied!");
-            });
-        }
-    });
-}
-
-// ========== COPY PROFILE REFERRAL ==========
-const copyProfileBtn = document.getElementById("copyProfileReferral");
-if (copyProfileBtn) {
-    copyProfileBtn.addEventListener("click", () => {
-        const code = document.getElementById("profileReferralCode")?.textContent;
-        if (code && code !== "-") {
-            navigator.clipboard?.writeText(code).then(() => {
-                alert("Referral code copied!");
-            }).catch(() => {
-                const textarea = document.createElement("textarea");
-                textarea.value = code;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand("copy");
-                textarea.remove();
-                alert("Referral code copied!");
-            });
-        }
-    });
-}
+document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
+    window.location.href = "choose-your-lane.html";
+});
+document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
+    window.location.href = "choose-your-lane.html";
+});
 
 console.log("Dashboard initialized successfully.");
