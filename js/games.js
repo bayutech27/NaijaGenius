@@ -28,6 +28,7 @@ console.log('📋 URL Params:', { rawCategory, rawType, exportName, isTournament
 
 // ========== MODULE STATE ==========
 let currentUserUID = null;
+let currentUserData = null;
 let category = null;
 let questionType = 'regular';
 let currentQuestions = [];
@@ -90,13 +91,11 @@ function showToast(message, type = 'success', duration = 4000) {
   toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
   container.appendChild(toast);
   
-  // Auto-close after duration
   setTimeout(() => {
     if (toast.parentNode) toast.remove();
   }, duration);
 }
 
-// Display critical error on the question card
 function displayErrorOnScreen(message) {
   if (questionText) {
     questionText.textContent = '⚠️ ' + message;
@@ -106,35 +105,36 @@ function displayErrorOnScreen(message) {
   if (questionNumber) {
     questionNumber.textContent = 'Error';
   }
-  // Hide options
   ['A', 'B', 'C', 'D'].forEach(letter => {
     const btn = optionBtns[letter];
     if (btn) {
       btn.style.display = 'none';
     }
   });
-  // Show a retry button
-  const retryBtn = document.createElement('button');
-  retryBtn.textContent = '🔄 Try Again';
-  retryBtn.style.cssText = `
-    margin-top: 1.5rem;
-    padding: 0.8rem 2rem;
-    background: linear-gradient(135deg, #3ED6B7, #259c84);
-    border: none;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 1rem;
-    color: #0a0f1e;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-  `;
-  retryBtn.addEventListener('click', () => {
-    window.location.reload();
-  });
-  const parent = document.querySelector('.question-box');
-  if (parent && !parent.querySelector('.retry-btn')) {
+  const existingRetry = document.querySelector('.retry-btn');
+  if (!existingRetry) {
+    const retryBtn = document.createElement('button');
+    retryBtn.textContent = '🔄 Try Again';
     retryBtn.className = 'retry-btn';
-    parent.appendChild(retryBtn);
+    retryBtn.style.cssText = `
+      margin-top: 1.5rem;
+      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, #3ED6B7, #259c84);
+      border: none;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0a0f1e;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    `;
+    retryBtn.addEventListener('click', () => {
+      window.location.reload();
+    });
+    const parent = document.querySelector('.question-box');
+    if (parent) {
+      parent.appendChild(retryBtn);
+    }
   }
 }
 
@@ -144,7 +144,7 @@ window.onerror = function(message, source, lineno, colno, error) {
   const errorMsg = error?.message || message || 'Unknown error';
   showToast('An unexpected error occurred. Please refresh.', 'error', 20000);
   displayErrorOnScreen('Unexpected error: ' + errorMsg);
-  return true; // prevent default
+  return true;
 };
 
 window.addEventListener('unhandledrejection', function(event) {
@@ -199,31 +199,49 @@ function startFunFactTimer() {
 
 // ========== AUTH VALIDATION ==========
 onAuthStateChanged(auth, async (user) => {
-  console.log('🔐 Auth state changed:', user ? `User: ${user.uid}` : 'No user');
+  console.log('🔐 Auth state changed (games):', user ? `User: ${user.uid}` : 'No user');
   
   if (!user) {
     showToast('Please log in to play.', 'error', 20000);
+    displayErrorOnScreen('Please log in to play this game.');
     setTimeout(() => window.location.href = '/login.html', 3000);
-    return;
-  }
-  
-  if (isTournament) {
-    try {
-      await import('./tournament.js');
-    } catch (err) {
-      console.error('Failed to load tournament module:', err);
-      showToast('Tournament mode unavailable. Please try again.', 'error', 20000);
-      displayErrorOnScreen('Tournament mode is currently unavailable.');
-      setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
-    }
     return;
   }
 
   currentUserUID = user.uid;
+  
   try {
+    // Get user data from Firestore
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      console.warn('User profile not found in Firestore.');
+      showToast('User profile not found. Please complete registration.', 'error', 20000);
+      displayErrorOnScreen('User profile not found. Please complete registration.');
+      setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
+      return;
+    }
+    
+    currentUserData = userSnap.data();
+    console.log('✅ User data loaded:', currentUserData);
+    
+    if (isTournament) {
+      try {
+        await import('./tournament.js');
+      } catch (err) {
+        console.error('Failed to load tournament module:', err);
+        showToast('Tournament mode unavailable. Please try again.', 'error', 20000);
+        displayErrorOnScreen('Tournament mode unavailable.');
+        setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
+      }
+      return;
+    }
+
     await loadLifelines();
     await readParamsFromURL();
     startFunFactTimer();
+    
   } catch (err) {
     console.error('Init error:', err);
     const msg = err.message || 'Failed to start game.';
@@ -241,15 +259,12 @@ async function loadLifelines() {
     return;
   }
   try {
-    const userRef = doc(db, 'users', currentUserUID);
-    const snap = await getDoc(userRef);
-    if (!snap.exists()) {
-      throw new Error('User profile not found.');
+    if (!currentUserData) {
+      throw new Error('User data not loaded.');
     }
-    const data = snap.data();
-    lifelineCounts.fifty_fifty = data.lifeline?.fifty_fifty ?? 3;
-    lifelineCounts.ask_crowd = data.lifeline?.ask_crowd ?? 3;
-    lifelineCounts.skip = data.lifeline?.skip ?? 3;
+    lifelineCounts.fifty_fifty = currentUserData.lifeline?.fifty_fifty ?? 3;
+    lifelineCounts.ask_crowd = currentUserData.lifeline?.ask_crowd ?? 3;
+    lifelineCounts.skip = currentUserData.lifeline?.skip ?? 3;
     updateLifelineUI();
   } catch (err) {
     console.error('Failed to load lifelines:', err);
@@ -294,14 +309,10 @@ function readParamsFromURL() {
   category = rawCategory;
   questionType = rawType;
   
-  // Set Game Type and Category (from URL, not Firestore)
   const displayName = formatCategoryName(category);
   if (gameCategory) gameCategory.textContent = displayName;
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
   
-  loadLifelines();
-  
-  // Load questions from JS bank
   if (exportNameParam) {
     loadQuestionsFromJS(exportNameParam);
   } else {
@@ -313,12 +324,11 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK (robust) ==========
+// ========== LOAD QUESTIONS FROM JS BANK ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
   try {
-    // Map export names to file names
     const exportMap = {
       'afrobeats': { file: 'afrobeats.js', export: 'afrobeats' },
       'nollywood': { file: 'nollywood.js', export: 'nollywood' },
@@ -337,8 +347,7 @@ async function loadQuestionsFromJS(exportNameParam) {
       throw new Error(`Question bank '${exportNameParam}' not found.`);
     }
     
-    // Build absolute URL using import.meta.url (current script location: /js/games.js)
-    const baseDir = new URL('.', import.meta.url).href;  // ends with /js/
+    const baseDir = new URL('.', import.meta.url).href;
     const questionUrl = new URL(`questions/${mapping.file}`, baseDir).href;
     console.log('📦 Importing from:', questionUrl);
     
@@ -347,7 +356,6 @@ async function loadQuestionsFromJS(exportNameParam) {
       module = await import(questionUrl);
     } catch (primaryError) {
       console.warn('Primary import failed, trying fallback:', primaryError);
-      // Fallback: try relative path without leading slash
       const fallbackUrl = `./questions/${mapping.file}`;
       console.log('📦 Fallback import from:', fallbackUrl);
       module = await import(fallbackUrl);
@@ -361,7 +369,6 @@ async function loadQuestionsFromJS(exportNameParam) {
       throw new Error('Question bank is empty or invalid.');
     }
     
-    // Shuffle and select 10 random questions
     const shuffled = fisherYatesShuffle([...questionBank]);
     const selected = shuffled.slice(0, Math.min(TOTAL_QUESTIONS, shuffled.length));
     
@@ -373,14 +380,12 @@ async function loadQuestionsFromJS(exportNameParam) {
     
     currentQuestions = selected;
     
-    // Update difficulty display from first question
     if (currentQuestions.length > 0 && gameDifficulty) {
       const firstQ = currentQuestions[0];
       const raw = firstQ.difficulty || 'Easy';
       gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     }
     
-    // Start the game with countdown
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
@@ -388,7 +393,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     const msg = err.message || 'Failed to load questions.';
     showToast(msg, 'error', 20000);
     displayErrorOnScreen(msg + ' Please refresh or go back.');
-    // Optionally redirect after 5 seconds
     setTimeout(() => {
       if (!roundEnded) {
         window.location.href = '/app/dashboard.html';
@@ -493,11 +497,10 @@ function loadQuestion(index) {
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
   if (questionText) {
     questionText.textContent = q.question;
-    questionText.style.color = ''; // reset color
+    questionText.style.color = '';
     questionText.style.fontWeight = '';
   }
   
-  // Update difficulty from the current question (not Firestore)
   if (gameDifficulty) {
     const raw = q.difficulty || 'Easy';
     gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
@@ -521,7 +524,7 @@ function loadQuestion(index) {
       btn.style.color = '';
       btn.style.borderColor = '';
       btn.disabled = false;
-      btn.style.display = ''; // reset display
+      btn.style.display = '';
     }
   });
   
@@ -629,7 +632,6 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLifelineUI();
       nextBtn.disabled = false;
 
-      // Streak logic...
       if (isCorrect) {
         if (streakDirection === 'loss') {
           const lossCount = Math.abs(currentStreak);
