@@ -136,8 +136,9 @@
                 card.addEventListener('click', () => {
                     const category = card.dataset.category;
                     const exportName = card.dataset.export;
+                    console.log('🔗 Redirecting to games.html with:', { category, exportName });
                     if (category && exportName) {
-                        window.location.href = `games.html?category=${category}&export=${exportName}`;
+                        window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
                     }
                 });
             });
