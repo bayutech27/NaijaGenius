@@ -75,8 +75,8 @@ const crowdBarC = $('crowdBarC'); const crowdBarD = $('crowdBarD');
 const crowdPercentA = $('crowdPercentA'); const crowdPercentB = $('crowdPercentB');
 const crowdPercentC = $('crowdPercentC'); const crowdPercentD = $('crowdPercentD');
 
-// ========== TOAST ==========
-function showToast(message, type = 'success') {
+// ========== ENHANCED TOAST ==========
+function showToast(message, type = 'success', duration = 4000) {
   let container = document.getElementById('toastContainer');
   if (!container) {
     container = document.createElement('div');
@@ -86,10 +86,74 @@ function showToast(message, type = 'success') {
   }
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i><span>${message}</span>`;
+  const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+  toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  
+  // Auto-close after duration
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, duration);
 }
+
+// Display critical error on the question card
+function displayErrorOnScreen(message) {
+  if (questionText) {
+    questionText.textContent = '⚠️ ' + message;
+    questionText.style.color = '#ff6b6b';
+    questionText.style.fontWeight = '600';
+  }
+  if (questionNumber) {
+    questionNumber.textContent = 'Error';
+  }
+  // Hide options
+  ['A', 'B', 'C', 'D'].forEach(letter => {
+    const btn = optionBtns[letter];
+    if (btn) {
+      btn.style.display = 'none';
+    }
+  });
+  // Show a retry button
+  const retryBtn = document.createElement('button');
+  retryBtn.textContent = '🔄 Try Again';
+  retryBtn.style.cssText = `
+    margin-top: 1.5rem;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(135deg, #3ED6B7, #259c84);
+    border: none;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0a0f1e;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+  `;
+  retryBtn.addEventListener('click', () => {
+    window.location.reload();
+  });
+  const parent = document.querySelector('.question-box');
+  if (parent && !parent.querySelector('.retry-btn')) {
+    retryBtn.className = 'retry-btn';
+    parent.appendChild(retryBtn);
+  }
+}
+
+// ========== GLOBAL ERROR HANDLING ==========
+window.onerror = function(message, source, lineno, colno, error) {
+  console.error('Global error:', message, error);
+  const errorMsg = error?.message || message || 'Unknown error';
+  showToast('An unexpected error occurred. Please refresh.', 'error', 20000);
+  displayErrorOnScreen('Unexpected error: ' + errorMsg);
+  return true; // prevent default
+};
+
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('Unhandled promise rejection:', event.reason);
+  const errorMsg = event.reason?.message || 'Unknown promise error';
+  showToast('Something went wrong. Please try again.', 'error', 20000);
+  displayErrorOnScreen('Error: ' + errorMsg);
+  event.preventDefault();
+});
 
 // ========== HELPER: FORMAT CATEGORY NAME ==========
 function formatCategoryName(raw) {
@@ -138,7 +202,8 @@ onAuthStateChanged(auth, async (user) => {
   console.log('🔐 Auth state changed:', user ? `User: ${user.uid}` : 'No user');
   
   if (!user) {
-    window.location.href = '/login.html';
+    showToast('Please log in to play.', 'error', 20000);
+    setTimeout(() => window.location.href = '/login.html', 3000);
     return;
   }
   
@@ -147,8 +212,9 @@ onAuthStateChanged(auth, async (user) => {
       await import('./tournament.js');
     } catch (err) {
       console.error('Failed to load tournament module:', err);
-      showToast('Tournament mode unavailable. Please try again.', 'error');
-      setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+      showToast('Tournament mode unavailable. Please try again.', 'error', 20000);
+      displayErrorOnScreen('Tournament mode is currently unavailable.');
+      setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
     }
     return;
   }
@@ -160,8 +226,10 @@ onAuthStateChanged(auth, async (user) => {
     startFunFactTimer();
   } catch (err) {
     console.error('Init error:', err);
-    showToast('Failed to start game. Please try again.', 'error');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+    const msg = err.message || 'Failed to start game.';
+    showToast(msg, 'error', 20000);
+    displayErrorOnScreen(msg);
+    setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
   }
 });
 
@@ -172,18 +240,22 @@ async function loadLifelines() {
     updateLifelineUI();
     return;
   }
-  const userRef = doc(db, 'users', currentUserUID);
-  const snap = await getDoc(userRef);
-  if (!snap.exists()) {
-    showToast('User profile not found.', 'error');
-    window.location.href = '/app/dashboard.html';
-    return;
+  try {
+    const userRef = doc(db, 'users', currentUserUID);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      throw new Error('User profile not found.');
+    }
+    const data = snap.data();
+    lifelineCounts.fifty_fifty = data.lifeline?.fifty_fifty ?? 3;
+    lifelineCounts.ask_crowd = data.lifeline?.ask_crowd ?? 3;
+    lifelineCounts.skip = data.lifeline?.skip ?? 3;
+    updateLifelineUI();
+  } catch (err) {
+    console.error('Failed to load lifelines:', err);
+    showToast('Could not load lifelines. Please refresh.', 'error', 20000);
+    throw err;
   }
-  const data = snap.data();
-  lifelineCounts.fifty_fifty = data.lifeline?.fifty_fifty ?? 3;
-  lifelineCounts.ask_crowd = data.lifeline?.ask_crowd ?? 3;
-  lifelineCounts.skip = data.lifeline?.skip ?? 3;
-  updateLifelineUI();
 }
 
 // ========== UPDATE LIFELINE UI ==========
@@ -212,9 +284,11 @@ function readParamsFromURL() {
   console.log('📖 Reading params:', { rawCategory, rawType, exportNameParam });
   
   if (!rawCategory) {
-    showToast('No category selected. Redirecting...', 'error');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 1500);
-    throw new Error('Missing category');
+    const err = new Error('No category selected.');
+    showToast(err.message, 'error', 20000);
+    displayErrorOnScreen('No category selected. Redirecting...');
+    setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
+    throw err;
   }
   
   category = rawCategory;
@@ -231,17 +305,20 @@ function readParamsFromURL() {
   if (exportNameParam) {
     loadQuestionsFromJS(exportNameParam);
   } else {
-    showToast('No question bank specified. Redirecting...', 'error');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+    const err = new Error('No question bank specified.');
+    showToast(err.message, 'error', 20000);
+    displayErrorOnScreen('Missing question bank. Redirecting...');
+    setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
+    throw err;
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK (using import.meta.url) ==========
+// ========== LOAD QUESTIONS FROM JS BANK (robust) ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
   try {
-    // Map export names to their file paths (relative to /js/ folder)
+    // Map export names to file names
     const exportMap = {
       'afrobeats': { file: 'afrobeats.js', export: 'afrobeats' },
       'nollywood': { file: 'nollywood.js', export: 'nollywood' },
@@ -257,10 +334,7 @@ async function loadQuestionsFromJS(exportNameParam) {
     
     const mapping = exportMap[exportNameParam];
     if (!mapping) {
-      console.error('❌ No mapping found for export:', exportNameParam);
-      showToast('Question bank not found. Please try again.', 'error');
-      setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
-      return;
+      throw new Error(`Question bank '${exportNameParam}' not found.`);
     }
     
     // Build absolute URL using import.meta.url (current script location: /js/games.js)
@@ -268,16 +342,23 @@ async function loadQuestionsFromJS(exportNameParam) {
     const questionUrl = new URL(`questions/${mapping.file}`, baseDir).href;
     console.log('📦 Importing from:', questionUrl);
     
-    const module = await import(questionUrl);
+    let module;
+    try {
+      module = await import(questionUrl);
+    } catch (primaryError) {
+      console.warn('Primary import failed, trying fallback:', primaryError);
+      // Fallback: try relative path without leading slash
+      const fallbackUrl = `./questions/${mapping.file}`;
+      console.log('📦 Fallback import from:', fallbackUrl);
+      module = await import(fallbackUrl);
+    }
+    
     const questionBank = module[mapping.export] || module.default;
     
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
     
     if (!Array.isArray(questionBank) || questionBank.length === 0) {
-      console.error('❌ Question bank is empty or not an array');
-      showToast('No questions found for this category.', 'error');
-      if (questionText) questionText.textContent = '😅 Oops! No questions yet.';
-      return;
+      throw new Error('Question bank is empty or invalid.');
     }
     
     // Shuffle and select 10 random questions
@@ -287,12 +368,12 @@ async function loadQuestionsFromJS(exportNameParam) {
     console.log('✅ Selected', selected.length, 'questions for game');
     
     if (selected.length < TOTAL_QUESTIONS) {
-      showToast(`Only ${selected.length} questions available. Starting game.`, 'warning');
+      showToast(`Only ${selected.length} questions available. Starting game.`, 'warning', 6000);
     }
     
     currentQuestions = selected;
     
-    // Update difficulty display from first question (if available)
+    // Update difficulty display from first question
     if (currentQuestions.length > 0 && gameDifficulty) {
       const firstQ = currentQuestions[0];
       const raw = firstQ.difficulty || 'Easy';
@@ -304,10 +385,18 @@ async function loadQuestionsFromJS(exportNameParam) {
     
   } catch (err) {
     console.error('❌ Error loading question bank:', err);
-    showToast('Failed to load questions. Please try again.', 'error');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+    const msg = err.message || 'Failed to load questions.';
+    showToast(msg, 'error', 20000);
+    displayErrorOnScreen(msg + ' Please refresh or go back.');
+    // Optionally redirect after 5 seconds
+    setTimeout(() => {
+      if (!roundEnded) {
+        window.location.href = '/app/dashboard.html';
+      }
+    }, 5000);
   }
 }
+
 // ========== COUNTDOWN OVERLAY ==========
 function showCountdown(callback) {
   const overlay = document.createElement('div');
@@ -402,7 +491,11 @@ function loadQuestion(index) {
   console.log('📖 Current question:', q);
   
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
-  if (questionText) questionText.textContent = q.question;
+  if (questionText) {
+    questionText.textContent = q.question;
+    questionText.style.color = ''; // reset color
+    questionText.style.fontWeight = '';
+  }
   
   // Update difficulty from the current question (not Firestore)
   if (gameDifficulty) {
@@ -428,6 +521,7 @@ function loadQuestion(index) {
       btn.style.color = '';
       btn.style.borderColor = '';
       btn.disabled = false;
+      btn.style.display = ''; // reset display
     }
   });
   
@@ -622,7 +716,7 @@ lifelineFifty?.addEventListener('click', async () => {
       await updateDoc(userRef, { 'lifeline.fifty_fifty': increment(-1) });
     } catch (err) {
       console.error('Failed to update lifeline:', err);
-      showToast('Could not save lifeline usage.', 'error');
+      showToast('Could not save lifeline usage.', 'error', 20000);
     }
   }
 });
@@ -668,7 +762,7 @@ lifelineAsk?.addEventListener('click', async () => {
       await updateDoc(userRef, { 'lifeline.ask_crowd': increment(-1) });
     } catch (err) {
       console.error('Failed to update lifeline:', err);
-      showToast('Could not save lifeline usage.', 'error');
+      showToast('Could not save lifeline usage.', 'error', 20000);
     }
   }
 });
@@ -685,7 +779,7 @@ lifelineSkip?.addEventListener('click', async () => {
       await updateDoc(userRef, { 'lifeline.skip': increment(-1) });
     } catch (err) {
       console.error('Failed to update lifeline:', err);
-      showToast('Could not save lifeline usage.', 'error');
+      showToast('Could not save lifeline usage.', 'error', 20000);
     }
   }
   questionAnswered = true;
@@ -806,7 +900,7 @@ async function endRound() {
     }
   } catch (err) {
     console.error('Error saving round data:', err);
-    showToast('Some data could not be saved, but your round is complete.', 'warning');
+    showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
   }
 
   hideLoader();
