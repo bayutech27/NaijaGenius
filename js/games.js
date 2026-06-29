@@ -236,23 +236,23 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK (with robust path handling) ==========
+// ========== LOAD QUESTIONS FROM JS BANK (using import.meta.url) ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
   try {
-    // Map export names to their file paths and default export names
+    // Map export names to their file paths (relative to /js/ folder)
     const exportMap = {
-      'afrobeats': { path: '/js/questions/afrobeats.js', export: 'afrobeats' },
-      'nollywood': { path: '/js/questions/nollywood.js', export: 'nollywood' },
-      'nigeriaHistory': { path: '/js/questions/nigeria-history.js', export: 'nigeriaHistory' },
-      'nigeriaCulture': { path: '/js/questions/nigeria-culture.js', export: 'nigeriaCulture' },
-      'nigeriaFood': { path: '/js/questions/nigeria-food.js', export: 'nigeriaFood' },
-      'nigeriaGeography': { path: '/js/questions/nigeria-geography.js', export: 'nigeriaGeography' },
-      'nigeriaSports': { path: '/js/questions/nigeria-sports.js', export: 'nigeriaSports' },
-      'lagosSlang': { path: '/js/questions/lagos-slangs.js', export: 'lagosSlang' },
-      'nigeriaProverbs': { path: '/js/questions/nigeria-proverbs.js', export: 'nigeriaProverbs' },
-      'superEagles': { path: '/js/questions/super-eagles.js', export: 'superEagles' }
+      'afrobeats': { file: 'afrobeats.js', export: 'afrobeats' },
+      'nollywood': { file: 'nollywood.js', export: 'nollywood' },
+      'nigeriaHistory': { file: 'nigeria-history.js', export: 'nigeriaHistory' },
+      'nigeriaCulture': { file: 'nigeria-culture.js', export: 'nigeriaCulture' },
+      'nigeriaFood': { file: 'nigeria-food.js', export: 'nigeriaFood' },
+      'nigeriaGeography': { file: 'nigeria-geography.js', export: 'nigeriaGeography' },
+      'nigeriaSports': { file: 'nigeria-sports.js', export: 'nigeriaSports' },
+      'lagosSlang': { file: 'lagos-slangs.js', export: 'lagosSlang' },
+      'nigeriaProverbs': { file: 'nigeria-proverbs.js', export: 'nigeriaProverbs' },
+      'superEagles': { file: 'super-eagles.js', export: 'superEagles' }
     };
     
     const mapping = exportMap[exportNameParam];
@@ -263,49 +263,13 @@ async function loadQuestionsFromJS(exportNameParam) {
       return;
     }
     
-    let questionBank = null;
-    let importError = null;
+    // Build absolute URL using import.meta.url (current script location: /js/games.js)
+    const baseDir = new URL('.', import.meta.url).href;  // ends with /js/
+    const questionUrl = new URL(`questions/${mapping.file}`, baseDir).href;
+    console.log('📦 Importing from:', questionUrl);
     
-    // Try primary path (absolute from root)
-    try {
-      console.log('📦 Attempting to import from:', mapping.path);
-      const module = await import(mapping.path);
-      questionBank = module[mapping.export] || module.default;
-    } catch (err) {
-      importError = err;
-      console.warn('⚠️ Primary import failed, trying relative path...', err);
-      
-      // Try relative path (without leading slash)
-      const relativePath = mapping.path.replace(/^\//, '');
-      try {
-        console.log('📦 Attempting relative import from:', relativePath);
-        const module = await import(relativePath);
-        questionBank = module[mapping.export] || module.default;
-      } catch (err2) {
-        importError = err2;
-        console.warn('⚠️ Relative import also failed:', err2);
-      }
-    }
-    
-    // If still null, try using import with a different base (./)
-    if (!questionBank) {
-      try {
-        const basePath = mapping.path.replace(/^\/js\//, './');
-        console.log('📦 Attempting import with base "./":', basePath);
-        const module = await import(basePath);
-        questionBank = module[mapping.export] || module.default;
-      } catch (err3) {
-        importError = err3;
-        console.error('❌ All import attempts failed:', err3);
-      }
-    }
-    
-    if (!questionBank) {
-      console.error('❌ Failed to load question bank after multiple attempts.');
-      showToast('Could not load questions. Please check the question bank files.', 'error');
-      setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
-      return;
-    }
+    const module = await import(questionUrl);
+    const questionBank = module[mapping.export] || module.default;
     
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
     
@@ -339,12 +303,11 @@ async function loadQuestionsFromJS(exportNameParam) {
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
-    console.error('❌ Unhandled error loading question bank:', err);
+    console.error('❌ Error loading question bank:', err);
     showToast('Failed to load questions. Please try again.', 'error');
     setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
   }
 }
-
 // ========== COUNTDOWN OVERLAY ==========
 function showCountdown(callback) {
   const overlay = document.createElement('div');
