@@ -54,9 +54,6 @@ const $ = (id) => document.getElementById(id);
 const gameType = $('gameType');
 const gameCategory = $('gameCategory');
 const gameDifficulty = $('gameDifficulty');
-const gameModeDisplay = $('gameModeDisplay');
-const gameCategoryDisplay = $('gameCategoryDisplay');
-const gameDifficultyDisplay = $('gameDifficultyDisplay');
 const timerSeconds = $('timerSeconds');
 const timerPath = $('timerPath');
 const progressBar = $('progressBar');
@@ -223,10 +220,6 @@ function readParamsFromURL() {
   category = rawCategory;
   questionType = rawType;
   
-  // Update Game Mode display
-  if (gameModeDisplay) gameModeDisplay.textContent = 'Choose Your Lane';
-  if (gameCategoryDisplay) gameCategoryDisplay.textContent = formatCategoryName(category);
-  
   const displayName = formatCategoryName(category);
   if (gameCategory) gameCategory.textContent = displayName;
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
@@ -302,10 +295,6 @@ async function loadQuestionsFromJS(exportNameParam) {
       if (gameDifficulty) {
         const raw = firstQ.difficulty || 'Easy';
         gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-      }
-      if (gameDifficultyDisplay) {
-        const raw = firstQ.difficulty || 'Easy';
-        gameDifficultyDisplay.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
       }
     }
     
@@ -419,10 +408,6 @@ function loadQuestion(index) {
   if (gameDifficulty) {
     const raw = q.difficulty || 'Easy';
     gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-  }
-  if (gameDifficultyDisplay) {
-    const raw = q.difficulty || 'Easy';
-    gameDifficultyDisplay.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
   }
   
   if (optionTexts.A) optionTexts.A.textContent = q.optionA;
