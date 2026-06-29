@@ -14,10 +14,8 @@ import {
   getEndOfRoundComment
 } from './comments.js';
 
-// ========== DYNAMIC IMPORT WITH FALLBACK ==========
-let showFunFactModal = () => {}; // default no-op
-
-// Try to load fun-facts.js, but if it fails, keep the dummy function
+// ========== DYNAMIC IMPORT FOR FUN-FACTS (with fallback) ==========
+let showFunFactModal = () => {};
 try {
   const funFactModule = await import('./fun-facts.js');
   if (funFactModule.showFunFactModal) {
@@ -47,6 +45,7 @@ let questionType = 'regular';
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let roundScore = 0;
+let correctCount = 0; // track number of correct answers
 let timerInterval = null;
 let timeLeft = 15;
 let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, skip: 0 };
@@ -213,7 +212,7 @@ function startFunFactTimer() {
     if (gameRoundActive) {
       funFactPending = true;
     } else {
-      showFunFactModal('', false);  // uses dynamically imported function (or dummy)
+      showFunFactModal('', false);
       funFactPending = false;
     }
   }, 600000);
@@ -332,7 +331,7 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK ==========
+// ========== LOAD QUESTIONS FROM JS BANK (FIXED) ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
@@ -357,47 +356,62 @@ async function loadQuestionsFromJS(exportNameParam) {
     
     let questionBank = null;
     let lastError = null;
+    const attemptedPaths = [];
     
-    // Attempt 1: Absolute path from root
-    const path1 = `/js/questions/${mapping.file}`;
-    console.log('📦 Attempting import from:', path1);
-    try {
-      const module = await import(path1);
-      questionBank = module[mapping.export] || module.default;
-    } catch (e) {
-      lastError = e;
-      console.warn('Attempt 1 failed:', e);
-    }
+    // List of paths to try (order matters)
+    const base = new URL('.', import.meta.url).href; // /js/
+    const pathsToTry = [
+      `/js/questions/${mapping.file}`,                     // absolute from root
+      `./questions/${mapping.file}`,                       // relative to current script
+      new URL(`questions/${mapping.file}`, base).href,     // using import.meta.url
+      `${window.location.origin}/js/questions/${mapping.file}`, // full URL
+    ];
     
-    // Attempt 2: Relative path from current script
-    if (!questionBank) {
-      const path2 = `./questions/${mapping.file}`;
-      console.log('📦 Attempting import from:', path2);
+    for (const path of pathsToTry) {
+      attemptedPaths.push(path);
+      console.log('📦 Attempting import from:', path);
       try {
-        const module = await import(path2);
+        const module = await import(path);
         questionBank = module[mapping.export] || module.default;
+        if (questionBank) {
+          console.log('✅ Import succeeded from:', path);
+          break;
+        }
       } catch (e) {
         lastError = e;
-        console.warn('Attempt 2 failed:', e);
+        console.warn('❌ Import failed:', e.message);
       }
     }
     
-    // Attempt 3: Using import.meta.url to build full URL
+    // If still null, try using fetch + eval as last resort (if allowed)
     if (!questionBank) {
       try {
-        const baseDir = new URL('.', import.meta.url).href;
-        const path3 = new URL(`questions/${mapping.file}`, baseDir).href;
-        console.log('📦 Attempting import from:', path3);
-        const module = await import(path3);
+        const fetchPath = pathsToTry[0]; // try the absolute path again with fetch
+        const response = await fetch(fetchPath);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+        // Extract the export (assuming default export is an array variable)
+        // We'll eval the code in a controlled context.
+        // This is a fallback; better to use dynamic import but if it fails, we try.
+        const blob = new Blob([text], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        const module = await import(url);
         questionBank = module[mapping.export] || module.default;
-      } catch (e) {
-        lastError = e;
-        console.warn('Attempt 3 failed:', e);
+        URL.revokeObjectURL(url);
+        console.log('✅ Import succeeded via fetch+eval from:', fetchPath);
+      } catch (fetchErr) {
+        lastError = fetchErr;
+        console.warn('❌ Fetch fallback failed:', fetchErr);
       }
     }
     
     if (!questionBank) {
-      throw new Error(`Failed to load question bank after multiple attempts. Last error: ${lastError?.message || 'Unknown'}`);
+      const errorMsg = `Failed to load question bank. Tried paths: ${attemptedPaths.join(', ')}. Last error: ${lastError?.message || 'Unknown'}`;
+      console.error(errorMsg);
+      showErrorOnScreen(errorMsg);
+      showToast('Question bank loading failed. Please refresh or contact support.', 'error', 20000);
+      setTimeout(() => window.location.href = '/app/dashboard.html', 5000);
+      return;
     }
     
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
@@ -627,8 +641,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btn.disabled || btn.classList.contains('disabled')) return;
       if (questionAnswered) return;
 
+      // Stop timer immediately at selection time
       clearInterval(timerInterval);
 
+      // Lock all options
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const b = optionBtns[letter];
         if (b) {
@@ -641,22 +657,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentQ = currentQuestions[currentQuestionIndex];
       if (!currentQ) return;
       const correct = currentQ.correctAnswer;
-      const pointsEarned = Math.max(0, timeLeft);
+      const pointsEarned = Math.max(0, timeLeft); // time left at selection
 
       const isCorrect = (selectedLetter === correct);
 
+      // Highlight selected option
       if (isCorrect) {
         btn.classList.add('correct');
-        btn.style.background = '#3ED6B7';
+        btn.style.background = '#3ED6B7';  // solid green
         btn.style.color = '#ffffff';
         btn.style.borderColor = '#3ED6B7';
         roundScore += pointsEarned;
+        correctCount++;
         console.log('✅ Correct! Score:', roundScore);
       } else {
         btn.classList.add('wrong');
-        btn.style.background = 'rgba(255,92,92,0.25)';
-        btn.style.color = '#ff5c5c';
-        btn.style.borderColor = '#ff5c5c';
+        btn.style.background = '#ff4444';   // solid red
+        btn.style.color = '#ffffff';
+        btn.style.borderColor = '#ff4444';
+        // Also highlight the correct answer in green
         if (optionBtns[correct]) {
           const correctBtn = optionBtns[correct];
           correctBtn.classList.add('correct');
@@ -672,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLifelineUI();
       nextBtn.disabled = false;
 
+      // Streak logic...
       if (isCorrect) {
         if (streakDirection === 'loss') {
           const lossCount = Math.abs(currentStreak);
@@ -911,19 +931,27 @@ async function endRound() {
   }
 
   try {
+    // Save round data to regular_points collection
     const pointRef = collection(db, 'regular_points');
     await addDoc(pointRef, {
       uid: currentUserUID,
       gameType: questionType,
       category: category,
       point: roundScore,
+      correctAnswers: correctCount,
+      totalQuestions: TOTAL_QUESTIONS,
       time: serverTimestamp()
     });
+    
+    // Update user stats
     const userRef = doc(db, 'users', currentUserUID);
     await updateDoc(userRef, {
       lifetimeRoundPlayed: increment(1),
-      totalScore: increment(roundScore)
+      totalScore: increment(roundScore),
+      totalCorrectAnswers: increment(correctCount)
     });
+    
+    // Update category stats
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const data = userSnap.data();
