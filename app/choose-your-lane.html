@@ -130,21 +130,71 @@
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.lane-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const category = card.dataset.category;
-                    const exportName = card.dataset.export;
-                    console.log('🔗 Redirecting to games.html with:', { category, exportName });
-                    if (category && exportName) {
-                        window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
-                    }
-                });
-            });
+    <script type="module">
+        // Import Firebase
+        import { auth, db } from '/js/firebase.config.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
 
-            const initials = document.getElementById('userInitials');
-            if (initials) initials.textContent = 'NG';
+        // DOM Elements
+        const userInitials = document.getElementById('userInitials');
+
+        // ========== AUTH & USER VALIDATION ==========
+        onAuthStateChanged(auth, async (user) => {
+            console.log('🔐 Auth state changed (choose-your-lane):', user ? `User: ${user.uid}` : 'No user');
+            
+            if (!user) {
+                // Redirect to login if not authenticated
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                // Get user data from Firestore
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const displayName = userData.displayName || userData.username || 'User';
+                    
+                    // Set user initials in avatar
+                    const initials = displayName.slice(0, 2).toUpperCase();
+                    if (userInitials) {
+                        userInitials.textContent = initials;
+                    }
+                    
+                    console.log('✅ User loaded:', displayName, 'Initials:', initials);
+                } else {
+                    console.warn('User profile not found in Firestore.');
+                    // Use email as fallback
+                    const email = user.email || 'User';
+                    const initials = email.slice(0, 2).toUpperCase();
+                    if (userInitials) {
+                        userInitials.textContent = initials;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                // Fallback: use email
+                const email = user.email || 'User';
+                const initials = email.slice(0, 2).toUpperCase();
+                if (userInitials) {
+                    userInitials.textContent = initials;
+                }
+            }
+        });
+
+        // ========== LANE SELECTION ==========
+        document.querySelectorAll('.lane-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const category = card.dataset.category;
+                const exportName = card.dataset.export;
+                console.log('🔗 Redirecting to games.html with:', { category, exportName });
+                if (category && exportName) {
+                    window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
+                }
+            });
         });
     </script>
 
