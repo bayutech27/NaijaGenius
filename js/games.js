@@ -1,8 +1,8 @@
 // ========== IMPORTS ==========
 import { auth, db } from '/js/firebase.config.js';
 import {
-  doc, getDoc, setDoc, updateDoc, addDoc, collection,
-  query, where, getDocs, serverTimestamp, increment, deleteDoc
+  doc, getDoc, updateDoc, addDoc, collection,
+  serverTimestamp, increment
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
 import {
@@ -15,12 +15,16 @@ import {
 } from './comments.js';
 import { showFunFactModal } from './fun-fact.js';
 
+console.log('🎮 games.js loaded');
+
 // ========== TOURNAMENT DETECTION ==========
 const params = new URLSearchParams(window.location.search);
 const rawCategory = params.get('category');
 const rawType = params.get('type') || 'regular';
 const exportName = params.get('export');
 const isTournament = (rawCategory === 'tournament' || rawType === 'tournament');
+
+console.log('📋 URL Params:', { rawCategory, rawType, exportName, isTournament });
 
 // ========== MODULE STATE ==========
 let currentUserUID = null;
@@ -111,11 +115,12 @@ function formatCategoryName(raw) {
 
 // ========== FISHER-YATES SHUFFLE ==========
 function fisherYatesShuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  return array;
+  return shuffled;
 }
 
 // ========== START FUN FACT TIMER ==========
@@ -133,6 +138,8 @@ function startFunFactTimer() {
 
 // ========== AUTH VALIDATION ==========
 onAuthStateChanged(auth, async (user) => {
+  console.log('🔐 Auth state changed:', user ? `User: ${user.uid}` : 'No user');
+  
   if (!user) {
     window.location.href = '/login.html';
     return;
@@ -203,7 +210,9 @@ function readParamsFromURL() {
   const params = new URLSearchParams(window.location.search);
   const rawCategory = params.get('category');
   const rawType = params.get('type') || 'regular';
-  const exportName = params.get('export');
+  const exportNameParam = params.get('export');
+  
+  console.log('📖 Reading params:', { rawCategory, rawType, exportNameParam });
   
   if (!rawCategory) {
     showToast('No category selected. Redirecting...', 'error');
@@ -223,17 +232,22 @@ function readParamsFromURL() {
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
   
   loadLifelines();
-  loadQuestionsFromJS(exportName);
+  
+  // Load questions from JS bank
+  if (exportNameParam) {
+    loadQuestionsFromJS(exportNameParam);
+  } else {
+    showToast('No question bank specified. Redirecting...', 'error');
+    setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+  }
 }
 
 // ========== LOAD QUESTIONS FROM JS BANK ==========
-async function loadQuestionsFromJS(exportName) {
+async function loadQuestionsFromJS(exportNameParam) {
+  console.log('📚 Loading questions for export:', exportNameParam);
+  
   try {
-    // Dynamic import based on the export name
-    let modulePath;
-    let defaultExportName;
-    
-    // Map export names to their file paths
+    // Map export names to their file paths and default export names
     const exportMap = {
       'afrobeats': { path: '/js/questions/afrobeats.js', export: 'afrobeats' },
       'nollywood': { path: '/js/questions/nollywood.js', export: 'nollywood' },
@@ -247,21 +261,24 @@ async function loadQuestionsFromJS(exportName) {
       'superEagles': { path: '/js/questions/super-eagles.js', export: 'superEagles' }
     };
     
-    const mapping = exportMap[exportName];
+    const mapping = exportMap[exportNameParam];
     if (!mapping) {
+      console.error('❌ No mapping found for export:', exportNameParam);
       showToast('Question bank not found. Please try again.', 'error');
       setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
       return;
     }
     
-    modulePath = mapping.path;
-    defaultExportName = mapping.export;
+    console.log('📦 Importing from:', mapping.path, 'export:', mapping.export);
     
     // Dynamic import
-    const module = await import(modulePath);
-    const questionBank = module[defaultExportName] || module.default;
+    const module = await import(mapping.path);
+    const questionBank = module[mapping.export] || module.default;
+    
+    console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
     
     if (!questionBank || !Array.isArray(questionBank) || questionBank.length === 0) {
+      console.error('❌ No questions found in bank');
       showToast('No questions found for this category.', 'error');
       if (questionText) questionText.textContent = '😅 Oops! No questions yet.';
       return;
@@ -270,6 +287,8 @@ async function loadQuestionsFromJS(exportName) {
     // Shuffle and select 10 random questions
     const shuffled = fisherYatesShuffle([...questionBank]);
     const selected = shuffled.slice(0, Math.min(TOTAL_QUESTIONS, shuffled.length));
+    
+    console.log('✅ Selected', selected.length, 'questions for game');
     
     if (selected.length < TOTAL_QUESTIONS) {
       showToast(`Only ${selected.length} questions available. Starting game.`, 'warning');
@@ -290,10 +309,11 @@ async function loadQuestionsFromJS(exportName) {
       }
     }
     
+    // Start the game with countdown
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
-    console.error('Error loading question bank:', err);
+    console.error('❌ Error loading question bank:', err);
     showToast('Failed to load questions. Please try again.', 'error');
     setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
   }
@@ -371,6 +391,8 @@ function showCountdown(callback) {
 
 // ========== LOAD QUESTION ==========
 function loadQuestion(index) {
+  console.log('📝 Loading question', index + 1, 'of', currentQuestions.length);
+  
   gameRoundActive = true;
   questionAnswered = false;
   lifelinesDisabled = false;
@@ -388,6 +410,8 @@ function loadQuestion(index) {
   }
   
   const q = currentQuestions[index];
+  console.log('📖 Current question:', q);
+  
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
   if (questionText) questionText.textContent = q.question;
   
@@ -471,6 +495,8 @@ function startTimer() {
 
 // ========== ANSWER SELECTION ==========
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('📄 DOM loaded, attaching event listeners');
+  
   const optionsGrid = document.querySelector('.options-grid');
   if (optionsGrid) {
     optionsGrid.addEventListener('click', async (e) => {
@@ -503,6 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.color = '#ffffff';
         btn.style.borderColor = '#3ED6B7';
         roundScore += pointsEarned;
+        console.log('✅ Correct! Score:', roundScore);
       } else {
         btn.classList.add('wrong');
         btn.style.background = 'rgba(255,92,92,0.25)';
@@ -515,6 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
           correctBtn.style.color = '#ffffff';
           correctBtn.style.borderColor = '#3ED6B7';
         }
+        console.log('❌ Wrong. Correct answer:', correct);
       }
 
       questionAnswered = true;
@@ -522,14 +550,13 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLifelineUI();
       nextBtn.disabled = false;
 
-      let commentTriggered = false;
+      // Streak logic...
       if (isCorrect) {
         if (streakDirection === 'loss') {
           const lossCount = Math.abs(currentStreak);
           if (lossCount >= 3) {
             const comment = onCorrectAfterStreak();
             showCommentModal(comment, () => {});
-            commentTriggered = true;
           }
           currentStreak = 1;
           streakDirection = 'win';
@@ -538,11 +565,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (currentStreak === 2) {
             const comment = onTwoStreakWin();
             showCommentModal(comment, () => {});
-            commentTriggered = true;
           } else if (currentStreak === 5) {
             const comment = onFiveStreakWin();
             showCommentModal(comment, () => {});
-            commentTriggered = true;
           }
         } else {
           currentStreak = 1;
@@ -558,11 +583,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (lossCount === 3) {
             const comment = onThreeStreakLoss();
             showCommentModal(comment, () => {});
-            commentTriggered = true;
           } else if (lossCount === 5) {
             const comment = onFiveStreakLoss();
             showCommentModal(comment, () => {});
-            commentTriggered = true;
           }
         } else {
           currentStreak = -1;
@@ -584,7 +607,7 @@ nextBtn.addEventListener('click', () => {
 // ========== NEXT QUESTION ==========
 function nextQuestion() {
   currentQuestionIndex++;
-  if (currentQuestionIndex < TOTAL_QUESTIONS) {
+  if (currentQuestionIndex < currentQuestions.length && currentQuestionIndex < TOTAL_QUESTIONS) {
     loadQuestion(currentQuestionIndex);
   } else {
     nextBtn.disabled = true;
@@ -1018,7 +1041,13 @@ function showRoundEndModal(newBest = false) {
     overlay.remove();
     roundEnded = false;
     isNewBest = false;
-    loadQuestionsFromJS(exportName);
+    const params = new URLSearchParams(window.location.search);
+    const exportNameParam = params.get('export');
+    if (exportNameParam) {
+      loadQuestionsFromJS(exportNameParam);
+    } else {
+      window.location.href = '/app/dashboard.html';
+    }
   });
   btnContainer.appendChild(playAgainBtn);
 
