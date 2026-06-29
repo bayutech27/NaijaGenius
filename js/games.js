@@ -17,15 +17,15 @@ import {
 // ========== DYNAMIC IMPORT WITH FALLBACK ==========
 let showFunFactModal = () => {}; // default no-op
 
-// Try to load fun-fact.js, but if it fails, keep the dummy function
+// Try to load fun-facts.js, but if it fails, keep the dummy function
 try {
-  const funFactModule = await import('./fun-fact.js');
+  const funFactModule = await import('./fun-facts.js');
   if (funFactModule.showFunFactModal) {
     showFunFactModal = funFactModule.showFunFactModal;
-    console.log('✅ fun-fact.js loaded successfully');
+    console.log('✅ fun-facts.js loaded successfully');
   }
 } catch (e) {
-  console.warn('⚠️ fun-fact.js not found – using dummy function.');
+  console.warn('⚠️ fun-facts.js not found – using dummy function.');
 }
 
 console.log('🎮 games.js loaded');
@@ -213,7 +213,7 @@ function startFunFactTimer() {
     if (gameRoundActive) {
       funFactPending = true;
     } else {
-      showFunFactModal('', false);  // now uses the dynamically imported function (or dummy)
+      showFunFactModal('', false);  // uses dynamically imported function (or dummy)
       funFactPending = false;
     }
   }, 600000);
