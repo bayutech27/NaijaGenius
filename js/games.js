@@ -220,6 +220,7 @@ function readParamsFromURL() {
   category = rawCategory;
   questionType = rawType;
   
+  // Set Game Type and Category (from URL, not Firestore)
   const displayName = formatCategoryName(category);
   if (gameCategory) gameCategory.textContent = displayName;
   if (gameType) gameType.textContent = questionType === 'regular' ? 'Regular' : 'Tournament';
@@ -235,7 +236,7 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK ==========
+// ========== LOAD QUESTIONS FROM JS BANK (with robust path handling) ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
@@ -262,16 +263,54 @@ async function loadQuestionsFromJS(exportNameParam) {
       return;
     }
     
-    console.log('📦 Importing from:', mapping.path, 'export:', mapping.export);
+    let questionBank = null;
+    let importError = null;
     
-    // Dynamic import
-    const module = await import(mapping.path);
-    const questionBank = module[mapping.export] || module.default;
+    // Try primary path (absolute from root)
+    try {
+      console.log('📦 Attempting to import from:', mapping.path);
+      const module = await import(mapping.path);
+      questionBank = module[mapping.export] || module.default;
+    } catch (err) {
+      importError = err;
+      console.warn('⚠️ Primary import failed, trying relative path...', err);
+      
+      // Try relative path (without leading slash)
+      const relativePath = mapping.path.replace(/^\//, '');
+      try {
+        console.log('📦 Attempting relative import from:', relativePath);
+        const module = await import(relativePath);
+        questionBank = module[mapping.export] || module.default;
+      } catch (err2) {
+        importError = err2;
+        console.warn('⚠️ Relative import also failed:', err2);
+      }
+    }
+    
+    // If still null, try using import with a different base (./)
+    if (!questionBank) {
+      try {
+        const basePath = mapping.path.replace(/^\/js\//, './');
+        console.log('📦 Attempting import with base "./":', basePath);
+        const module = await import(basePath);
+        questionBank = module[mapping.export] || module.default;
+      } catch (err3) {
+        importError = err3;
+        console.error('❌ All import attempts failed:', err3);
+      }
+    }
+    
+    if (!questionBank) {
+      console.error('❌ Failed to load question bank after multiple attempts.');
+      showToast('Could not load questions. Please check the question bank files.', 'error');
+      setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
+      return;
+    }
     
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
     
-    if (!questionBank || !Array.isArray(questionBank) || questionBank.length === 0) {
-      console.error('❌ No questions found in bank');
+    if (!Array.isArray(questionBank) || questionBank.length === 0) {
+      console.error('❌ Question bank is empty or not an array');
       showToast('No questions found for this category.', 'error');
       if (questionText) questionText.textContent = '😅 Oops! No questions yet.';
       return;
@@ -289,20 +328,18 @@ async function loadQuestionsFromJS(exportNameParam) {
     
     currentQuestions = selected;
     
-    // Update category and difficulty displays from first question
-    if (currentQuestions.length > 0) {
+    // Update difficulty display from first question (if available)
+    if (currentQuestions.length > 0 && gameDifficulty) {
       const firstQ = currentQuestions[0];
-      if (gameDifficulty) {
-        const raw = firstQ.difficulty || 'Easy';
-        gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-      }
+      const raw = firstQ.difficulty || 'Easy';
+      gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     }
     
     // Start the game with countdown
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
-    console.error('❌ Error loading question bank:', err);
+    console.error('❌ Unhandled error loading question bank:', err);
     showToast('Failed to load questions. Please try again.', 'error');
     setTimeout(() => window.location.href = '/app/dashboard.html', 2000);
   }
@@ -404,7 +441,7 @@ function loadQuestion(index) {
   if (questionNumber) questionNumber.textContent = `Question ${index + 1}`;
   if (questionText) questionText.textContent = q.question;
   
-  // Update difficulty from question data
+  // Update difficulty from the current question (not Firestore)
   if (gameDifficulty) {
     const raw = q.difficulty || 'Easy';
     gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
