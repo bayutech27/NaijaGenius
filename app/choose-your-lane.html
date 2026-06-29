@@ -40,7 +40,7 @@
         </div>
 
         <div class="lane-grid">
-            <div class="lane-card" data-category="afrobeats">
+            <div class="lane-card" data-category="afrobeats" data-export="afrobeats">
                 <div class="lane-icon">🎵</div>
                 <div class="lane-info">
                     <div class="lane-name">Afrobeats</div>
@@ -48,7 +48,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nollywood">
+            <div class="lane-card" data-category="nollywood" data-export="nollywood">
                 <div class="lane-icon">🎬</div>
                 <div class="lane-info">
                     <div class="lane-name">Nollywood</div>
@@ -56,7 +56,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="lagos_slang">
+            <div class="lane-card" data-category="lagos_slang" data-export="lagosSlang">
                 <div class="lane-icon">🗣️</div>
                 <div class="lane-info">
                     <div class="lane-name">Lagos Slang</div>
@@ -64,7 +64,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="super_eagles">
+            <div class="lane-card" data-category="super_eagles" data-export="superEagles">
                 <div class="lane-icon">⚽</div>
                 <div class="lane-info">
                     <div class="lane-name">Super Eagles</div>
@@ -72,7 +72,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nigeria_proverbs">
+            <div class="lane-card" data-category="nigeria_proverbs" data-export="nigeriaProverbs">
                 <div class="lane-icon">📖</div>
                 <div class="lane-info">
                     <div class="lane-name">Naija Proverbs</div>
@@ -80,7 +80,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nigeria_history">
+            <div class="lane-card" data-category="nigeria_history" data-export="nigeriaHistory">
                 <div class="lane-icon">🏛️</div>
                 <div class="lane-info">
                     <div class="lane-name">Naija History</div>
@@ -88,7 +88,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nigeria_food">
+            <div class="lane-card" data-category="nigeria_food" data-export="nigeriaFood">
                 <div class="lane-icon">🍲</div>
                 <div class="lane-info">
                     <div class="lane-name">Naija Food</div>
@@ -96,7 +96,7 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nigeria_geography">
+            <div class="lane-card" data-category="nigeria_geography" data-export="nigeriaGeography">
                 <div class="lane-icon">🌍</div>
                 <div class="lane-info">
                     <div class="lane-name">Naija Geography</div>
@@ -104,11 +104,19 @@
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
-            <div class="lane-card" data-category="nigeria_culture">
+            <div class="lane-card" data-category="nigeria_culture" data-export="nigeriaCulture">
                 <div class="lane-icon">🎭</div>
                 <div class="lane-info">
                     <div class="lane-name">Naija Culture</div>
                     <div class="lane-desc">Festivals &amp; traditions</div>
+                </div>
+                <i class="fas fa-arrow-right lane-arrow"></i>
+            </div>
+            <div class="lane-card" data-category="nigeria_sports" data-export="nigeriaSports">
+                <div class="lane-icon">🏏</div>
+                <div class="lane-info">
+                    <div class="lane-name">Naija Sports</div>
+                    <div class="lane-desc">Athletes, teams, and sporting glory</div>
                 </div>
                 <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
@@ -127,8 +135,9 @@
             document.querySelectorAll('.lane-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const category = card.dataset.category;
-                    if (category) {
-                        window.location.href = `games.html?category=${category}`;
+                    const exportName = card.dataset.export;
+                    if (category && exportName) {
+                        window.location.href = `games.html?category=${category}&export=${exportName}`;
                     }
                 });
             });
