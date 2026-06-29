@@ -23,7 +23,14 @@
 
     <!-- Main Game Area -->
     <main class="game-container">
-        <!-- Meta Bar – added Difficulty row -->
+        <!-- Game Mode Display -->
+        <div class="game-mode-display">
+            <span class="game-mode-label">Game Mode: <strong id="gameModeDisplay">Choose Your Lane</strong></span>
+            <span class="game-category-label">Category: <strong id="gameCategoryDisplay">Loading...</strong></span>
+            <span class="game-difficulty-label">Difficulty: <strong id="gameDifficultyDisplay">-</strong></span>
+        </div>
+
+        <!-- Meta Bar -->
         <div class="game-meta-bar">
             <div class="meta-item">
                 <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
@@ -81,7 +88,7 @@
             </button>
         </div>
 
-        <!-- Lifelines Row + Next Button (enlarged) -->
+        <!-- Lifelines Row + Next Button -->
         <div class="lifelines-row">
             <button class="lifeline-btn" id="lifelineFiftyFifty">
                 <i class="fas fa-percent"></i>
