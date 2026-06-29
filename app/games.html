@@ -3,150 +3,142 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A0A0F" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <title>Choose Your Lane • NaijaGenius</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>NaijaGenius • Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/games.css" />
 </head>
 <body>
-
-    <!-- ===== HEADER ===== -->
+    <!-- Header -->
     <header class="app-header">
         <div class="header-container">
             <div class="logo-wrapper">
                 <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="window.location.href='dashboard.html'">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <div class="user-avatar" id="userAvatarBtn">
-                    <span id="userInitials">NG</span>
-                </div>
+                <a href="/app/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
             </div>
         </div>
     </header>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content" id="mainContent">
-
-        <div class="hero-section" style="text-align:left; margin-bottom:1.5rem;">
-            <h2 class="page-title" style="font-size:1.8rem;">Choose Your Lane</h2>
-            <p class="page-subtitle">Pick a category that suits your vibe</p>
-        </div>
-
-        <div class="lane-grid">
-            <div class="lane-card" data-category="afrobeats" data-export="afrobeats">
-                <div class="lane-icon">🎵</div>
-                <div class="lane-info">
-                    <div class="lane-name">Afrobeats</div>
-                    <div class="lane-desc">From Fela to Burna Boy</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
+    <!-- Main Game Area -->
+    <main class="game-container">
+        <!-- Meta Bar -->
+        <div class="game-meta-bar">
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
+                <span id="gameType" class="meta-value">Regular</span>
             </div>
-            <div class="lane-card" data-category="nollywood" data-export="nollywood">
-                <div class="lane-icon">🎬</div>
-                <div class="lane-info">
-                    <div class="lane-name">Nollywood</div>
-                    <div class="lane-desc">Movies, actors, iconic lines</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-list"></i> Category</span>
+                <span id="gameCategory" class="meta-value">Afrobeats</span>
             </div>
-            <div class="lane-card" data-category="lagos_slang" data-export="lagosSlang">
-                <div class="lane-icon">🗣️</div>
-                <div class="lane-info">
-                    <div class="lane-name">Lagos Slang</div>
-                    <div class="lane-desc">Street language &amp; pidgin</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
+            <div class="meta-item">
+                <span class="meta-label"><i class="fas fa-signal"></i> Difficulty</span>
+                <span id="gameDifficulty" class="meta-value">Easy</span>
             </div>
-            <div class="lane-card" data-category="super_eagles" data-export="superEagles">
-                <div class="lane-icon">⚽</div>
-                <div class="lane-info">
-                    <div class="lane-name">Super Eagles</div>
-                    <div class="lane-desc">History, players, World Cup</div>
+            <div class="meta-item timer-wrapper">
+                <span class="meta-label"><i class="fas fa-hourglass-half"></i> Time</span>
+                <div class="circular-timer" id="timerDisplay">
+                    <svg viewBox="0 0 36 36" class="timer-svg">
+                        <path class="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="timer-progress" id="timerPath" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <span class="timer-seconds" id="timerSeconds">15</span>
                 </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_proverbs" data-export="nigeriaProverbs">
-                <div class="lane-icon">📖</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija Proverbs</div>
-                    <div class="lane-desc">Yoruba, Igbo, Hausa wisdom</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_history" data-export="nigeriaHistory">
-                <div class="lane-icon">🏛️</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija History</div>
-                    <div class="lane-desc">Independence &amp; key events</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_food" data-export="nigeriaFood">
-                <div class="lane-icon">🍲</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija Food</div>
-                    <div class="lane-desc">Dishes, ingredients, street food</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_geography" data-export="nigeriaGeography">
-                <div class="lane-icon">🌍</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija Geography</div>
-                    <div class="lane-desc">States, capitals, rivers</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_culture" data-export="nigeriaCulture">
-                <div class="lane-icon">🎭</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija Culture</div>
-                    <div class="lane-desc">Festivals &amp; traditions</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
-            </div>
-            <div class="lane-card" data-category="nigeria_sports" data-export="nigeriaSports">
-                <div class="lane-icon">🏏</div>
-                <div class="lane-info">
-                    <div class="lane-name">Naija Sports</div>
-                    <div class="lane-desc">Athletes, teams, and sporting glory</div>
-                </div>
-                <i class="fas fa-arrow-right lane-arrow"></i>
             </div>
         </div>
 
+        <!-- Progress Bar -->
+        <div class="progress-wrapper">
+            <div class="progress-bar" id="progressBar" style="width: 10%;"></div>
+            <span class="progress-label" id="progressLabel">Question 1 of 10</span>
+        </div>
+
+        <!-- Question Box -->
+        <div class="question-box glass-card">
+            <div class="question-number" id="questionNumber">Loading…</div>
+            <p class="question-text" id="questionText">Loading question…</p>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="options-grid">
+            <button class="option-btn" id="optionA" data-option="A">
+                <span class="option-letter">A</span>
+                <span class="option-text" id="optionAText">Loading…</span>
+            </button>
+            <button class="option-btn" id="optionB" data-option="B">
+                <span class="option-letter">B</span>
+                <span class="option-text" id="optionBText">Loading…</span>
+            </button>
+            <button class="option-btn" id="optionC" data-option="C">
+                <span class="option-letter">C</span>
+                <span class="option-text" id="optionCText">Loading…</span>
+            </button>
+            <button class="option-btn" id="optionD" data-option="D">
+                <span class="option-letter">D</span>
+                <span class="option-text" id="optionDText">Loading…</span>
+            </button>
+        </div>
+
+        <!-- Lifelines Row + Next Button -->
+        <div class="lifelines-row">
+            <button class="lifeline-btn" id="lifelineFiftyFifty">
+                <i class="fas fa-percent"></i>
+                <span class="lifeline-label">50:50</span>
+                <span class="lifeline-count" id="countFiftyFifty">1</span>
+            </button>
+            <button class="lifeline-btn" id="lifelineAskCrowd">
+                <i class="fas fa-users"></i>
+                <span class="lifeline-label">Ask Crowd</span>
+                <span class="lifeline-count" id="countAskCrowd">1</span>
+            </button>
+            <button class="lifeline-btn" id="lifelineSkip">
+                <i class="fas fa-forward-step"></i>
+                <span class="lifeline-label">Skip</span>
+                <span class="lifeline-count" id="countSkip">1</span>
+            </button>
+            <button class="next-btn" id="nextBtn" disabled>
+                <i class="fas fa-forward"></i> Next
+            </button>
+        </div>
+
+        <!-- Ask Crowd Panel -->
+        <div class="crowd-panel" id="crowdPanel">
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">A</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarA" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentA">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">B</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarB" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentB">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">C</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarC" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentC">0%</span>
+            </div>
+            <div class="crowd-bar-wrapper">
+                <span class="crowd-label">D</span>
+                <div class="crowd-bar-bg">
+                    <div class="crowd-bar-fill" id="crowdBarD" style="width: 0%;"></div>
+                </div>
+                <span class="crowd-percent" id="crowdPercentD">0%</span>
+            </div>
+        </div>
     </main>
 
-    <!-- ===== BOTTOM NAV (hidden on this page) ===== -->
-    <nav class="bottom-nav" id="bottomNav" style="display:none;"></nav>
-
-    <!-- ===== TOAST CONTAINER ===== -->
+    <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.lane-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const category = card.dataset.category;
-                    const exportName = card.dataset.export;
-                    console.log('🔗 Redirecting to games.html with:', { category, exportName });
-                    if (category && exportName) {
-                        window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
-                    }
-                });
-            });
-
-            const initials = document.getElementById('userInitials');
-            if (initials) initials.textContent = 'NG';
-        });
-    </script>
-
+    <script type="module" src="/js/games.js"></script>
 </body>
 </html>
