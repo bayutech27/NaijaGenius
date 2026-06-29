@@ -13,7 +13,20 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
-import { showFunFactModal } from './fun-fact.js';
+
+// ========== DYNAMIC IMPORT WITH FALLBACK ==========
+let showFunFactModal = () => {}; // default no-op
+
+// Try to load fun-fact.js, but if it fails, keep the dummy function
+try {
+  const funFactModule = await import('./fun-fact.js');
+  if (funFactModule.showFunFactModal) {
+    showFunFactModal = funFactModule.showFunFactModal;
+    console.log('✅ fun-fact.js loaded successfully');
+  }
+} catch (e) {
+  console.warn('⚠️ fun-fact.js not found – using dummy function.');
+}
 
 console.log('🎮 games.js loaded');
 
@@ -78,11 +91,9 @@ const crowdPercentC = $('crowdPercentC'); const crowdPercentD = $('crowdPercentD
 
 // ========== DEDICATED ERROR DISPLAY ==========
 function showErrorOnScreen(message) {
-  // Remove any existing error panel
   const oldError = document.getElementById('gameErrorPanel');
   if (oldError) oldError.remove();
 
-  // Create a new error panel
   const panel = document.createElement('div');
   panel.id = 'gameErrorPanel';
   panel.style.cssText = `
@@ -114,29 +125,20 @@ function showErrorOnScreen(message) {
     ">Retry</button>
   `;
 
-  // Insert at the top of the game container
   const container = document.querySelector('.game-container');
-  if (container) {
-    container.prepend(panel);
-  } else {
-    document.body.prepend(panel);
-  }
+  if (container) container.prepend(panel);
+  else document.body.prepend(panel);
 
-  // Retry button reloads the page
   document.getElementById('errorRetryBtn')?.addEventListener('click', () => {
     window.location.reload();
   });
 
-  // Also update the question card if it exists
   if (questionText) {
     questionText.textContent = '⚠️ ' + message;
     questionText.style.color = '#ff6b6b';
     questionText.style.fontWeight = '600';
   }
-  if (questionNumber) {
-    questionNumber.textContent = 'Error';
-  }
-  // Hide options
+  if (questionNumber) questionNumber.textContent = 'Error';
   ['A', 'B', 'C', 'D'].forEach(letter => {
     const btn = optionBtns[letter];
     if (btn) btn.style.display = 'none';
@@ -211,7 +213,7 @@ function startFunFactTimer() {
     if (gameRoundActive) {
       funFactPending = true;
     } else {
-      showFunFactModal('', false);
+      showFunFactModal('', false);  // now uses the dynamically imported function (or dummy)
       funFactPending = false;
     }
   }, 600000);
@@ -330,12 +332,11 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK (with multiple fallbacks) ==========
+// ========== LOAD QUESTIONS FROM JS BANK ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
   
   try {
-    // Map export names to file names
     const exportMap = {
       'afrobeats': { file: 'afrobeats.js', export: 'afrobeats' },
       'nollywood': { file: 'nollywood.js', export: 'nollywood' },
@@ -405,7 +406,6 @@ async function loadQuestionsFromJS(exportNameParam) {
       throw new Error('Question bank is empty or invalid.');
     }
     
-    // Shuffle and select 10 random questions
     const shuffled = fisherYatesShuffle([...questionBank]);
     const selected = shuffled.slice(0, Math.min(TOTAL_QUESTIONS, shuffled.length));
     
@@ -423,7 +423,6 @@ async function loadQuestionsFromJS(exportNameParam) {
       gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     }
     
-    // Start the game with countdown
     showCountdown(() => loadQuestion(0));
     
   } catch (err) {
@@ -513,7 +512,6 @@ function showCountdown(callback) {
 function loadQuestion(index) {
   console.log('📝 Loading question', index + 1, 'of', currentQuestions.length);
   
-  // Clear any error panel if present
   const errorPanel = document.getElementById('gameErrorPanel');
   if (errorPanel) errorPanel.remove();
   
