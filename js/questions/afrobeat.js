@@ -1,12 +1,9 @@
 // js/question/afrobeats.js
 
 /**
- * Afrobeats Trivia Question Bank
- * Returns a random question from the dataset
- * Each question contains: question, optionA, optionB, optionC, optionD, correctAnswer, category, difficulty
- */
-function afrobeats() {
-    const questions = [
+ * Afrobeats Trivia Question Bank */
+
+    const afrobeats = [
         {
             question: "What is Don Jazzy's mother's name?",
             optionA: "Mrs Ajereh",
@@ -5048,13 +5045,4 @@ function afrobeats() {
             difficulty: "easy"
         }
     ];
-
-    // Return a random question from the array
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    return questions[randomIndex];
-}
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { afrobeats };
-}
+export default afrobeats;
