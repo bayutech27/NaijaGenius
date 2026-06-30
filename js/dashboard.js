@@ -129,6 +129,14 @@ document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
     window.location.href = "choose-your-lane.html";
 });
 
+// ---- Task 2: new One Chance handlers ----
+document.getElementById("oneChanceBtn")?.addEventListener("click", () => {
+    window.location.href = "games.html?type=one_chance";
+});
+document.getElementById("oneChanceBtnPlay")?.addEventListener("click", () => {
+    window.location.href = "games.html?type=one_chance";
+});
+
 // ========== NAVIGATION ==========
 document.querySelectorAll("[data-nav]").forEach(btn => {
     btn.addEventListener("click", (e) => {
