@@ -54,7 +54,7 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-/* ----- HEADER ----- */
+/* ----- HEADER (no brand, equal spacing) ----- */
 .app-header {
     position: fixed;
     top: 0;
@@ -65,21 +65,68 @@ body {
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     z-index: 1000;
+    padding: 0 1rem;
 }
+
 .header-container {
     max-width: 1200px;
     margin: 0 auto;
     height: 100%;
-    padding: 0 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.header-actions {
+
+.header-left {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
+
+/* Back button (used on games page, but kept for consistency) */
+.back-btn {
+    color: #3ED6B7;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+}
+.back-btn:hover { color: #ffffff; }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+/* --- Stats badges (coins & lives) --- */
+.header-stats {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-right: 0.5rem;
+}
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f0f3fa;
+}
+.stat-badge i {
+    font-size: 1rem;
+}
+.stat-badge span {
+    min-width: 20px;
+    text-align: center;
+}
+
 .icon-btn {
     background: transparent;
     border: none;
@@ -367,7 +414,6 @@ body {
     font-size: 1.2rem;
     color: #00E5A0;
 }
-/* Continuous icon animation */
 .animate-icon {
     animation: iconFloat 2.4s ease-in-out infinite;
 }
@@ -396,6 +442,127 @@ body {
 }
 .mode-btn:hover .mode-arrow {
     transform: translateX(4px);
+}
+
+/* Disabled mode buttons (when lives = 0) */
+.mode-btn:disabled {
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ----- LIVES WARNING (shown when lives === 0) ----- */
+.lives-warning {
+    display: none; /* toggled by JS */
+    margin-top: 1rem;
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid #ff6b6b;
+    border-radius: 12px;
+    padding: 0.8rem;
+    color: #ff6b6b;
+    font-weight: 600;
+    text-align: center;
+}
+.shop-link-btn {
+    background: none;
+    border: none;
+    color: #3ED6B7;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ----- SHOP SECTION ----- */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.shop-item {
+    background: rgba(20, 25, 40, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 16px;
+    padding: 1.2rem;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.shop-item:hover {
+    transform: translateY(-4px);
+    border-color: #FFD700;
+}
+.shop-item-icon {
+    font-size: 2.5rem;
+    color: #FFD700;
+    margin-bottom: 0.5rem;
+}
+.shop-item-info h4 {
+    font-size: 1rem;
+    color: #f0f3fa;
+    margin: 0.3rem 0;
+}
+.shop-item-info p {
+    font-size: 0.9rem;
+    color: #a0b3d9;
+    margin: 0.2rem 0;
+}
+.shop-buy-btn {
+    background: linear-gradient(135deg, #3ED6B7, #259c84);
+    border: none;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    color: #0a0f1e;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+}
+.shop-buy-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.shop-buy-btn:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.shop-coins-display {
+    font-size: 1.2rem;
+    color: #a0b3d9;
+}
+.shop-coins-display strong {
+    color: #FFD700;
+}
+
+/* Ad life container */
+.ad-life-container {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(20, 25, 40, 0.5);
+    border-radius: 16px;
+    border: 1px dashed rgba(62, 214, 183, 0.3);
+}
+.ad-life-btn {
+    background: linear-gradient(135deg, #FF6B6B, #ee5a24);
+    border: none;
+    border-radius: 40px;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.ad-life-btn:hover {
+    transform: scale(1.05);
+}
+.ad-life-note {
+    font-size: 0.8rem;
+    color: #a0b3d9;
+    margin-top: 0.5rem;
 }
 
 /* ----- LEADERBOARD ----- */
@@ -682,140 +849,7 @@ body {
     }
 }
 
-/* ===== SHOP SECTION ===== */
-.shop-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-.shop-item {
-    background: rgba(20,25,40,0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,215,0,0.2);
-    border-radius: 16px;
-    padding: 1.2rem;
-    text-align: center;
-    transition: transform 0.2s;
-}
-.shop-item:hover {
-    transform: translateY(-4px);
-    border-color: #FFD700;
-}
-.shop-item-icon {
-    font-size: 2.5rem;
-    color: #FFD700;
-    margin-bottom: 0.5rem;
-}
-.shop-item-info h4 {
-    font-size: 1rem;
-    color: #f0f3fa;
-    margin: 0.3rem 0;
-}
-.shop-item-info p {
-    font-size: 0.9rem;
-    color: #a0b3d9;
-    margin: 0.2rem 0;
-}
-.shop-buy-btn {
-    background: linear-gradient(135deg, #3ED6B7, #259c84);
-    border: none;
-    border-radius: 30px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    color: #0a0f1e;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: opacity 0.2s;
-}
-.shop-buy-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-.shop-buy-btn:not(:disabled):hover {
-    transform: scale(1.05);
-}
-
-.shop-coins-display {
-    font-size: 1.2rem;
-    color: #a0b3d9;
-}
-.shop-coins-display strong {
-    color: #FFD700;
-}
-
-.ad-life-container {
-    margin-top: 2rem;
-    text-align: center;
-    padding: 1.5rem;
-    background: rgba(20,25,40,0.5);
-    border-radius: 16px;
-    border: 1px dashed rgba(62,214,183,0.3);
-}
-.ad-life-btn {
-    background: linear-gradient(135deg, #FF6B6B, #ee5a24);
-    border: none;
-    border-radius: 40px;
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-.ad-life-btn:hover {
-    transform: scale(1.05);
-}
-.ad-life-note {
-    font-size: 0.8rem;
-    color: #a0b3d9;
-    margin-top: 0.5rem;
-}
-
-/* ===== HEADER STATS ===== */
-.header-stats {
-    display: flex;
-    gap: 0.8rem;
-    align-items: center;
-    margin-right: 1rem;
-}
-.stat-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: rgba(255,255,255,0.08);
-    padding: 0.2rem 0.8rem;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #f0f3fa;
-}
-.stat-badge i {
-    font-size: 1rem;
-}
-.stat-badge span {
-    min-width: 20px;
-    text-align: center;
-}
-
-/* ===== LIVES WARNING ===== */
-.shop-link-btn {
-    background: none;
-    border: none;
-    color: #3ED6B7;
-    font-weight: 700;
-    text-decoration: underline;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* ===== MODE BUTTONS DISABLED ===== */
-.mode-btn:disabled {
-    cursor: not-allowed;
-    filter: grayscale(0.5);
-}
-
-/* ===== RESPONSIVE ===== */
+/* Responsive: header stats on very small screens */
 @media (max-width: 520px) {
     .header-stats {
         gap: 0.4rem;
@@ -838,7 +872,6 @@ body {
         font-size: 2rem;
     }
 }
-
 
 /* ----- TOUCH TARGETS & SMOOTH SCROLL ----- */
 button, .nav-item, .sidebar-item, .challenge-card, .mode-btn, .lane-card {
