@@ -63,7 +63,7 @@ let roundCoins = 0;
 let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
 
-// Variables to hold pending wrong-answer info (for delayed feedback)
+// Variables for delayed feedback (used only in non‑One‑Chance modes)
 let pendingSelectedLetter = null;
 let pendingCorrectLetter = null;
 
@@ -659,18 +659,31 @@ function startTimer() {
         }
       });
 
-      // Store correct answer for delayed feedback
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
-      if (correctAns) {
-        pendingCorrectLetter = correctAns;
-        pendingSelectedLetter = null; // no selection, timeout
+
+      // ── ONE CHANCE: immediate feedback & end round ──
+      if (questionType === 'one_chance') {
+        // Reveal correct answer in green
+        if (correctAns && optionBtns[correctAns]) {
+          applyCorrectStyle(optionBtns[correctAns]);
+        }
+        // Streak update (wrong)
+        const comment = handleStreakUpdate(false);
+        if (comment) showCommentModal(comment);
+        // End round immediately
+        endRound();
+        return;
       }
 
-      // Update streak (wrong)
+      // ── OTHER MODES (Jollof Mix, Pick Your Lane): delayed feedback ──
+      if (correctAns) {
+        pendingCorrectLetter = correctAns;
+        pendingSelectedLetter = null;
+      }
+      // Streak update (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
-
-      // Handle wrong answer (will decide replay or feedback)
+      // Handle wrong answer (replay or delayed feedback)
       handleWrongAnswer();
     }
   }, 1000);
@@ -815,22 +828,19 @@ function showReplayModal(onYes, onNo) {
 
 // ========== APPLY WRONG FEEDBACK (called after "No" or when lives = 0) ==========
 function applyWrongFeedback(selectedLetter, correctLetter) {
-  // Highlight selected as wrong (if any)
   if (selectedLetter && optionBtns[selectedLetter]) {
     applyWrongStyle(optionBtns[selectedLetter]);
   }
-  // Highlight correct answer in green
   if (correctLetter && optionBtns[correctLetter]) {
     applyCorrectStyle(optionBtns[correctLetter]);
   }
 }
 
-// ========== HANDLE WRONG ANSWER (replay or continue) ==========
+// ========== HANDLE WRONG ANSWER (replay or continue – only for non‑One‑Chance) ==========
 function handleWrongAnswer() {
   const hasLives = livesRemaining > 0;
 
   if (hasLives) {
-    // Show replay modal
     showReplayModal(
       // Yes: replay the question
       async () => {
@@ -859,14 +869,12 @@ function handleWrongAnswer() {
           document.querySelectorAll('.option-crowd').forEach(el => {
             el.style.display = 'none';
           });
-          // Clear pending wrong info
           pendingSelectedLetter = null;
           pendingCorrectLetter = null;
           console.log('🔄 Replaying question with fresh timer.');
         } catch (err) {
           console.error('Failed to decrement lives:', err);
           showToast('Failed to use life. Please try again.', 'error');
-          // Fallback: continue without replay
           applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
           proceedAfterWrong();
         }
@@ -948,7 +956,24 @@ function attachOptionListener() {
       updateLifelineUI();
       nextBtn.disabled = false;
     } else {
-      // ── 5. Wrong answer – store info, no feedback yet ──
+      // ── 5. Wrong answer ──
+      // ── ONE CHANCE: immediate feedback & end round ──
+      if (questionType === 'one_chance') {
+        // Highlight selected as wrong
+        applyWrongStyle(btn);
+        // Highlight correct answer in green
+        if (correctLetter && optionBtns[correctLetter]) {
+          applyCorrectStyle(optionBtns[correctLetter]);
+        }
+        // Streak update (wrong)
+        const comment = handleStreakUpdate(false);
+        if (comment) showCommentModal(comment);
+        // End round immediately
+        endRound();
+        return;
+      }
+
+      // ── OTHER MODES: store info for delayed feedback ──
       pendingSelectedLetter = selectedLetter;
       pendingCorrectLetter = correctLetter;
 
@@ -956,7 +981,7 @@ function attachOptionListener() {
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
 
-      // Handle wrong answer (will decide replay or delayed feedback)
+      // Handle wrong answer (replay or delayed feedback)
       handleWrongAnswer();
     }
   });
@@ -997,12 +1022,10 @@ lifelineFifty?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Use one fifty-fifty
   if (lifelineCounts.fifty_fifty <= 0) return;
   lifelineCounts.fifty_fifty--;
   updateLifelineUI();
 
-  // If the free one was used, we need to decrement Firestore extras
   if (!freeLifelines.fifty_fifty) {
     try {
       const userRef = doc(db, 'users', currentUserUID);
@@ -1017,7 +1040,6 @@ lifelineFifty?.addEventListener('click', async () => {
     console.log('🆓 Used free fifty_fifty');
   }
 
-  // Apply effect: hide 2 wrong options
   const correct = currentQ.correctAnswer;
   const wrongOptions = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
   const toHide = fisherYatesShuffle(wrongOptions).slice(0, 2);
@@ -1035,7 +1057,6 @@ lifelineAsk?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Use one ask_crowd
   if (lifelineCounts.ask_crowd <= 0) return;
   lifelineCounts.ask_crowd--;
   updateLifelineUI();
@@ -1054,7 +1075,6 @@ lifelineAsk?.addEventListener('click', async () => {
     console.log('🆓 Used free ask_crowd');
   }
 
-  // Generate crowd percentages
   const correct = currentQ.correctAnswer;
   const correctPct = Math.floor(Math.random() * 26) + 45;
   let remaining = 100 - correctPct;
@@ -1073,7 +1093,6 @@ lifelineAsk?.addEventListener('click', async () => {
   result[correct] = correctPct;
   others.forEach((letter, idx) => { result[letter] = dist[idx] || 0; });
 
-  // Show in‑option crowd bars
   const letters = ['A', 'B', 'C', 'D'];
   letters.forEach(letter => {
     const container = document.querySelector(`#option${letter} .option-crowd`);
@@ -1093,7 +1112,6 @@ lifelineCallFriend?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Use one callFriend
   if (lifelineCounts.callFriend <= 0) return;
   lifelineCounts.callFriend--;
   updateLifelineUI();
@@ -1112,7 +1130,6 @@ lifelineCallFriend?.addEventListener('click', async () => {
     console.log('🆓 Used free callFriend');
   }
 
-  // Show modal with correct answer
   const correctLetter = currentQ.correctAnswer;
   showCallFriendModal(correctLetter);
 });
@@ -1480,15 +1497,12 @@ function showRoundEndModal(newBest = false) {
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
   card.appendChild(scoreDiv);
 
-  // For One Chance, show correct count out of attempted questions, else out of total
+  // For One Chance, show correct count out of attempted questions
   let attempted = TOTAL_QUESTIONS;
   let correctOutOfText = '';
   if (questionType === 'one_chance') {
-    // currentQuestionIndex is the index of the missed question (or last completed if finished)
     attempted = Math.min(currentQuestionIndex + 1, TOTAL_QUESTIONS);
-    // If they completed all, attempted = 10
     correctOutOfText = `${correctCount} of ${attempted} correct`;
-    // Also show reached text
     const reachedDiv = document.createElement('div');
     reachedDiv.style.cssText = `
       font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
@@ -1505,8 +1519,6 @@ function showRoundEndModal(newBest = false) {
   `;
   correctDiv.textContent = correctOutOfText;
   card.appendChild(correctDiv);
-
-  // Remove the separate "reached" div for One Chance that was previously here (we now handle it above)
 
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
