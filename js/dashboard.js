@@ -33,7 +33,7 @@ function getLevel(correctCount) {
             return lv;
         }
     }
-    return LEVELS[0]; // fallback
+    return LEVELS[0];
 }
 
 function updateLevel(correctCount) {
@@ -41,7 +41,6 @@ function updateLevel(correctCount) {
     if (levelNameEl) levelNameEl.textContent = level.name;
     if (levelBadgeEl) {
         levelBadgeEl.src = `/assets/${level.badge}`;
-        // fallback if image fails
         levelBadgeEl.onerror = function() {
             this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23333'/><text x='50' y='58' font-size='40' text-anchor='middle' fill='%23FFD700'>?</text></svg>";
         };
@@ -107,7 +106,6 @@ onAuthStateChanged(auth, async (user) => {
             console.log('🔄 Lives renewed to 2');
         }
 
-        // Update UI
         updateHeaderUI(coins, lives);
         if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
 
@@ -115,8 +113,6 @@ onAuthStateChanged(auth, async (user) => {
         const totalCorrect = userData.totalCorrectAnswers || 0;
         if (totalGamesPlayed) totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
         if (correctAnswersEl) correctAnswersEl.textContent = totalCorrect;
-
-        // Update level
         updateLevel(totalCorrect);
 
         let best = 0;
@@ -175,12 +171,15 @@ document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
 document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
     window.location.href = "games.html";
 });
+
+// Updated to point to pick-your-lane.html
 document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
-    window.location.href = "choose-your-lane.html";
+    window.location.href = "pick-your-lane.html";
 });
 document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
-    window.location.href = "choose-your-lane.html";
+    window.location.href = "pick-your-lane.html";
 });
+
 document.getElementById("oneChanceBtn")?.addEventListener("click", () => {
     window.location.href = "games.html?type=one_chance";
 });
