@@ -61,9 +61,11 @@ let lifelinesDisabled = false;
 let oneChanceMissed = false;
 let roundCoins = 0;
 let livesRemaining = 0;
-
-// Flag to track if the free lifeline has been used this round
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+
+// Variables to hold pending wrong-answer info (for delayed feedback)
+let pendingSelectedLetter = null;
+let pendingCorrectLetter = null;
 
 const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
@@ -290,7 +292,6 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // Load lifelines from Firestore (extras) and add the free 1
     await loadLifelines();
     await readParamsFromURL();
 
@@ -304,12 +305,10 @@ onAuthStateChanged(auth, async (user) => {
 // ========== LOAD LIFELINES (from Firestore + free 1) ==========
 async function loadLifelines() {
   try {
-    // Read the user's lifeline extras from Firestore
     if (!currentUserUID) throw new Error('User not authenticated');
     const userRef = doc(db, 'users', currentUserUID);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
-      // Fallback defaults if doc missing
       lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
       freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
       updateLifelineUI();
@@ -317,14 +316,11 @@ async function loadLifelines() {
     }
     const data = userSnap.data();
     const extras = data.lifeline || {};
-
-    // Each round: 1 free + extras from Firestore
     lifelineCounts = {
       fifty_fifty: 1 + (extras.fifty_fifty || 0),
       ask_crowd:   1 + (extras.ask_crowd || 0),
       callFriend:  1 + (extras.callFriend || 0)
     };
-    // Reset free flags for the new round
     freeLifelines = {
       fifty_fifty: true,
       ask_crowd:   true,
@@ -334,7 +330,6 @@ async function loadLifelines() {
     console.log('🔄 Lifelines loaded:', lifelineCounts, 'extras:', extras);
   } catch (err) {
     console.error('Failed to load lifelines from Firestore:', err);
-    // Fallback to default 1 each
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
     freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
     updateLifelineUI();
@@ -620,6 +615,10 @@ function loadQuestion(index) {
     el.style.display = 'none';
   });
 
+  // Reset pending wrong-answer variables
+  pendingSelectedLetter = null;
+  pendingCorrectLetter = null;
+
   updateLifelineUI();
   startTimer();
 }
@@ -660,13 +659,18 @@ function startTimer() {
         }
       });
 
+      // Store correct answer for delayed feedback
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
-      if (correctAns && optionBtns[correctAns]) {
-        applyCorrectStyle(optionBtns[correctAns]);
+      if (correctAns) {
+        pendingCorrectLetter = correctAns;
+        pendingSelectedLetter = null; // no selection, timeout
       }
 
+      // Update streak (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
+
+      // Handle wrong answer (will decide replay or feedback)
       handleWrongAnswer();
     }
   }, 1000);
@@ -809,10 +813,26 @@ function showReplayModal(onYes, onNo) {
   });
 }
 
+// ========== APPLY WRONG FEEDBACK (called after "No" or when lives = 0) ==========
+function applyWrongFeedback(selectedLetter, correctLetter) {
+  // Highlight selected as wrong (if any)
+  if (selectedLetter && optionBtns[selectedLetter]) {
+    applyWrongStyle(optionBtns[selectedLetter]);
+  }
+  // Highlight correct answer in green
+  if (correctLetter && optionBtns[correctLetter]) {
+    applyCorrectStyle(optionBtns[correctLetter]);
+  }
+}
+
 // ========== HANDLE WRONG ANSWER (replay or continue) ==========
 function handleWrongAnswer() {
-  if (livesRemaining > 0) {
+  const hasLives = livesRemaining > 0;
+
+  if (hasLives) {
+    // Show replay modal
     showReplayModal(
+      // Yes: replay the question
       async () => {
         try {
           const userRef = doc(db, 'users', currentUserUID);
@@ -820,6 +840,7 @@ function handleWrongAnswer() {
             lives: increment(-1)
           });
           livesRemaining = Math.max(0, livesRemaining - 1);
+          // Reset question state
           questionAnswered = false;
           ['A', 'B', 'C', 'D'].forEach(letter => {
             const btn = optionBtns[letter];
@@ -838,18 +859,27 @@ function handleWrongAnswer() {
           document.querySelectorAll('.option-crowd').forEach(el => {
             el.style.display = 'none';
           });
+          // Clear pending wrong info
+          pendingSelectedLetter = null;
+          pendingCorrectLetter = null;
           console.log('🔄 Replaying question with fresh timer.');
         } catch (err) {
           console.error('Failed to decrement lives:', err);
           showToast('Failed to use life. Please try again.', 'error');
+          // Fallback: continue without replay
+          applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
           proceedAfterWrong();
         }
       },
+      // No: continue, show feedback now
       () => {
+        applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
         proceedAfterWrong();
       }
     );
   } else {
+    // No lives – immediately show feedback and continue
+    applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
     proceedAfterWrong();
   }
 }
@@ -877,9 +907,11 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
+    // ── 1. Stop timer ──
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
+    // ── 2. Lock options ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const b = optionBtns[letter];
       if (b) {
@@ -888,6 +920,7 @@ function attachOptionListener() {
       }
     });
 
+    // ── 3. Validate ──
     const selectedLetter = btn.dataset.option;
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!currentQ) {
@@ -898,16 +931,9 @@ function attachOptionListener() {
     const correctLetter = currentQ.correctAnswer;
     const isCorrect = (selectedLetter === correctLetter);
 
+    // ── 4. Handle correct answer (immediate feedback) ──
     if (isCorrect) {
       applyCorrectStyle(btn);
-    } else {
-      applyWrongStyle(btn);
-      if (optionBtns[correctLetter]) {
-        applyCorrectStyle(optionBtns[correctLetter]);
-      }
-    }
-
-    if (isCorrect) {
       const coinsEarned = (timeLeft <= 7) ? 10 : 15;
       roundCoins += coinsEarned;
       roundScore += pointsEarned;
@@ -922,8 +948,15 @@ function attachOptionListener() {
       updateLifelineUI();
       nextBtn.disabled = false;
     } else {
+      // ── 5. Wrong answer – store info, no feedback yet ──
+      pendingSelectedLetter = selectedLetter;
+      pendingCorrectLetter = correctLetter;
+
+      // Streak update (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
+
+      // Handle wrong answer (will decide replay or delayed feedback)
       handleWrongAnswer();
     }
   });
@@ -971,7 +1004,6 @@ lifelineFifty?.addEventListener('click', async () => {
 
   // If the free one was used, we need to decrement Firestore extras
   if (!freeLifelines.fifty_fifty) {
-    // Used an extra – decrement Firestore
     try {
       const userRef = doc(db, 'users', currentUserUID);
       await updateDoc(userRef, { 'lifeline.fifty_fifty': increment(-1) });
@@ -981,7 +1013,6 @@ lifelineFifty?.addEventListener('click', async () => {
       showToast('Could not save lifeline usage.', 'error', 20000);
     }
   } else {
-    // Used the free one – mark as used
     freeLifelines.fifty_fifty = false;
     console.log('🆓 Used free fifty_fifty');
   }
@@ -1449,21 +1480,33 @@ function showRoundEndModal(newBest = false) {
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
   card.appendChild(scoreDiv);
 
-  const correctDiv = document.createElement('div');
-  correctDiv.style.cssText = `
-    font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
-  `;
-  correctDiv.textContent = `${correctCount} of ${TOTAL_QUESTIONS} correct`;
-  card.appendChild(correctDiv);
-
+  // For One Chance, show correct count out of attempted questions, else out of total
+  let attempted = TOTAL_QUESTIONS;
+  let correctOutOfText = '';
   if (questionType === 'one_chance') {
+    // currentQuestionIndex is the index of the missed question (or last completed if finished)
+    attempted = Math.min(currentQuestionIndex + 1, TOTAL_QUESTIONS);
+    // If they completed all, attempted = 10
+    correctOutOfText = `${correctCount} of ${attempted} correct`;
+    // Also show reached text
     const reachedDiv = document.createElement('div');
     reachedDiv.style.cssText = `
       font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
     `;
-    reachedDiv.textContent = `You reached question ${currentQuestionIndex + 1} of ${TOTAL_QUESTIONS}`;
+    reachedDiv.textContent = `You reached question ${attempted} of ${TOTAL_QUESTIONS}`;
     card.appendChild(reachedDiv);
+  } else {
+    correctOutOfText = `${correctCount} of ${TOTAL_QUESTIONS} correct`;
   }
+
+  const correctDiv = document.createElement('div');
+  correctDiv.style.cssText = `
+    font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
+  `;
+  correctDiv.textContent = correctOutOfText;
+  card.appendChild(correctDiv);
+
+  // Remove the separate "reached" div for One Chance that was previously here (we now handle it above)
 
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
