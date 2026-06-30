@@ -14,24 +14,22 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
+    <!-- ===== HEADER (without brand) ===== -->
     <header class="app-header">
         <div class="header-container">
-            <div class="logo-wrapper">
-                <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
+            <div class="header-left">
+                <a href="/app/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
             </div>
             <div class="header-actions">
                 <!-- Coins & Lives counters -->
-                <div class="header-stats">
-                    <span class="stat-badge" id="headerCoins">
-                        <i class="fas fa-coins" style="color:#FFD700;"></i>
-                        <span id="headerCoinsValue">0</span>
-                    </span>
-                    <span class="stat-badge" id="headerLives">
-                        <i class="fas fa-heart" style="color:#ff6b6b;"></i>
-                        <span id="headerLivesValue">2</span>
-                    </span>
-                </div>
+                <span class="stat-badge" id="headerCoins">
+                    <i class="fas fa-coins" style="color:#FFD700;"></i>
+                    <span id="headerCoinsValue">0</span>
+                </span>
+                <span class="stat-badge" id="headerLives">
+                    <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+                    <span id="headerLivesValue">2</span>
+                </span>
                 <button class="icon-btn notification-btn" id="notificationBtn">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge" id="notificationBadge"></span>
@@ -103,11 +101,10 @@
                 <div class="empty-placeholder" style="display: none;">No challenges available. Check back soon!</div>
             </div>
 
-            <!-- ---- CHOOSE A MODE (stacked & centered on mobile) ---- -->
+            <!-- ---- CHOOSE A MODE ---- -->
             <div class="mode-section">
                 <h2 class="section-title mode-title">Choose a Mode</h2>
-                <div class="mode-grid" id="modeGrid">
-                    <!-- Jollof Mix -->
+                <div class="mode-grid">
                     <button class="mode-btn" id="jollofMixBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-fire mode-icon animate-icon"></i>
@@ -115,7 +112,6 @@
                         <span class="mode-name">Jollof Mix</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <!-- Pick Your Lane -->
                     <button class="mode-btn" id="chooseLaneBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-road mode-icon animate-icon"></i>
@@ -123,7 +119,6 @@
                         <span class="mode-name">Pick Your Lane</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <!-- One Chance -->
                     <button class="mode-btn" id="oneChanceBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-bolt mode-icon animate-icon"></i>
@@ -132,22 +127,19 @@
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
-                <!-- Lives warning (shown when lives === 0) -->
-                <div id="livesWarning" style="display:none; margin-top:1rem; background:rgba(255,107,107,0.15); border:1px solid #ff6b6b; border-radius:12px; padding:0.8rem; color:#ff6b6b; font-weight:600; text-align:center;">
-                    <i class="fas fa-heart-broken"></i> No lives left! Get more from the <button class="shop-link-btn" data-nav="shop">Shop</button>.
-                </div>
+                <!-- Lives warning removed – lives are for replay, not to block playing -->
             </div>
 
         </section>
 
         <!-- ============================================================
-        PLAY SECTION — same mode buttons
+        PLAY SECTION
         ============================================================ -->
         <section id="playSection" class="page-section">
             <div class="mode-section play-mode-section">
                 <h2 class="section-title mode-title">Choose a Mode</h2>
                 <p class="page-subtitle" style="margin-bottom:1.5rem;">Pick your challenge and start winning</p>
-                <div class="mode-grid" id="playModeGrid">
+                <div class="mode-grid">
                     <button class="mode-btn" id="jollofMixBtnPlay">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-fire mode-icon animate-icon"></i>
@@ -170,10 +162,6 @@
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
-                <!-- Lives warning (shown when lives === 0) -->
-                <div id="livesWarningPlay" style="display:none; margin-top:1rem; background:rgba(255,107,107,0.15); border:1px solid #ff6b6b; border-radius:12px; padding:0.8rem; color:#ff6b6b; font-weight:600; text-align:center;">
-                    <i class="fas fa-heart-broken"></i> No lives left! Get more from the <button class="shop-link-btn" data-nav="shop">Shop</button>.
-                </div>
             </div>
         </section>
 
@@ -193,7 +181,7 @@
                 <button id="watchAdBtn" class="ad-life-btn">
                     <i class="fas fa-video"></i> Watch Ad for +1 Life
                 </button>
-                <p class="ad-life-note">Watch a short video to earn an extra life (max 1 per day?) – we'll keep it unlimited for now.</p>
+                <p class="ad-life-note">Watch a short video to earn an extra life.</p>
             </div>
         </section>
 
