@@ -6,7 +6,6 @@ import { showFunFactModal } from './fun-facts.js';
 import { renderShop, setupAdButton } from './shop.js';
 
 // ========== DOM ELEMENTS ==========
-const walletBalance = document.getElementById("walletBalance");
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
 const correctAnswersEl = document.getElementById("correctAnswers");
 const bestScoreValue = document.getElementById("bestScoreValue");
@@ -16,6 +15,38 @@ const greetingText = document.getElementById("greetingText");
 const headerCoinsValue = document.getElementById("headerCoinsValue");
 const headerLivesValue = document.getElementById("headerLivesValue");
 const shopCoinsDisplay = document.getElementById("shopCoinsDisplay");
+const levelNameEl = document.getElementById("levelName");
+const levelBadgeEl = document.getElementById("levelBadge");
+
+// ========== LEVEL DEFINITIONS ==========
+const LEVELS = [
+    { min: 0, max: 300, name: 'Ajebutter', badge: 'ajebutter.png' },
+    { min: 301, max: 1000, name: 'Naija Pikin', badge: 'naija-pikin.png' },
+    { min: 1001, max: 3000, name: 'Ogbonge', badge: 'ogbonge.png' },
+    { min: 3001, max: 6000, name: 'Oga Patapata', badge: 'oga-patapata.png' },
+    { min: 6001, max: Infinity, name: 'De Genius', badge: 'de-genius.png' }
+];
+
+function getLevel(correctCount) {
+    for (let lv of LEVELS) {
+        if (correctCount >= lv.min && correctCount <= lv.max) {
+            return lv;
+        }
+    }
+    return LEVELS[0]; // fallback
+}
+
+function updateLevel(correctCount) {
+    const level = getLevel(correctCount);
+    if (levelNameEl) levelNameEl.textContent = level.name;
+    if (levelBadgeEl) {
+        levelBadgeEl.src = `/assets/${level.badge}`;
+        // fallback if image fails
+        levelBadgeEl.onerror = function() {
+            this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23333'/><text x='50' y='58' font-size='40' text-anchor='middle' fill='%23FFD700'>?</text></svg>";
+        };
+    }
+}
 
 // ========== HELPER: TIME-BASED GREETING ==========
 function getGreeting() {
@@ -65,7 +96,6 @@ onAuthStateChanged(auth, async (user) => {
         let lives = userData.lives ?? 2;
         let lastRenewal = userData.lastLiveRenewal?.toDate?.() || new Date(0);
 
-        // Check if 24 hours have passed since last renewal
         const now = new Date();
         const hoursSince = (now - lastRenewal) / (1000 * 60 * 60);
         if (hoursSince >= 24) {
@@ -79,12 +109,15 @@ onAuthStateChanged(auth, async (user) => {
 
         // Update UI
         updateHeaderUI(coins, lives);
-        if (walletBalance) walletBalance.textContent = coins;
         if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
 
         // ===== GAME STATS =====
+        const totalCorrect = userData.totalCorrectAnswers || 0;
         if (totalGamesPlayed) totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
-        if (correctAnswersEl) correctAnswersEl.textContent = userData.totalCorrectAnswers || 0;
+        if (correctAnswersEl) correctAnswersEl.textContent = totalCorrect;
+
+        // Update level
+        updateLevel(totalCorrect);
 
         let best = 0;
         const categories = userData.categoryStats || {};
@@ -109,10 +142,11 @@ onAuthStateChanged(auth, async (user) => {
                 const newCoins = updated.coins || 0;
                 const newLives = updated.lives ?? 2;
                 updateHeaderUI(newCoins, newLives);
-                if (walletBalance) walletBalance.textContent = newCoins;
                 if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
                 if (totalGamesPlayed) totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
-                if (correctAnswersEl) correctAnswersEl.textContent = updated.totalCorrectAnswers || 0;
+                const newCorrect = updated.totalCorrectAnswers || 0;
+                if (correctAnswersEl) correctAnswersEl.textContent = newCorrect;
+                updateLevel(newCorrect);
 
                 let newBest = 0;
                 const cats = updated.categoryStats || {};
