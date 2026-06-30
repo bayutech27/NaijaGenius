@@ -20,7 +20,6 @@ import {
 console.log('🎮 games.js loaded');
 
 // ========== SHARED EXPORT MAP ==========
-// Task 3: extracted from loadQuestionsFromJS for reuse in mixed mode
 const SHARED_EXPORT_MAP = {
   'afrobeats':        { file: 'afrobeats.js',        export: 'afrobeats'        },
   'nollywood':        { file: 'nollywood.js',        export: 'nollywood'        },
@@ -62,6 +61,7 @@ let isNewBest = false;
 let gameRoundActive = false;
 let questionAnswered = false;
 let lifelinesDisabled = false;
+let oneChanceMissed = false; // Task 1: track if One Chance round has a miss
 
 const MAX_SCORE_PER_QUESTION = 15; // max points = time left at answer = 15
 const TOTAL_QUESTIONS = 10;
@@ -197,7 +197,6 @@ function fisherYatesShuffle(array) {
 }
 
 // ========== REUSABLE IMPORT HELPER ==========
-// Task 3: extracted from loadQuestionsFromJS to avoid duplication
 async function importQuestionBank(mapping) {
   let questionBank = null;
   let lastError = null;
@@ -296,7 +295,6 @@ onAuthStateChanged(auth, async (user) => {
 
     await loadLifelines();
     await readParamsFromURL();
-    // Fun‑fact timer removed
 
   } catch (err) {
     console.error('Init error:', err);
@@ -308,7 +306,6 @@ onAuthStateChanged(auth, async (user) => {
 // ========== LOAD LIFELINES ==========
 async function loadLifelines() {
   if (questionType === 'regular' || questionType === 'one_chance') {
-    // For both regular (Pick Your Lane) and one_chance (and Jollof Mix which is regular), use 1 each
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
     updateLifelineUI();
     return;
@@ -340,7 +337,6 @@ function updateLifelineUI() {
 }
 
 // ========== READ PARAMS FROM URL ==========
-// Task 3: Modified to handle missing category (Jollof Mix / One Chance) and to detect one_chance type
 function readParamsFromURL() {
   const urlParams       = new URLSearchParams(window.location.search);
   const rawCat          = urlParams.get('category');
@@ -349,10 +345,9 @@ function readParamsFromURL() {
 
   console.log('📖 Reading params:', { rawCat, rawT, exportNameParam });
 
-  // If category is present, use single-category path (Pick Your Lane / Tournament)
   if (rawCat) {
     category     = rawCat;
-    questionType = rawT; // might be 'regular' or 'tournament'
+    questionType = rawT;
 
     const displayName = formatCategoryName(category);
     if (gameCategory) gameCategory.textContent = displayName;
@@ -366,21 +361,16 @@ function readParamsFromURL() {
       throw new Error('Missing export parameter');
     }
   } else {
-    // No category → mixed mode (Jollof Mix or One Chance)
-    questionType = rawT; // will be 'regular' (Jollof Mix) or 'one_chance'
-    category = 'mixed'; // set to a fixed value for Firestore and display
-
-    // Set UI elements
+    // Mixed mode (Jollof Mix or One Chance)
+    questionType = rawT;
+    category = 'mixed';
     if (gameCategory) gameCategory.textContent = 'Mixed';
     if (gameType)     gameType.textContent     = questionType === 'one_chance' ? 'One Chance' : 'Jollof Mix';
-
-    // Load mixed questions (shared by Jollof Mix and One Chance)
     loadMixedQuestions();
   }
 }
 
 // ========== LOAD QUESTIONS FROM JS BANK (single category) ==========
-// Task 3: refactored to use SHARED_EXPORT_MAP and importQuestionBank helper
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
 
@@ -433,7 +423,6 @@ async function loadQuestionsFromJS(exportNameParam) {
 }
 
 // ========== LOAD MIXED QUESTIONS (Jollof Mix & One Chance) ==========
-// Task 3: new function to build mixed-category question set
 async function loadMixedQuestions() {
   console.log('🔄 Loading mixed-category questions...');
   const mixedQuestions = [];
@@ -442,10 +431,8 @@ async function loadMixedQuestions() {
     try {
       const bank = await importQuestionBank(mapping);
       if (bank && bank.length > 0) {
-        // Pick one random question from this category
         const randomIndex = Math.floor(Math.random() * bank.length);
         const question = bank[randomIndex];
-        // Optionally add a category field for debugging, but not needed for game logic
         mixedQuestions.push(question);
         console.log(`✅ Added one question from ${key}`);
       } else {
@@ -463,7 +450,6 @@ async function loadMixedQuestions() {
     return;
   }
 
-  // Shuffle the order of categories
   const shuffledMixed = fisherYatesShuffle(mixedQuestions);
   const selected = shuffledMixed.slice(0, Math.min(TOTAL_QUESTIONS, shuffledMixed.length));
 
@@ -475,7 +461,6 @@ async function loadMixedQuestions() {
 
   currentQuestions = selected;
 
-  // Set difficulty display to first question's difficulty (if any)
   if (currentQuestions.length > 0 && gameDifficulty) {
     const firstQ = currentQuestions[0];
     const raw = firstQ.difficulty || 'Easy';
@@ -561,6 +546,7 @@ function loadQuestion(index) {
   gameRoundActive   = true;
   questionAnswered  = false;
   lifelinesDisabled = false;
+  oneChanceMissed = false; // Task 2: reset flag for new question
   nextBtn.disabled  = true;
 
   nextBtn.innerHTML = (index === TOTAL_QUESTIONS - 1)
@@ -637,36 +623,19 @@ function startTimer() {
     }
 
     if (timeLeft <= 0) {
-      // Time expired — lock everything, reveal correct answer, score = 0 for this question
       clearInterval(timerInterval);
       questionAnswered  = true;
       lifelinesDisabled = true;
       updateLifelineUI();
-      // ── One Chance: end round immediately on timeout ──
-      if (questionType === 'one_chance') {
-        // Do not enable Next; end round now
-        // But we need to reveal correct answer and handle streak before ending
-        // We'll do that and then call endRound()
-        ['A', 'B', 'C', 'D'].forEach(letter => {
-          const btn = optionBtns[letter];
-          if (btn) {
-            btn.disabled = true;
-            btn.classList.add('disabled');
-          }
-        });
-        const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
-        if (correctAns && optionBtns[correctAns]) {
-          applyCorrectStyle(optionBtns[correctAns]);
+
+      // Lock all option buttons
+      ['A', 'B', 'C', 'D'].forEach(letter => {
+        const btn = optionBtns[letter];
+        if (btn) {
+          btn.disabled = true;
+          btn.classList.add('disabled');
         }
-        // Streak: treat timeout as wrong
-        handleStreakUpdate(false);
-        // End round immediately
-        endRound();
-        return;
-      } else {
-        // Normal mode (Jollof Mix / Pick Your Lane): enable Next
-        nextBtn.disabled = false;
-      }
+      });
 
       // Reveal correct answer in green
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
@@ -674,9 +643,17 @@ function startTimer() {
         applyCorrectStyle(optionBtns[correctAns]);
       }
 
-      // No points added — timeLeft is 0 so pointsEarned would be 0
       // Streak: treat timeout as a wrong answer
       handleStreakUpdate(false);
+
+      // Task 1: For One Chance, set flag and show Finish; else enable Next
+      if (questionType === 'one_chance') {
+        oneChanceMissed = true;
+        nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
+        nextBtn.disabled = false;
+      } else {
+        nextBtn.disabled = false;
+      }
     }
   }, 1000);
 }
@@ -706,7 +683,6 @@ function handleStreakUpdate(isCorrect) {
 
   if (isCorrect) {
     if (streakDirection === 'loss') {
-      // Was on a losing streak — check how bad it was before resetting
       const previousLossCount = Math.abs(currentStreak);
       currentStreak   = 1;
       streakDirection = 'win';
@@ -721,12 +697,10 @@ function handleStreakUpdate(isCorrect) {
         commentText = onFiveStreakWin();
       }
     } else {
-      // null / first question
       currentStreak   = 1;
       streakDirection = 'win';
     }
   } else {
-    // Wrong or timeout
     if (streakDirection === 'win') {
       currentStreak   = -1;
       streakDirection = 'loss';
@@ -748,10 +722,6 @@ function handleStreakUpdate(isCorrect) {
 }
 
 // ========== ANSWER SELECTION ==========
-// IMPORTANT: This module originally used a top-level `await import('./fun-facts.js')`
-// which caused DOMContentLoaded to fire before the listener could be attached.
-// That import has been removed, so the listener is now attached synchronously.
-// The .options-grid element is guaranteed to exist by the time this runs.
 function attachOptionListener() {
   const optionsGrid = document.querySelector('.options-grid');
   if (!optionsGrid) {
@@ -769,7 +739,7 @@ function attachOptionListener() {
 
     // ── 1. Stop the timer at the EXACT moment of selection ──
     clearInterval(timerInterval);
-    const pointsEarned = Math.max(0, timeLeft); // time remaining at click = score
+    const pointsEarned = Math.max(0, timeLeft);
 
     // ── 2. Lock ALL option buttons instantly so no second click can register ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
@@ -791,8 +761,7 @@ function attachOptionListener() {
     const correctLetter = currentQ.correctAnswer;
     const isCorrect      = (selectedLetter === correctLetter);
 
-    // ── 4. Apply full background highlight: green if correct, red if wrong,
-    //        and ALWAYS reveal the true correct option in green ──
+    // ── 4. Apply full background highlight ──
     if (isCorrect) {
       applyCorrectStyle(btn);
     } else {
@@ -802,11 +771,11 @@ function attachOptionListener() {
       }
     }
 
-    // ── 5. Save progress: accumulate correct count + running score ──
+    // ── 5. Save progress ──
     if (isCorrect) {
       roundScore   += pointsEarned;
       correctCount += 1;
-      console.log(`✅ Correct! +${pointsEarned} pts (time left at click) → round total: ${roundScore}/${TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION}`);
+      console.log(`✅ Correct! +${pointsEarned} pts → round total: ${roundScore}`);
     } else {
       console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → round total: ${roundScore}`);
     }
@@ -816,34 +785,38 @@ function attachOptionListener() {
     lifelinesDisabled = true;
     updateLifelineUI();
 
-    // ── 7. Evaluate streak rules and show the matching comment modal ──
+    // ── 7. Evaluate streak rules and show comment ──
     const commentText = handleStreakUpdate(isCorrect);
     if (commentText) {
       showCommentModal(commentText);
     }
 
-    // ── 8. Handle One Chance: on wrong, end round immediately ──
+    // ── 8. Task 1: One Chance wrong → set flag, change button to Finish ──
     if (questionType === 'one_chance' && !isCorrect) {
-      // Do not enable Next; end round now
-      endRound();
-      return;
+      oneChanceMissed = true;
+      nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
     }
 
-    // ── 9. For all other cases: enable Next ──
+    // ── 9. Enable Next for all cases ──
     nextBtn.disabled = false;
   });
 
   console.log('✅ Option click listener attached to .options-grid');
 }
 
-// Attach immediately — do NOT wait for DOMContentLoaded (see comment above).
+// Attach immediately
 attachOptionListener();
 
 // ========== NEXT BUTTON ==========
+// Task 2: Modified to check oneChanceMissed
 nextBtn.addEventListener('click', () => {
   if (nextBtn.disabled) return;
   if (questionAnswered) {
-    nextQuestion();
+    if (oneChanceMissed) {
+      endRound(); // Finish the round after a miss
+    } else {
+      nextQuestion();
+    }
   }
 });
 
@@ -898,7 +871,7 @@ lifelineAsk?.addEventListener('click', async () => {
   if (!currentQ) return;
 
   const correct     = currentQ.correctAnswer;
-  const correctPct  = Math.floor(Math.random() * 26) + 45; // 45–70%
+  const correctPct  = Math.floor(Math.random() * 26) + 45;
   let remaining     = 100 - correctPct;
   const others      = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
   const dist        = [];
@@ -962,14 +935,13 @@ lifelineSkip?.addEventListener('click', async () => {
     }
   }
 
-  // Skip counts as neither correct nor wrong — don't trigger streak
   questionAnswered  = true;
   lifelinesDisabled = true;
   updateLifelineUI();
   nextQuestion();
 });
 
-// ========== LOADER ==========
+// ========== LOADER (kept for potential future use) ==========
 function showLoader(message = 'Wait a moment. Calculating your score...') {
   if (document.getElementById('scoreLoader')) return;
 
@@ -1013,93 +985,94 @@ function hideLoader() {
 }
 
 // ========== END ROUND ==========
+// Task 3: Refactored to display result instantly and save in background
 async function endRound() {
   if (roundEnded) return;
   roundEnded    = true;
   gameRoundActive = false;
   clearInterval(timerInterval);
 
-  // Fun‑fact pending checks removed
+  // Show result modal immediately (no loader, no Firestore read)
+  showRoundEndModal(false); // no badge yet
 
-  showLoader('Calculating your score... Please wait.');
+  // Firestore save and badge patch in background (fire-and-forget)
+  (async () => {
+    try {
+      // Read previous best
+      let previousBest = 0;
+      try {
+        const userRef = doc(db, 'users', currentUserUID);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          const catStats = data.categoryStats || {};
+          previousBest = catStats[category]?.bestScore || 0;
+        }
+      } catch (err) {
+        console.warn('Could not read previous best:', err);
+        previousBest = 0; // treat as not new best if we can't read
+      }
 
-  // Read previous best before saving
-  let previousBest = 0;
-  try {
-    const userRef  = doc(db, 'users', currentUserUID);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const data    = userSnap.data();
-      const catStats = data.categoryStats || {};
-      previousBest  = catStats[category]?.bestScore || 0;
-    }
-  } catch (err) {
-    console.warn('Could not read previous best:', err);
-  }
-
-  // Save round to Firestore
-  try {
-    // 1. Save round record
-    const pointRef = collection(db, 'regular_points');
-    // Task 3: add questionsReached field
-    await addDoc(pointRef, {
-      uid:              currentUserUID,
-      gameType:         questionType,
-      category:         category,
-      point:            roundScore,
-      correctAnswers:   correctCount,
-      totalQuestions:   TOTAL_QUESTIONS,
-      questionsReached: currentQuestionIndex + 1, // new field
-      time:             serverTimestamp()
-    });
-
-    // 2. Update user lifetime stats
-    const userRef = doc(db, 'users', currentUserUID);
-    await updateDoc(userRef, {
-      lifetimeRoundPlayed:  increment(1),
-      totalScore:           increment(roundScore),
-      totalCorrectAnswers:  increment(correctCount)
-    });
-
-    // 3. Update category stats — compute new best correctly
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const data     = userSnap.data();
-      const catStats = data.categoryStats || {};
-      const catKey   = category;
-
-      if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
-
-      const currentBest = catStats[catKey].bestScore || 0;
-      const newBest     = roundScore > currentBest ? roundScore : currentBest;
-
-      await updateDoc(userRef, {
-        [`categoryStats.${catKey}.played`]:    increment(1),
-        [`categoryStats.${catKey}.bestScore`]: newBest   // set the actual value, not increment
+      // Save round to Firestore
+      const pointRef = collection(db, 'regular_points');
+      await addDoc(pointRef, {
+        uid:              currentUserUID,
+        gameType:         questionType,
+        category:         category,
+        point:            roundScore,
+        correctAnswers:   correctCount,
+        totalQuestions:   TOTAL_QUESTIONS,
+        questionsReached: currentQuestionIndex + 1,
+        time:             serverTimestamp()
       });
 
-      if (roundScore > previousBest) {
-        isNewBest = true;
+      const userRef = doc(db, 'users', currentUserUID);
+      await updateDoc(userRef, {
+        lifetimeRoundPlayed:  increment(1),
+        totalScore:           increment(roundScore),
+        totalCorrectAnswers:  increment(correctCount)
+      });
+
+      // Update category stats and determine new best
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data     = userSnap.data();
+        const catStats = data.categoryStats || {};
+        const catKey   = category;
+        if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
+
+        const currentBest = catStats[catKey].bestScore || 0;
+        const newBest     = roundScore > currentBest ? roundScore : currentBest;
+
+        await updateDoc(userRef, {
+          [`categoryStats.${catKey}.played`]:    increment(1),
+          [`categoryStats.${catKey}.bestScore`]: newBest
+        });
+
+        // Check if it's a genuine new best
+        if (roundScore > previousBest) {
+          // Patch the modal with the badge
+          const container = document.getElementById('newBestBadgeContainer');
+          if (container) {
+            container.innerHTML = `
+              <div style="font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; color:#FFD700; background:rgba(255,215,0,0.12); border:1px solid rgba(255,215,0,0.3); border-radius:40px; padding:0.4rem 1.2rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 0 30px rgba(255,215,0,0.15);">
+                🏆 New Best Score!
+              </div>
+            `;
+          }
+          // Trigger fireworks
+          setTimeout(() => showFireworks(), 300);
+        }
       }
+    } catch (err) {
+      console.error('Error saving round data:', err);
+      showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
     }
-
-    console.log(`✅ Round saved. Score: ${roundScore}, Correct: ${correctCount}/${TOTAL_QUESTIONS}, New best: ${isNewBest}`);
-
-  } catch (err) {
-    console.error('Error saving round data:', err);
-    showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
-  }
-
-  hideLoader();
-  showRoundEndModal(isNewBest);
+  })(); // immediately invoked, not awaited
 }
 
 // ========== COMMENT MODAL ==========
-// Displays a streak comment mid-round. Does NOT block the Next button —
-// user dismisses it themselves and can proceed independently.
-// Task 3: increased z-index to ensure it appears above loader and round-end modal
 function showCommentModal(comment) {
-  // If one is already open, remove it first
   const existing = document.getElementById('commentModal');
   if (existing) existing.remove();
 
@@ -1109,7 +1082,7 @@ function showCommentModal(comment) {
     position:fixed; top:0; left:0; width:100%; height:100%;
     background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    z-index:10002; /* Increased to appear above loader (10000) and round-end modal (9999) */
+    z-index:10002;
     padding:1rem;
   `;
 
@@ -1224,6 +1197,7 @@ function showFireworks() {
 }
 
 // ========== ROUND END MODAL ==========
+// Task 3: Added placeholder container for later badge patching
 function showRoundEndModal(newBest = false) {
   const overlay = document.createElement('div');
   overlay.id = 'roundEndModal';
@@ -1243,7 +1217,6 @@ function showRoundEndModal(newBest = false) {
     font-family:'Poppins',sans-serif;
   `;
 
-  // Close → back to dashboard
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
@@ -1256,33 +1229,29 @@ function showRoundEndModal(newBest = false) {
   });
   card.appendChild(closeBtn);
 
-  // Logo
   const logo = document.createElement('div');
   logo.style.cssText = `font-family:'Orbitron',monospace;font-weight:800;font-size:1.8rem;margin-bottom:0.5rem;`;
   logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
   card.appendChild(logo);
 
-  // New best badge
+  // ── New Best badge container (placeholder for later patching) ──
+  const badgeContainer = document.createElement('div');
+  badgeContainer.id = 'newBestBadgeContainer';
+  // If newBest is true (only used in old code path, but keep for safety), add badge now
   if (newBest) {
     const badge = document.createElement('div');
     badge.textContent = '🏆 New Best Score!';
-    badge.style.cssText = `
-      font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; color:#FFD700;
-      background:rgba(255,215,0,0.12); border:1px solid rgba(255,215,0,0.3);
-      border-radius:40px; padding:0.4rem 1.2rem; display:inline-block;
-      margin-bottom:0.8rem; box-shadow:0 0 30px rgba(255,215,0,0.15);
-    `;
-    card.appendChild(badge);
+    badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; color:#FFD700; background:rgba(255,215,0,0.12); border:1px solid rgba(255,215,0,0.3); border-radius:40px; padding:0.4rem 1.2rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 0 30px rgba(255,215,0,0.15);`;
+    badgeContainer.appendChild(badge);
   }
+  card.appendChild(badgeContainer);
 
-  // Title
   const title = document.createElement('h2');
   title.textContent = 'Round Complete!';
   title.style.cssText = `font-size:1.8rem;color:#FFD700;margin:0.5rem 0 0.8rem;`;
   card.appendChild(title);
 
-  // Score display — score / max possible
-  const maxPossible = TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION; // 150
+  const maxPossible = TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION;
   const scoreDiv    = document.createElement('div');
   scoreDiv.style.cssText = `
     font-family:'Orbitron',monospace; font-size:3rem; font-weight:800;
@@ -1291,7 +1260,6 @@ function showRoundEndModal(newBest = false) {
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
   card.appendChild(scoreDiv);
 
-  // Correct answers sub-line
   const correctDiv = document.createElement('div');
   correctDiv.style.cssText = `
     font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
@@ -1299,7 +1267,6 @@ function showRoundEndModal(newBest = false) {
   correctDiv.textContent = `${correctCount} of ${TOTAL_QUESTIONS} correct`;
   card.appendChild(correctDiv);
 
-  // ── Task 3: For One Chance, show questions reached ──
   if (questionType === 'one_chance') {
     const reachedDiv = document.createElement('div');
     reachedDiv.style.cssText = `
@@ -1309,14 +1276,12 @@ function showRoundEndModal(newBest = false) {
     card.appendChild(reachedDiv);
   }
 
-  // Comment from getEndOfRoundComment
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
   msgP.textContent = endComment;
   msgP.style.cssText = `font-size:1.1rem;color:#f0f3fa;margin:0.8rem 0 1.5rem;font-weight:500;`;
   card.appendChild(msgP);
 
-  // Buttons
   const btnContainer = document.createElement('div');
   btnContainer.style.cssText = `display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;`;
 
@@ -1343,13 +1308,13 @@ function showRoundEndModal(newBest = false) {
     questionAnswered     = false;
     lifelinesDisabled    = false;
     gameRoundActive      = false;
+    oneChanceMissed      = false; // Task 2: reset flag
 
     const urlParams       = new URLSearchParams(window.location.search);
     const exportNameParam = urlParams.get('export');
     if (exportNameParam) {
       loadLifelines().then(() => loadQuestionsFromJS(exportNameParam));
     } else {
-      // For mixed mode, reload the same type (Jollof Mix or One Chance)
       const typeParam = urlParams.get('type') || 'regular';
       window.location.href = `games.html${typeParam === 'regular' ? '' : '?type=' + typeParam}`;
     }
@@ -1373,8 +1338,4 @@ function showRoundEndModal(newBest = false) {
   card.appendChild(btnContainer);
   overlay.appendChild(card);
   document.body.appendChild(overlay);
-
-  if (newBest) {
-    setTimeout(() => showFireworks(), 300);
-  }
 }
