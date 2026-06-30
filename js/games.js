@@ -19,6 +19,21 @@ import {
 
 console.log('🎮 games.js loaded');
 
+// ========== SHARED EXPORT MAP ==========
+// Task 3: extracted from loadQuestionsFromJS for reuse in mixed mode
+const SHARED_EXPORT_MAP = {
+  'afrobeats':        { file: 'afrobeats.js',        export: 'afrobeats'        },
+  'nollywood':        { file: 'nollywood.js',        export: 'nollywood'        },
+  'nigeriaHistory':   { file: 'nigeria-history.js',  export: 'nigeriaHistory'   },
+  'nigeriaCulture':   { file: 'nigeria-culture.js',  export: 'nigeriaCulture'   },
+  'nigeriaFood':      { file: 'nigeria-food.js',     export: 'nigeriaFood'      },
+  'nigeriaGeography': { file: 'nigeria-geography.js',export: 'nigeriaGeography' },
+  'nigeriaSports':    { file: 'nigeria-sports.js',   export: 'nigeriaSports'    },
+  'lagosSlang':       { file: 'lagos-slangs.js',     export: 'lagosSlang'       },
+  'nigeriaProverbs':  { file: 'nigeria-proverbs.js', export: 'nigeriaProverbs'  },
+  'superEagles':      { file: 'super-eagles.js',     export: 'superEagles'      }
+};
+
 // ========== TOURNAMENT DETECTION ==========
 const params = new URLSearchParams(window.location.search);
 const rawCategory = params.get('category');
@@ -181,6 +196,69 @@ function fisherYatesShuffle(array) {
   return shuffled;
 }
 
+// ========== REUSABLE IMPORT HELPER ==========
+// Task 3: extracted from loadQuestionsFromJS to avoid duplication
+async function importQuestionBank(mapping) {
+  let questionBank = null;
+  let lastError = null;
+  const attemptedPaths = [];
+
+  const base = new URL('.', import.meta.url).href;
+  const pathsToTry = [
+    `/js/questions/${mapping.file}`,
+    `./questions/${mapping.file}`,
+    new URL(`questions/${mapping.file}`, base).href,
+    `${window.location.origin}/js/questions/${mapping.file}`,
+  ];
+
+  for (const path of pathsToTry) {
+    attemptedPaths.push(path);
+    console.log('📦 Attempting import from:', path);
+    try {
+      const module = await import(path);
+      questionBank = module[mapping.export] || module.default;
+      if (questionBank) {
+        console.log('✅ Import succeeded from:', path);
+        break;
+      }
+    } catch (e) {
+      lastError = e;
+      console.warn('❌ Import failed:', e.message);
+    }
+  }
+
+  // Fetch + blob URL fallback
+  if (!questionBank) {
+    try {
+      const fetchPath = pathsToTry[0];
+      const response = await fetch(fetchPath);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const text = await response.text();
+      const blob = new Blob([text], { type: 'application/javascript' });
+      const blobUrl = URL.createObjectURL(blob);
+      const module = await import(blobUrl);
+      questionBank = module[mapping.export] || module.default;
+      URL.revokeObjectURL(blobUrl);
+      console.log('✅ Import succeeded via fetch+blob from:', fetchPath);
+    } catch (fetchErr) {
+      lastError = fetchErr;
+      console.warn('❌ Fetch fallback failed:', fetchErr);
+    }
+  }
+
+  if (!questionBank) {
+    console.error(`Failed to load question bank for ${mapping.export}:`, lastError?.message);
+    return null;
+  }
+
+  if (!Array.isArray(questionBank) || questionBank.length === 0) {
+    console.warn(`Question bank for ${mapping.export} is empty or invalid.`);
+    return null;
+  }
+
+  return questionBank;
+}
+
 // ========== AUTH ==========
 onAuthStateChanged(auth, async (user) => {
   console.log('🔐 Auth state changed (games):', user ? `User: ${user.uid}` : 'No user');
@@ -229,7 +307,8 @@ onAuthStateChanged(auth, async (user) => {
 
 // ========== LOAD LIFELINES ==========
 async function loadLifelines() {
-  if (questionType === 'regular') {
+  if (questionType === 'regular' || questionType === 'one_chance') {
+    // For both regular (Pick Your Lane) and one_chance (and Jollof Mix which is regular), use 1 each
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
     updateLifelineUI();
     return;
@@ -261,6 +340,7 @@ function updateLifelineUI() {
 }
 
 // ========== READ PARAMS FROM URL ==========
+// Task 3: Modified to handle missing category (Jollof Mix / One Chance) and to detect one_chance type
 function readParamsFromURL() {
   const urlParams       = new URLSearchParams(window.location.search);
   const rawCat          = urlParams.get('category');
@@ -269,100 +349,50 @@ function readParamsFromURL() {
 
   console.log('📖 Reading params:', { rawCat, rawT, exportNameParam });
 
-  if (!rawCat) {
-    showErrorOnScreen('No category selected. Redirecting...');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
-    throw new Error('Missing category');
-  }
+  // If category is present, use single-category path (Pick Your Lane / Tournament)
+  if (rawCat) {
+    category     = rawCat;
+    questionType = rawT; // might be 'regular' or 'tournament'
 
-  category     = rawCat;
-  questionType = rawT;
+    const displayName = formatCategoryName(category);
+    if (gameCategory) gameCategory.textContent = displayName;
+    if (gameType)     gameType.textContent     = questionType === 'regular' ? 'Regular' : 'Tournament';
 
-  const displayName = formatCategoryName(category);
-  if (gameCategory) gameCategory.textContent = displayName;
-  if (gameType)     gameType.textContent     = questionType === 'regular' ? 'Regular' : 'Tournament';
-
-  if (exportNameParam) {
-    loadQuestionsFromJS(exportNameParam);
+    if (exportNameParam) {
+      loadQuestionsFromJS(exportNameParam);
+    } else {
+      showErrorOnScreen('Missing question bank. Redirecting...');
+      setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
+      throw new Error('Missing export parameter');
+    }
   } else {
-    showErrorOnScreen('Missing question bank. Redirecting...');
-    setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
-    throw new Error('Missing export parameter');
+    // No category → mixed mode (Jollof Mix or One Chance)
+    questionType = rawT; // will be 'regular' (Jollof Mix) or 'one_chance'
+    category = 'mixed'; // set to a fixed value for Firestore and display
+
+    // Set UI elements
+    if (gameCategory) gameCategory.textContent = 'Mixed';
+    if (gameType)     gameType.textContent     = questionType === 'one_chance' ? 'One Chance' : 'Jollof Mix';
+
+    // Load mixed questions (shared by Jollof Mix and One Chance)
+    loadMixedQuestions();
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK ==========
+// ========== LOAD QUESTIONS FROM JS BANK (single category) ==========
+// Task 3: refactored to use SHARED_EXPORT_MAP and importQuestionBank helper
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
 
   try {
-    const exportMap = {
-      'afrobeats':        { file: 'afrobeats.js',        export: 'afrobeats'        },
-      'nollywood':        { file: 'nollywood.js',        export: 'nollywood'        },
-      'nigeriaHistory':   { file: 'nigeria-history.js',  export: 'nigeriaHistory'   },
-      'nigeriaCulture':   { file: 'nigeria-culture.js',  export: 'nigeriaCulture'   },
-      'nigeriaFood':      { file: 'nigeria-food.js',     export: 'nigeriaFood'      },
-      'nigeriaGeography': { file: 'nigeria-geography.js',export: 'nigeriaGeography' },
-      'nigeriaSports':    { file: 'nigeria-sports.js',   export: 'nigeriaSports'    },
-      'lagosSlang':       { file: 'lagos-slangs.js',     export: 'lagosSlang'       },
-      'nigeriaProverbs':  { file: 'nigeria-proverbs.js', export: 'nigeriaProverbs'  },
-      'superEagles':      { file: 'super-eagles.js',     export: 'superEagles'      }
-    };
-
-    const mapping = exportMap[exportNameParam];
+    const mapping = SHARED_EXPORT_MAP[exportNameParam];
     if (!mapping) {
       throw new Error(`Question bank '${exportNameParam}' not found.`);
     }
 
-    let questionBank = null;
-    let lastError    = null;
-    const attemptedPaths = [];
-
-    const base = new URL('.', import.meta.url).href;
-    const pathsToTry = [
-      `/js/questions/${mapping.file}`,
-      `./questions/${mapping.file}`,
-      new URL(`questions/${mapping.file}`, base).href,
-      `${window.location.origin}/js/questions/${mapping.file}`,
-    ];
-
-    for (const path of pathsToTry) {
-      attemptedPaths.push(path);
-      console.log('📦 Attempting import from:', path);
-      try {
-        const module = await import(path);
-        questionBank = module[mapping.export] || module.default;
-        if (questionBank) {
-          console.log('✅ Import succeeded from:', path);
-          break;
-        }
-      } catch (e) {
-        lastError = e;
-        console.warn('❌ Import failed:', e.message);
-      }
-    }
-
-    // Fetch + blob URL fallback
+    const questionBank = await importQuestionBank(mapping);
     if (!questionBank) {
-      try {
-        const fetchPath = pathsToTry[0];
-        const response = await fetch(fetchPath);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = await response.text();
-        const blob = new Blob([text], { type: 'application/javascript' });
-        const blobUrl = URL.createObjectURL(blob);
-        const module = await import(blobUrl);
-        questionBank = module[mapping.export] || module.default;
-        URL.revokeObjectURL(blobUrl);
-        console.log('✅ Import succeeded via fetch+blob from:', fetchPath);
-      } catch (fetchErr) {
-        lastError = fetchErr;
-        console.warn('❌ Fetch fallback failed:', fetchErr);
-      }
-    }
-
-    if (!questionBank) {
-      const errorMsg = `Failed to load question bank. Tried paths: ${attemptedPaths.join(', ')}. Last error: ${lastError?.message || 'Unknown'}`;
+      const errorMsg = `Failed to load question bank for '${exportNameParam}'.`;
       console.error(errorMsg);
       showErrorOnScreen(errorMsg);
       showToast('Question bank loading failed. Please refresh or contact support.', 'error', 20000);
@@ -371,10 +401,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     }
 
     console.log('📚 Questions loaded:', questionBank?.length || 0, 'questions');
-
-    if (!Array.isArray(questionBank) || questionBank.length === 0) {
-      throw new Error('Question bank is empty or invalid.');
-    }
 
     const shuffled = fisherYatesShuffle([...questionBank]);
     const selected = shuffled.slice(0, Math.min(TOTAL_QUESTIONS, shuffled.length));
@@ -404,6 +430,59 @@ async function loadQuestionsFromJS(exportNameParam) {
       if (!roundEnded) window.location.href = '/app/dashboard.html';
     }, 5000);
   }
+}
+
+// ========== LOAD MIXED QUESTIONS (Jollof Mix & One Chance) ==========
+// Task 3: new function to build mixed-category question set
+async function loadMixedQuestions() {
+  console.log('🔄 Loading mixed-category questions...');
+  const mixedQuestions = [];
+
+  for (const [key, mapping] of Object.entries(SHARED_EXPORT_MAP)) {
+    try {
+      const bank = await importQuestionBank(mapping);
+      if (bank && bank.length > 0) {
+        // Pick one random question from this category
+        const randomIndex = Math.floor(Math.random() * bank.length);
+        const question = bank[randomIndex];
+        // Optionally add a category field for debugging, but not needed for game logic
+        mixedQuestions.push(question);
+        console.log(`✅ Added one question from ${key}`);
+      } else {
+        console.warn(`⚠️ Skipping ${key} – bank empty or failed to load.`);
+      }
+    } catch (err) {
+      console.warn(`⚠️ Skipping ${key} due to error:`, err.message);
+    }
+  }
+
+  if (mixedQuestions.length === 0) {
+    showErrorOnScreen('No questions could be loaded. Please try again.');
+    showToast('Failed to load any questions. Redirecting...', 'error', 20000);
+    setTimeout(() => window.location.href = '/app/dashboard.html', 5000);
+    return;
+  }
+
+  // Shuffle the order of categories
+  const shuffledMixed = fisherYatesShuffle(mixedQuestions);
+  const selected = shuffledMixed.slice(0, Math.min(TOTAL_QUESTIONS, shuffledMixed.length));
+
+  console.log(`✅ Selected ${selected.length} mixed questions for game`);
+
+  if (selected.length < TOTAL_QUESTIONS) {
+    showToast(`Only ${selected.length} questions available. Starting game.`, 'warning', 6000);
+  }
+
+  currentQuestions = selected;
+
+  // Set difficulty display to first question's difficulty (if any)
+  if (currentQuestions.length > 0 && gameDifficulty) {
+    const firstQ = currentQuestions[0];
+    const raw = firstQ.difficulty || 'Easy';
+    gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+  }
+
+  showCountdown(() => loadQuestion(0));
 }
 
 // ========== COUNTDOWN OVERLAY ==========
@@ -563,15 +642,31 @@ function startTimer() {
       questionAnswered  = true;
       lifelinesDisabled = true;
       updateLifelineUI();
-      nextBtn.disabled  = false;
-
-      ['A', 'B', 'C', 'D'].forEach(letter => {
-        const btn = optionBtns[letter];
-        if (btn) {
-          btn.disabled = true;
-          btn.classList.add('disabled');
+      // ── One Chance: end round immediately on timeout ──
+      if (questionType === 'one_chance') {
+        // Do not enable Next; end round now
+        // But we need to reveal correct answer and handle streak before ending
+        // We'll do that and then call endRound()
+        ['A', 'B', 'C', 'D'].forEach(letter => {
+          const btn = optionBtns[letter];
+          if (btn) {
+            btn.disabled = true;
+            btn.classList.add('disabled');
+          }
+        });
+        const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
+        if (correctAns && optionBtns[correctAns]) {
+          applyCorrectStyle(optionBtns[correctAns]);
         }
-      });
+        // Streak: treat timeout as wrong
+        handleStreakUpdate(false);
+        // End round immediately
+        endRound();
+        return;
+      } else {
+        // Normal mode (Jollof Mix / Pick Your Lane): enable Next
+        nextBtn.disabled = false;
+      }
 
       // Reveal correct answer in green
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
@@ -716,17 +811,26 @@ function attachOptionListener() {
       console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → round total: ${roundScore}`);
     }
 
-    // ── 6. Mark answered, disable lifelines for this question, enable Next ──
+    // ── 6. Mark answered, disable lifelines ──
     questionAnswered  = true;
     lifelinesDisabled = true;
     updateLifelineUI();
-    nextBtn.disabled  = false;
 
     // ── 7. Evaluate streak rules and show the matching comment modal ──
     const commentText = handleStreakUpdate(isCorrect);
     if (commentText) {
       showCommentModal(commentText);
     }
+
+    // ── 8. Handle One Chance: on wrong, end round immediately ──
+    if (questionType === 'one_chance' && !isCorrect) {
+      // Do not enable Next; end round now
+      endRound();
+      return;
+    }
+
+    // ── 9. For all other cases: enable Next ──
+    nextBtn.disabled = false;
   });
 
   console.log('✅ Option click listener attached to .options-grid');
@@ -775,7 +879,7 @@ lifelineFifty?.addEventListener('click', async () => {
   if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
   if (lifelineCounts.fifty_fifty <= 0) lifelineFifty.classList.add('disabled');
 
-  if (questionType !== 'regular') {
+  if (questionType !== 'regular' && questionType !== 'one_chance') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
       await updateDoc(userRef, { 'lifeline.fifty_fifty': increment(-1) });
@@ -827,7 +931,7 @@ lifelineAsk?.addEventListener('click', async () => {
   if (countAskCrowd) countAskCrowd.textContent = lifelineCounts.ask_crowd;
   if (lifelineCounts.ask_crowd <= 0) lifelineAsk.classList.add('disabled');
 
-  if (questionType !== 'regular') {
+  if (questionType !== 'regular' && questionType !== 'one_chance') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
       await updateDoc(userRef, { 'lifeline.ask_crowd': increment(-1) });
@@ -848,7 +952,7 @@ lifelineSkip?.addEventListener('click', async () => {
   if (countSkip) countSkip.textContent = lifelineCounts.skip;
   if (lifelineCounts.skip <= 0) lifelineSkip.classList.add('disabled');
 
-  if (questionType !== 'regular') {
+  if (questionType !== 'regular' && questionType !== 'one_chance') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
       await updateDoc(userRef, { 'lifeline.skip': increment(-1) });
@@ -937,14 +1041,16 @@ async function endRound() {
   try {
     // 1. Save round record
     const pointRef = collection(db, 'regular_points');
+    // Task 3: add questionsReached field
     await addDoc(pointRef, {
-      uid:            currentUserUID,
-      gameType:       questionType,
-      category:       category,
-      point:          roundScore,
-      correctAnswers: correctCount,
-      totalQuestions: TOTAL_QUESTIONS,
-      time:           serverTimestamp()
+      uid:              currentUserUID,
+      gameType:         questionType,
+      category:         category,
+      point:            roundScore,
+      correctAnswers:   correctCount,
+      totalQuestions:   TOTAL_QUESTIONS,
+      questionsReached: currentQuestionIndex + 1, // new field
+      time:             serverTimestamp()
     });
 
     // 2. Update user lifetime stats
@@ -991,6 +1097,7 @@ async function endRound() {
 // ========== COMMENT MODAL ==========
 // Displays a streak comment mid-round. Does NOT block the Next button —
 // user dismisses it themselves and can proceed independently.
+// Task 3: increased z-index to ensure it appears above loader and round-end modal
 function showCommentModal(comment) {
   // If one is already open, remove it first
   const existing = document.getElementById('commentModal');
@@ -1002,7 +1109,8 @@ function showCommentModal(comment) {
     position:fixed; top:0; left:0; width:100%; height:100%;
     background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    z-index:8888; padding:1rem;
+    z-index:10002; /* Increased to appear above loader (10000) and round-end modal (9999) */
+    padding:1rem;
   `;
 
   const card = document.createElement('div');
@@ -1191,6 +1299,16 @@ function showRoundEndModal(newBest = false) {
   correctDiv.textContent = `${correctCount} of ${TOTAL_QUESTIONS} correct`;
   card.appendChild(correctDiv);
 
+  // ── Task 3: For One Chance, show questions reached ──
+  if (questionType === 'one_chance') {
+    const reachedDiv = document.createElement('div');
+    reachedDiv.style.cssText = `
+      font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
+    `;
+    reachedDiv.textContent = `You reached question ${currentQuestionIndex + 1} of ${TOTAL_QUESTIONS}`;
+    card.appendChild(reachedDiv);
+  }
+
   // Comment from getEndOfRoundComment
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
@@ -1231,7 +1349,9 @@ function showRoundEndModal(newBest = false) {
     if (exportNameParam) {
       loadLifelines().then(() => loadQuestionsFromJS(exportNameParam));
     } else {
-      window.location.href = '/app/dashboard.html';
+      // For mixed mode, reload the same type (Jollof Mix or One Chance)
+      const typeParam = urlParams.get('type') || 'regular';
+      window.location.href = `games.html${typeParam === 'regular' ? '' : '?type=' + typeParam}`;
     }
   });
   btnContainer.appendChild(playAgainBtn);
