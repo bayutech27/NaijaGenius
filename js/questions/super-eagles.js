@@ -499,5 +499,5 @@ const superEagles = [
 { question: "Stephen Keshi won the 2013 AFCON title in which country?", optionA: "Ghana", optionB: "South Africa", optionC: "Egypt", optionD: "Tunisia", correctAnswer: "B", category: "super_eagles", difficulty: "easy" },
 { question: "Nigeria's group at France 98 included Spain Bulgaria and?", optionA: "Argentina", optionB: "Italy", optionC: "Paraguay", optionD: "Denmark", correctAnswer: "C", category: "super_eagles", difficulty: "medium" },
 { question: "Gernot Rohr coached Nigeria during which World Cup?", optionA: "2014", optionB: "2022", optionC: "Both 2018 and 2022", optionD: "2018", correctAnswer: "D", category: "super_eagles", difficulty: "easy" }
-];es
+];
 export default superEagles;
