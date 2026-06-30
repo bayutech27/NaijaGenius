@@ -677,73 +677,97 @@ function handleStreakUpdate(isCorrect) {
   return commentText;
 }
 
-// ========== ANSWER SELECTION — ATTACHED AFTER DOM READY ==========
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('📄 DOM loaded, attaching event listeners');
-
+// ========== ANSWER SELECTION ==========
+// IMPORTANT: This module uses a top-level `await import('./fun-facts.js')` near
+// the top of the file. Because of that top-level await, this module's body does
+// not finish executing until that import resolves — by which point the browser
+// has frequently ALREADY fired `DOMContentLoaded` (module scripts are deferred,
+// and DOMContentLoaded can fire before a slow/async module finishes running).
+// The old code attached this listener inside a `DOMContentLoaded` handler, so on
+// many loads the listener was registered AFTER the event already fired and it
+// never ran — which is why clicking an option appeared to do nothing at all,
+// and every downstream feature (scoring, streaks, comments, Firestore save)
+// silently never triggered. Fix: attach directly. By the time this module's
+// synchronous code runs (after any top-level awaits), the DOM (parsed via
+// normal HTML parsing, before deferred module scripts execute) is already
+// available, so querying it directly here is always safe.
+function attachOptionListener() {
   const optionsGrid = document.querySelector('.options-grid');
-  if (optionsGrid) {
-    optionsGrid.addEventListener('click', (e) => {
-      const btn = e.target.closest('.option-btn');
-      if (!btn) return;
-      if (btn.disabled || btn.classList.contains('disabled')) return;
-      if (questionAnswered) return;
+  if (!optionsGrid) {
+    console.error('❌ .options-grid not found in DOM — answer selection will not work.');
+    showErrorOnScreen('Game UI failed to initialize (options grid missing).');
+    return;
+  }
 
-      // ── 1. Stop timer immediately at the exact moment of selection ──
-      clearInterval(timerInterval);
-      const pointsEarned = Math.max(0, timeLeft); // time remaining = points
+  optionsGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.option-btn');
+    if (!btn) return;
+    if (btn.disabled || btn.classList.contains('disabled')) return;
+    if (questionAnswered) return;
+    if (!gameRoundActive) return;
 
-      // ── 2. Lock ALL option buttons instantly ──
-      ['A', 'B', 'C', 'D'].forEach(letter => {
-        const b = optionBtns[letter];
-        if (b) {
-          b.disabled = true;
-          b.classList.add('disabled');
-        }
-      });
+    // ── 1. Stop the timer at the EXACT moment of selection ──
+    clearInterval(timerInterval);
+    const pointsEarned = Math.max(0, timeLeft); // time remaining at click = score
 
-      // ── 3. Detect selected letter and compare to correctAnswer ──
-      const selectedLetter = btn.dataset.option;
-      const currentQ = currentQuestions[currentQuestionIndex];
-      if (!currentQ) return;
-
-      const correctLetter = currentQ.correctAnswer;
-      const isCorrect     = (selectedLetter === correctLetter);
-
-      // ── 4. Apply full-background highlight ──
-      if (isCorrect) {
-        applyCorrectStyle(btn);
-      } else {
-        applyWrongStyle(btn);
-        // Always reveal the correct answer in green when wrong
-        if (optionBtns[correctLetter]) {
-          applyCorrectStyle(optionBtns[correctLetter]);
-        }
-      }
-
-      // ── 5. Accumulate score and correct count ──
-      if (isCorrect) {
-        roundScore   += pointsEarned;
-        correctCount += 1;
-        console.log(`✅ Correct! +${pointsEarned} pts → total: ${roundScore}`);
-      } else {
-        console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → total: ${roundScore}`);
-      }
-
-      // ── 6. Mark question answered, disable lifelines, enable Next ──
-      questionAnswered  = true;
-      lifelinesDisabled = true;
-      updateLifelineUI();
-      nextBtn.disabled  = false;
-
-      // ── 7. Evaluate streak and show comment modal if triggered ──
-      const commentText = handleStreakUpdate(isCorrect);
-      if (commentText) {
-        showCommentModal(commentText);
+    // ── 2. Lock ALL option buttons instantly so no second click can register ──
+    ['A', 'B', 'C', 'D'].forEach(letter => {
+      const b = optionBtns[letter];
+      if (b) {
+        b.disabled = true;
+        b.classList.add('disabled');
       }
     });
-  }
-});
+
+    // ── 3. Validate selected letter against currentQ.correctAnswer ──
+    const selectedLetter = btn.dataset.option;
+    const currentQ = currentQuestions[currentQuestionIndex];
+    if (!currentQ) {
+      console.error('❌ No current question found at index', currentQuestionIndex);
+      return;
+    }
+
+    const correctLetter = currentQ.correctAnswer;
+    const isCorrect      = (selectedLetter === correctLetter);
+
+    // ── 4. Apply full background highlight: green if correct, red if wrong,
+    //        and ALWAYS reveal the true correct option in green ──
+    if (isCorrect) {
+      applyCorrectStyle(btn);
+    } else {
+      applyWrongStyle(btn);
+      if (optionBtns[correctLetter]) {
+        applyCorrectStyle(optionBtns[correctLetter]);
+      }
+    }
+
+    // ── 5. Save progress: accumulate correct count + running score ──
+    if (isCorrect) {
+      roundScore   += pointsEarned;
+      correctCount += 1;
+      console.log(`✅ Correct! +${pointsEarned} pts (time left at click) → round total: ${roundScore}/${TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION}`);
+    } else {
+      console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → round total: ${roundScore}`);
+    }
+
+    // ── 6. Mark answered, disable lifelines for this question, enable Next ──
+    questionAnswered  = true;
+    lifelinesDisabled = true;
+    updateLifelineUI();
+    nextBtn.disabled  = false;
+
+    // ── 7. Evaluate streak rules and show the matching comment modal ──
+    const commentText = handleStreakUpdate(isCorrect);
+    if (commentText) {
+      showCommentModal(commentText);
+    }
+  });
+
+  console.log('✅ Option click listener attached to .options-grid');
+}
+
+// Attach immediately — do NOT wait for DOMContentLoaded (see comment above).
+attachOptionListener();
 
 // ========== NEXT BUTTON ==========
 nextBtn.addEventListener('click', () => {
