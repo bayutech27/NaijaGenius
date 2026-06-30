@@ -62,6 +62,9 @@ let oneChanceMissed = false;
 let roundCoins = 0;
 let livesRemaining = 0;
 
+// Flag to track if the free lifeline has been used this round
+let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+
 const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
 
@@ -287,6 +290,7 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
+    // Load lifelines from Firestore (extras) and add the free 1
     await loadLifelines();
     await readParamsFromURL();
 
@@ -297,23 +301,43 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ========== LOAD LIFELINES ==========
+// ========== LOAD LIFELINES (from Firestore + free 1) ==========
 async function loadLifelines() {
-  if (questionType === 'regular' || questionType === 'one_chance') {
-    lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
-    updateLifelineUI();
-    return;
-  }
   try {
-    if (!currentUserData) throw new Error('User data not loaded.');
-    lifelineCounts.fifty_fifty = currentUserData.lifeline?.fifty_fifty ?? 3;
-    lifelineCounts.ask_crowd   = currentUserData.lifeline?.ask_crowd   ?? 3;
-    lifelineCounts.callFriend  = currentUserData.lifeline?.callFriend ?? 3;
+    // Read the user's lifeline extras from Firestore
+    if (!currentUserUID) throw new Error('User not authenticated');
+    const userRef = doc(db, 'users', currentUserUID);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      // Fallback defaults if doc missing
+      lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
+      freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+      updateLifelineUI();
+      return;
+    }
+    const data = userSnap.data();
+    const extras = data.lifeline || {};
+
+    // Each round: 1 free + extras from Firestore
+    lifelineCounts = {
+      fifty_fifty: 1 + (extras.fifty_fifty || 0),
+      ask_crowd:   1 + (extras.ask_crowd || 0),
+      callFriend:  1 + (extras.callFriend || 0)
+    };
+    // Reset free flags for the new round
+    freeLifelines = {
+      fifty_fifty: true,
+      ask_crowd:   true,
+      callFriend:  true
+    };
     updateLifelineUI();
+    console.log('🔄 Lifelines loaded:', lifelineCounts, 'extras:', extras);
   } catch (err) {
-    console.error('Failed to load lifelines:', err);
-    showErrorOnScreen('Could not load lifelines. Please refresh.');
-    throw err;
+    console.error('Failed to load lifelines from Firestore:', err);
+    // Fallback to default 1 each
+    lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
+    freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+    updateLifelineUI();
   }
 }
 
@@ -641,7 +665,6 @@ function startTimer() {
         applyCorrectStyle(optionBtns[correctAns]);
       }
 
-      // Timeout treated as wrong – update streak and handle replay
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
       handleWrongAnswer();
@@ -788,10 +811,8 @@ function showReplayModal(onYes, onNo) {
 
 // ========== HANDLE WRONG ANSWER (replay or continue) ==========
 function handleWrongAnswer() {
-  // Only show replay modal if lives > 0
   if (livesRemaining > 0) {
     showReplayModal(
-      // Yes callback: replay the question
       async () => {
         try {
           const userRef = doc(db, 'users', currentUserUID);
@@ -799,7 +820,6 @@ function handleWrongAnswer() {
             lives: increment(-1)
           });
           livesRemaining = Math.max(0, livesRemaining - 1);
-          // Reset question state
           questionAnswered = false;
           ['A', 'B', 'C', 'D'].forEach(letter => {
             const btn = optionBtns[letter];
@@ -825,13 +845,11 @@ function handleWrongAnswer() {
           proceedAfterWrong();
         }
       },
-      // No callback: continue to next question
       () => {
         proceedAfterWrong();
       }
     );
   } else {
-    // No lives – proceed directly
     proceedAfterWrong();
   }
 }
@@ -859,11 +877,9 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
-    // ── 1. Stop timer ──
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
-    // ── 2. Lock options ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const b = optionBtns[letter];
       if (b) {
@@ -872,7 +888,6 @@ function attachOptionListener() {
       }
     });
 
-    // ── 3. Validate ──
     const selectedLetter = btn.dataset.option;
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!currentQ) {
@@ -883,7 +898,6 @@ function attachOptionListener() {
     const correctLetter = currentQ.correctAnswer;
     const isCorrect = (selectedLetter === correctLetter);
 
-    // ── 4. Highlight ──
     if (isCorrect) {
       applyCorrectStyle(btn);
     } else {
@@ -893,7 +907,6 @@ function attachOptionListener() {
       }
     }
 
-    // ── 5. Handle correct answer ──
     if (isCorrect) {
       const coinsEarned = (timeLeft <= 7) ? 10 : 15;
       roundCoins += coinsEarned;
@@ -909,10 +922,8 @@ function attachOptionListener() {
       updateLifelineUI();
       nextBtn.disabled = false;
     } else {
-      // ── 6. Wrong answer ──
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
-      // Handle replay decision (modal only if lives > 0)
       handleWrongAnswer();
     }
   });
@@ -945,7 +956,7 @@ function nextQuestion() {
   }
 }
 
-// ========== LIFELINES ==========
+// ========== LIFELINES – 50:50 ==========
 lifelineFifty?.addEventListener('click', async () => {
   if (lifelineFifty.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -953,30 +964,39 @@ lifelineFifty?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  const correct      = currentQ.correctAnswer;
-  const wrongOptions = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
-  const toHide       = fisherYatesShuffle(wrongOptions).slice(0, 2);
+  // Use one fifty-fifty
+  if (lifelineCounts.fifty_fifty <= 0) return;
+  lifelineCounts.fifty_fifty--;
+  updateLifelineUI();
 
+  // If the free one was used, we need to decrement Firestore extras
+  if (!freeLifelines.fifty_fifty) {
+    // Used an extra – decrement Firestore
+    try {
+      const userRef = doc(db, 'users', currentUserUID);
+      await updateDoc(userRef, { 'lifeline.fifty_fifty': increment(-1) });
+      console.log('💾 Decremented fifty_fifty extra in Firestore');
+    } catch (err) {
+      console.error('Failed to update lifeline in Firestore:', err);
+      showToast('Could not save lifeline usage.', 'error', 20000);
+    }
+  } else {
+    // Used the free one – mark as used
+    freeLifelines.fifty_fifty = false;
+    console.log('🆓 Used free fifty_fifty');
+  }
+
+  // Apply effect: hide 2 wrong options
+  const correct = currentQ.correctAnswer;
+  const wrongOptions = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
+  const toHide = fisherYatesShuffle(wrongOptions).slice(0, 2);
   toHide.forEach(letter => {
     const btn = optionBtns[letter];
     if (btn) btn.style.visibility = 'hidden';
   });
-
-  lifelineCounts.fifty_fifty--;
-  if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
-  if (lifelineCounts.fifty_fifty <= 0) lifelineFifty.classList.add('disabled');
-
-  if (questionType !== 'regular' && questionType !== 'one_chance') {
-    try {
-      const userRef = doc(db, 'users', currentUserUID);
-      await updateDoc(userRef, { 'lifeline.fifty_fifty': increment(-1) });
-    } catch (err) {
-      console.error('Failed to update lifeline:', err);
-      showToast('Could not save lifeline usage.', 'error', 20000);
-    }
-  }
 });
 
+// ========== LIFELINES – Ask Crowd ==========
 lifelineAsk?.addEventListener('click', async () => {
   if (lifelineAsk.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -984,12 +1004,31 @@ lifelineAsk?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  const correct     = currentQ.correctAnswer;
-  const correctPct  = Math.floor(Math.random() * 26) + 45;
-  let remaining     = 100 - correctPct;
-  const others      = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
-  const dist        = [];
+  // Use one ask_crowd
+  if (lifelineCounts.ask_crowd <= 0) return;
+  lifelineCounts.ask_crowd--;
+  updateLifelineUI();
 
+  if (!freeLifelines.ask_crowd) {
+    try {
+      const userRef = doc(db, 'users', currentUserUID);
+      await updateDoc(userRef, { 'lifeline.ask_crowd': increment(-1) });
+      console.log('💾 Decremented ask_crowd extra in Firestore');
+    } catch (err) {
+      console.error('Failed to update lifeline in Firestore:', err);
+      showToast('Could not save lifeline usage.', 'error', 20000);
+    }
+  } else {
+    freeLifelines.ask_crowd = false;
+    console.log('🆓 Used free ask_crowd');
+  }
+
+  // Generate crowd percentages
+  const correct = currentQ.correctAnswer;
+  const correctPct = Math.floor(Math.random() * 26) + 45;
+  let remaining = 100 - correctPct;
+  const others = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
+  const dist = [];
   for (let i = 0; i < others.length; i++) {
     if (i === others.length - 1) {
       dist.push(remaining);
@@ -999,7 +1038,6 @@ lifelineAsk?.addEventListener('click', async () => {
       remaining -= val;
     }
   }
-
   const result = {};
   result[correct] = correctPct;
   others.forEach((letter, idx) => { result[letter] = dist[idx] || 0; });
@@ -1014,22 +1052,9 @@ lifelineAsk?.addEventListener('click', async () => {
     if (bar) bar.style.width = (result[letter] || 0) + '%';
     if (pct) pct.textContent = (result[letter] || 0) + '%';
   });
-
-  lifelineCounts.ask_crowd--;
-  if (countAskCrowd) countAskCrowd.textContent = lifelineCounts.ask_crowd;
-  if (lifelineCounts.ask_crowd <= 0) lifelineAsk.classList.add('disabled');
-
-  if (questionType !== 'regular' && questionType !== 'one_chance') {
-    try {
-      const userRef = doc(db, 'users', currentUserUID);
-      await updateDoc(userRef, { 'lifeline.ask_crowd': increment(-1) });
-    } catch (err) {
-      console.error('Failed to update lifeline:', err);
-      showToast('Could not save lifeline usage.', 'error', 20000);
-    }
-  }
 });
 
+// ========== LIFELINES – Call a Friend ==========
 lifelineCallFriend?.addEventListener('click', async () => {
   if (lifelineCallFriend.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -1037,22 +1062,27 @@ lifelineCallFriend?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  const correctLetter = currentQ.correctAnswer;
-
+  // Use one callFriend
+  if (lifelineCounts.callFriend <= 0) return;
   lifelineCounts.callFriend--;
-  if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend;
-  if (lifelineCounts.callFriend <= 0) lifelineCallFriend.classList.add('disabled');
+  updateLifelineUI();
 
-  if (questionType !== 'regular' && questionType !== 'one_chance') {
+  if (!freeLifelines.callFriend) {
     try {
       const userRef = doc(db, 'users', currentUserUID);
       await updateDoc(userRef, { 'lifeline.callFriend': increment(-1) });
+      console.log('💾 Decremented callFriend extra in Firestore');
     } catch (err) {
-      console.error('Failed to update lifeline:', err);
+      console.error('Failed to update lifeline in Firestore:', err);
       showToast('Could not save lifeline usage.', 'error', 20000);
     }
+  } else {
+    freeLifelines.callFriend = false;
+    console.log('🆓 Used free callFriend');
   }
 
+  // Show modal with correct answer
+  const correctLetter = currentQ.correctAnswer;
   showCallFriendModal(correctLetter);
 });
 
@@ -1280,7 +1310,7 @@ function showCommentModal(comment) {
   document.body.appendChild(overlay);
 }
 
-// ========== FIREWORKS (z-index increased to 10001) ==========
+// ========== FIREWORKS ==========
 function showFireworks() {
   const canvas = document.createElement('canvas');
   canvas.id = 'fireworksCanvas';
