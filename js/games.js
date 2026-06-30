@@ -14,17 +14,8 @@ import {
   getEndOfRoundComment
 } from './comments.js';
 
-// ========== DYNAMIC IMPORT FOR FUN-FACTS (with fallback) ==========
-let showFunFactModal = () => {};
-try {
-  const funFactModule = await import('./fun-facts.js');
-  if (funFactModule.showFunFactModal) {
-    showFunFactModal = funFactModule.showFunFactModal;
-    console.log('✅ fun-facts.js loaded successfully');
-  }
-} catch (e) {
-  console.warn('⚠️ fun-facts.js not found – using dummy function.');
-}
+// ========== FUN-FACTS REMOVED ==========
+// (No longer needed – all related code has been deleted)
 
 console.log('🎮 games.js loaded');
 
@@ -53,8 +44,6 @@ let currentStreak = 0;
 let streakDirection = null; // 'win' | 'loss' | null
 let roundEnded = false;
 let isNewBest = false;
-let funFactTimer = null;
-let funFactPending = false;
 let gameRoundActive = false;
 let questionAnswered = false;
 let lifelinesDisabled = false;
@@ -192,19 +181,6 @@ function fisherYatesShuffle(array) {
   return shuffled;
 }
 
-// ========== FUN FACT TIMER ==========
-function startFunFactTimer() {
-  clearInterval(funFactTimer);
-  funFactTimer = setInterval(() => {
-    if (gameRoundActive) {
-      funFactPending = true;
-    } else {
-      showFunFactModal('', false);
-      funFactPending = false;
-    }
-  }, 600000);
-}
-
 // ========== AUTH ==========
 onAuthStateChanged(auth, async (user) => {
   console.log('🔐 Auth state changed (games):', user ? `User: ${user.uid}` : 'No user');
@@ -242,7 +218,7 @@ onAuthStateChanged(auth, async (user) => {
 
     await loadLifelines();
     await readParamsFromURL();
-    startFunFactTimer();
+    // Fun‑fact timer removed
 
   } catch (err) {
     console.error('Init error:', err);
@@ -668,7 +644,6 @@ function handleStreakUpdate(isCorrect) {
         commentText = onFiveStreakLoss();
       }
     } else {
-      // null / first question
       currentStreak   = -1;
       streakDirection = 'loss';
     }
@@ -678,19 +653,10 @@ function handleStreakUpdate(isCorrect) {
 }
 
 // ========== ANSWER SELECTION ==========
-// IMPORTANT: This module uses a top-level `await import('./fun-facts.js')` near
-// the top of the file. Because of that top-level await, this module's body does
-// not finish executing until that import resolves — by which point the browser
-// has frequently ALREADY fired `DOMContentLoaded` (module scripts are deferred,
-// and DOMContentLoaded can fire before a slow/async module finishes running).
-// The old code attached this listener inside a `DOMContentLoaded` handler, so on
-// many loads the listener was registered AFTER the event already fired and it
-// never ran — which is why clicking an option appeared to do nothing at all,
-// and every downstream feature (scoring, streaks, comments, Firestore save)
-// silently never triggered. Fix: attach directly. By the time this module's
-// synchronous code runs (after any top-level awaits), the DOM (parsed via
-// normal HTML parsing, before deferred module scripts execute) is already
-// available, so querying it directly here is always safe.
+// IMPORTANT: This module originally used a top-level `await import('./fun-facts.js')`
+// which caused DOMContentLoaded to fire before the listener could be attached.
+// That import has been removed, so the listener is now attached synchronously.
+// The .options-grid element is guaranteed to exist by the time this runs.
 function attachOptionListener() {
   const optionsGrid = document.querySelector('.options-grid');
   if (!optionsGrid) {
@@ -949,14 +915,7 @@ async function endRound() {
   gameRoundActive = false;
   clearInterval(timerInterval);
 
-  if (funFactPending) {
-    funFactPending = false;
-    clearInterval(funFactTimer);
-    setTimeout(() => {
-      showFunFactModal('', false);
-      startFunFactTimer();
-    }, 2000);
-  }
+  // Fun‑fact pending checks removed
 
   showLoader('Calculating your score... Please wait.');
 
