@@ -123,7 +123,7 @@ document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
 });
 
 document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
-    window.location.href = "choose-your-lane.html";
+    window.location.href = "pick-your-lane.html";
 });
 document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
     window.location.href = "choose-your-lane.html";
