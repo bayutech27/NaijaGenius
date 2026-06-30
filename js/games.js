@@ -1,3 +1,8 @@
+// ========================================================================
+// games.js – Updated: Ask Crowd now shown inside option buttons,
+//             Skip replaced with Call a Friend lifeline.
+// ========================================================================
+
 // ========== IMPORTS ==========
 import { auth, db } from '/js/firebase.config.js';
 import {
@@ -15,8 +20,6 @@ import {
 } from './comments.js';
 
 // ========== FUN-FACTS REMOVED ==========
-// (No longer needed – all related code has been deleted)
-
 console.log('🎮 games.js loaded');
 
 // ========== SHARED EXPORT MAP ==========
@@ -53,7 +56,8 @@ let roundScore = 0;
 let correctCount = 0;
 let timerInterval = null;
 let timeLeft = 15;
-let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, skip: 0 };
+// Updated lifeline counts: fifty_fifty, ask_crowd, callFriend (replaces skip)
+let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, callFriend: 0 };
 let currentStreak = 0;
 let streakDirection = null; // 'win' | 'loss' | null
 let roundEnded = false;
@@ -61,9 +65,9 @@ let isNewBest = false;
 let gameRoundActive = false;
 let questionAnswered = false;
 let lifelinesDisabled = false;
-let oneChanceMissed = false; // Task 1: track if One Chance round has a miss
+let oneChanceMissed = false;
 
-const MAX_SCORE_PER_QUESTION = 15; // max points = time left at answer = 15
+const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
 
 // ========== DOM REFS ==========
@@ -81,16 +85,12 @@ const optionBtns  = { A: $('optionA'),     B: $('optionB'),     C: $('optionC'),
 const optionTexts = { A: $('optionAText'), B: $('optionBText'), C: $('optionCText'), D: $('optionDText') };
 const countFiftyFifty = $('countFiftyFifty');
 const countAskCrowd   = $('countAskCrowd');
-const countSkip       = $('countSkip');
+const countCallFriend = $('countCallFriend');      // renamed from countSkip
 const lifelineFifty   = $('lifelineFiftyFifty');
 const lifelineAsk     = $('lifelineAskCrowd');
-const lifelineSkip    = $('lifelineSkip');
+const lifelineCallFriend = $('lifelineCallFriend'); // renamed from lifelineSkip
 const nextBtn         = $('nextBtn');
-const crowdPanel      = $('crowdPanel');
-const crowdBarA  = $('crowdBarA');  const crowdBarB  = $('crowdBarB');
-const crowdBarC  = $('crowdBarC');  const crowdBarD  = $('crowdBarD');
-const crowdPercentA = $('crowdPercentA'); const crowdPercentB = $('crowdPercentB');
-const crowdPercentC = $('crowdPercentC'); const crowdPercentD = $('crowdPercentD');
+// Removed crowdPanel and its bar refs – they are now inside option buttons.
 
 // ========== DEDICATED ERROR DISPLAY ==========
 function showErrorOnScreen(message) {
@@ -226,7 +226,6 @@ async function importQuestionBank(mapping) {
     }
   }
 
-  // Fetch + blob URL fallback
   if (!questionBank) {
     try {
       const fetchPath = pathsToTry[0];
@@ -306,7 +305,8 @@ onAuthStateChanged(auth, async (user) => {
 // ========== LOAD LIFELINES ==========
 async function loadLifelines() {
   if (questionType === 'regular' || questionType === 'one_chance') {
-    lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, skip: 1 };
+    // Default: one use each
+    lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
     updateLifelineUI();
     return;
   }
@@ -314,7 +314,7 @@ async function loadLifelines() {
     if (!currentUserData) throw new Error('User data not loaded.');
     lifelineCounts.fifty_fifty = currentUserData.lifeline?.fifty_fifty ?? 3;
     lifelineCounts.ask_crowd   = currentUserData.lifeline?.ask_crowd   ?? 3;
-    lifelineCounts.skip        = currentUserData.lifeline?.skip        ?? 3;
+    lifelineCounts.callFriend  = currentUserData.lifeline?.callFriend ?? 3; // renamed from skip
     updateLifelineUI();
   } catch (err) {
     console.error('Failed to load lifelines:', err);
@@ -329,11 +329,11 @@ function updateLifelineUI() {
 
   if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
   if (countAskCrowd)   countAskCrowd.textContent   = lifelineCounts.ask_crowd;
-  if (countSkip)       countSkip.textContent        = lifelineCounts.skip;
+  if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend; // updated
 
   lifelineFifty.classList.toggle('disabled', lifelineCounts.fifty_fifty <= 0 || forceDisable);
   lifelineAsk.classList.toggle('disabled',   lifelineCounts.ask_crowd   <= 0 || forceDisable);
-  lifelineSkip.classList.toggle('disabled',  lifelineCounts.skip        <= 0 || forceDisable);
+  lifelineCallFriend.classList.toggle('disabled', lifelineCounts.callFriend <= 0 || forceDisable);
 }
 
 // ========== READ PARAMS FROM URL ==========
@@ -361,7 +361,6 @@ function readParamsFromURL() {
       throw new Error('Missing export parameter');
     }
   } else {
-    // Mixed mode (Jollof Mix or One Chance)
     questionType = rawT;
     category = 'mixed';
     if (gameCategory) gameCategory.textContent = 'Mixed';
@@ -422,7 +421,7 @@ async function loadQuestionsFromJS(exportNameParam) {
   }
 }
 
-// ========== LOAD MIXED QUESTIONS (Jollof Mix & One Chance) ==========
+// ========== LOAD MIXED QUESTIONS ==========
 async function loadMixedQuestions() {
   console.log('🔄 Loading mixed-category questions...');
   const mixedQuestions = [];
@@ -546,7 +545,7 @@ function loadQuestion(index) {
   gameRoundActive   = true;
   questionAnswered  = false;
   lifelinesDisabled = false;
-  oneChanceMissed = false; // Task 2: reset flag for new question
+  oneChanceMissed = false;
   nextBtn.disabled  = true;
 
   nextBtn.innerHTML = (index === TOTAL_QUESTIONS - 1)
@@ -596,7 +595,11 @@ function loadQuestion(index) {
     }
   });
 
-  if (crowdPanel) crowdPanel.classList.remove('show');
+  // NEW: Hide all in‑option crowd bars when loading a new question
+  document.querySelectorAll('.option-crowd').forEach(el => {
+    el.style.display = 'none';
+  });
+
   updateLifelineUI();
   startTimer();
 }
@@ -637,16 +640,13 @@ function startTimer() {
         }
       });
 
-      // Reveal correct answer in green
       const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
       if (correctAns && optionBtns[correctAns]) {
         applyCorrectStyle(optionBtns[correctAns]);
       }
 
-      // Streak: treat timeout as a wrong answer
       handleStreakUpdate(false);
 
-      // Task 1: For One Chance, set flag and show Finish; else enable Next
       if (questionType === 'one_chance') {
         oneChanceMissed = true;
         nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
@@ -675,9 +675,7 @@ function applyWrongStyle(btn) {
   btn.classList.remove('correct');
 }
 
-// ========== STREAK LOGIC (extracted for reuse) ==========
-// Call this after every answer (isCorrect = true/false).
-// Returns the comment string if one should be shown, otherwise null.
+// ========== STREAK LOGIC ==========
 function handleStreakUpdate(isCorrect) {
   let commentText = null;
 
@@ -737,11 +735,9 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
-    // ── 1. Stop the timer at the EXACT moment of selection ──
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
-    // ── 2. Lock ALL option buttons instantly so no second click can register ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const b = optionBtns[letter];
       if (b) {
@@ -750,7 +746,6 @@ function attachOptionListener() {
       }
     });
 
-    // ── 3. Validate selected letter against currentQ.correctAnswer ──
     const selectedLetter = btn.dataset.option;
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!currentQ) {
@@ -761,7 +756,6 @@ function attachOptionListener() {
     const correctLetter = currentQ.correctAnswer;
     const isCorrect      = (selectedLetter === correctLetter);
 
-    // ── 4. Apply full background highlight ──
     if (isCorrect) {
       applyCorrectStyle(btn);
     } else {
@@ -771,7 +765,6 @@ function attachOptionListener() {
       }
     }
 
-    // ── 5. Save progress ──
     if (isCorrect) {
       roundScore   += pointsEarned;
       correctCount += 1;
@@ -780,40 +773,34 @@ function attachOptionListener() {
       console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → round total: ${roundScore}`);
     }
 
-    // ── 6. Mark answered, disable lifelines ──
     questionAnswered  = true;
     lifelinesDisabled = true;
     updateLifelineUI();
 
-    // ── 7. Evaluate streak rules and show comment ──
     const commentText = handleStreakUpdate(isCorrect);
     if (commentText) {
       showCommentModal(commentText);
     }
 
-    // ── 8. Task 1: One Chance wrong → set flag, change button to Finish ──
     if (questionType === 'one_chance' && !isCorrect) {
       oneChanceMissed = true;
       nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
     }
 
-    // ── 9. Enable Next for all cases ──
     nextBtn.disabled = false;
   });
 
   console.log('✅ Option click listener attached to .options-grid');
 }
 
-// Attach immediately
 attachOptionListener();
 
 // ========== NEXT BUTTON ==========
-// Task 2: Modified to check oneChanceMissed
 nextBtn.addEventListener('click', () => {
   if (nextBtn.disabled) return;
   if (questionAnswered) {
     if (oneChanceMissed) {
-      endRound(); // Finish the round after a miss
+      endRound();
     } else {
       nextQuestion();
     }
@@ -832,6 +819,7 @@ function nextQuestion() {
 }
 
 // ========== LIFELINES ==========
+// 50:50 – unchanged
 lifelineFifty?.addEventListener('click', async () => {
   if (lifelineFifty.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -863,6 +851,7 @@ lifelineFifty?.addEventListener('click', async () => {
   }
 });
 
+// Ask Crowd – now updates in‑option bars
 lifelineAsk?.addEventListener('click', async () => {
   if (lifelineAsk.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -890,15 +879,16 @@ lifelineAsk?.addEventListener('click', async () => {
   result[correct] = correctPct;
   others.forEach((letter, idx) => { result[letter] = dist[idx] || 0; });
 
-  if (crowdPanel) crowdPanel.classList.add('show');
-  if (crowdBarA)     crowdBarA.style.width     = (result.A || 0) + '%';
-  if (crowdBarB)     crowdBarB.style.width     = (result.B || 0) + '%';
-  if (crowdBarC)     crowdBarC.style.width     = (result.C || 0) + '%';
-  if (crowdBarD)     crowdBarD.style.width     = (result.D || 0) + '%';
-  if (crowdPercentA) crowdPercentA.textContent = (result.A || 0) + '%';
-  if (crowdPercentB) crowdPercentB.textContent = (result.B || 0) + '%';
-  if (crowdPercentC) crowdPercentC.textContent = (result.C || 0) + '%';
-  if (crowdPercentD) crowdPercentD.textContent = (result.D || 0) + '%';
+  // Show in‑option crowd bars for each option
+  const letters = ['A', 'B', 'C', 'D'];
+  letters.forEach(letter => {
+    const container = document.querySelector(`#option${letter} .option-crowd`);
+    const bar = document.getElementById(`crowdBar${letter}`);
+    const pct = document.getElementById(`crowdPercent${letter}`);
+    if (container) container.style.display = 'flex';
+    if (bar) bar.style.width = (result[letter] || 0) + '%';
+    if (pct) pct.textContent = (result[letter] || 0) + '%';
+  });
 
   lifelineCounts.ask_crowd--;
   if (countAskCrowd) countAskCrowd.textContent = lifelineCounts.ask_crowd;
@@ -915,33 +905,106 @@ lifelineAsk?.addEventListener('click', async () => {
   }
 });
 
-lifelineSkip?.addEventListener('click', async () => {
-  if (lifelineSkip.classList.contains('disabled')) return;
+// Call a Friend (replaces Skip)
+lifelineCallFriend?.addEventListener('click', async () => {
+  if (lifelineCallFriend.classList.contains('disabled')) return;
   if (questionAnswered) return;
 
-  clearInterval(timerInterval);
+  const currentQ = currentQuestions[currentQuestionIndex];
+  if (!currentQ) return;
 
-  lifelineCounts.skip--;
-  if (countSkip) countSkip.textContent = lifelineCounts.skip;
-  if (lifelineCounts.skip <= 0) lifelineSkip.classList.add('disabled');
+  const correctLetter = currentQ.correctAnswer;
 
+  // Decrement count and update UI
+  lifelineCounts.callFriend--;
+  if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend;
+  if (lifelineCounts.callFriend <= 0) lifelineCallFriend.classList.add('disabled');
+
+  // Firestore update for tournament mode
   if (questionType !== 'regular' && questionType !== 'one_chance') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
-      await updateDoc(userRef, { 'lifeline.skip': increment(-1) });
+      await updateDoc(userRef, { 'lifeline.callFriend': increment(-1) });
     } catch (err) {
       console.error('Failed to update lifeline:', err);
       showToast('Could not save lifeline usage.', 'error', 20000);
     }
   }
 
-  questionAnswered  = true;
-  lifelinesDisabled = true;
-  updateLifelineUI();
-  nextQuestion();
+  // Show modal with correct answer
+  showCallFriendModal(correctLetter);
 });
 
-// ========== LOADER (kept for potential future use) ==========
+// ========== CALL FRIEND MODAL ==========
+function showCallFriendModal(correctLetter) {
+  // Remove any existing modal
+  const existing = document.getElementById('callFriendModal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'callFriendModal';
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.8); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    z-index:10003; padding:1rem;
+  `;
+
+  const card = document.createElement('div');
+  card.style.cssText = `
+    background:rgba(20,25,40,0.95);
+    border:1px solid rgba(62,214,183,0.4);
+    border-radius:2rem; padding:2rem 1.5rem;
+    max-width:400px; width:100%;
+    text-align:center; font-family:'Poppins',sans-serif;
+  `;
+
+  // Phone icon
+  const icon = document.createElement('div');
+  icon.style.cssText = `
+    font-size:3rem; color:#3ED6B7; margin-bottom:0.5rem;
+  `;
+  icon.innerHTML = '<i class="fas fa-phone-volume"></i>';
+  card.appendChild(icon);
+
+  // Message
+  const msg = document.createElement('p');
+  msg.style.cssText = `
+    font-size:1.2rem; color:#f0f3fa; font-weight:500;
+    margin:0.5rem 0 0.8rem;
+  `;
+  msg.textContent = 'Your friend says:';
+  card.appendChild(msg);
+
+  const answer = document.createElement('p');
+  answer.style.cssText = `
+    font-size:2.5rem; font-weight:800; color:#FFD700;
+    margin:0.2rem 0 0.8rem; letter-spacing:0.05em;
+  `;
+  answer.textContent = `The correct answer is ${correctLetter}!`;
+  card.appendChild(answer);
+
+  // Close button (X)
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '✕';
+  closeBtn.style.cssText = `
+    position:absolute; top:0.8rem; right:1.2rem;
+    background:none; border:none; font-size:1.6rem;
+    color:#a0b3d9; cursor:pointer; font-family:'Poppins',sans-serif;
+  `;
+  // Position the close button relative to the card
+  card.style.position = 'relative';
+  card.prepend(closeBtn); // put at top right
+
+  closeBtn.addEventListener('click', () => overlay.remove());
+
+  // Also allow clicking outside to close? We'll just use the button.
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+// ========== LOADER (kept) ==========
 function showLoader(message = 'Wait a moment. Calculating your score...') {
   if (document.getElementById('scoreLoader')) return;
 
@@ -985,20 +1048,16 @@ function hideLoader() {
 }
 
 // ========== END ROUND ==========
-// Task 3: Refactored to display result instantly and save in background
 async function endRound() {
   if (roundEnded) return;
   roundEnded    = true;
   gameRoundActive = false;
   clearInterval(timerInterval);
 
-  // Show result modal immediately (no loader, no Firestore read)
-  showRoundEndModal(false); // no badge yet
+  showRoundEndModal(false);
 
-  // Firestore save and badge patch in background (fire-and-forget)
   (async () => {
     try {
-      // Read previous best
       let previousBest = 0;
       try {
         const userRef = doc(db, 'users', currentUserUID);
@@ -1010,10 +1069,9 @@ async function endRound() {
         }
       } catch (err) {
         console.warn('Could not read previous best:', err);
-        previousBest = 0; // treat as not new best if we can't read
+        previousBest = 0;
       }
 
-      // Save round to Firestore
       const pointRef = collection(db, 'regular_points');
       await addDoc(pointRef, {
         uid:              currentUserUID,
@@ -1033,7 +1091,6 @@ async function endRound() {
         totalCorrectAnswers:  increment(correctCount)
       });
 
-      // Update category stats and determine new best
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const data     = userSnap.data();
@@ -1049,9 +1106,7 @@ async function endRound() {
           [`categoryStats.${catKey}.bestScore`]: newBest
         });
 
-        // Check if it's a genuine new best
         if (roundScore > previousBest) {
-          // Patch the modal with the badge
           const container = document.getElementById('newBestBadgeContainer');
           if (container) {
             container.innerHTML = `
@@ -1060,7 +1115,6 @@ async function endRound() {
               </div>
             `;
           }
-          // Trigger fireworks
           setTimeout(() => showFireworks(), 300);
         }
       }
@@ -1068,7 +1122,7 @@ async function endRound() {
       console.error('Error saving round data:', err);
       showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
     }
-  })(); // immediately invoked, not awaited
+  })();
 }
 
 // ========== COMMENT MODAL ==========
@@ -1197,7 +1251,6 @@ function showFireworks() {
 }
 
 // ========== ROUND END MODAL ==========
-// Task 3: Added placeholder container for later badge patching
 function showRoundEndModal(newBest = false) {
   const overlay = document.createElement('div');
   overlay.id = 'roundEndModal';
@@ -1234,10 +1287,8 @@ function showRoundEndModal(newBest = false) {
   logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
   card.appendChild(logo);
 
-  // ── New Best badge container (placeholder for later patching) ──
   const badgeContainer = document.createElement('div');
   badgeContainer.id = 'newBestBadgeContainer';
-  // If newBest is true (only used in old code path, but keep for safety), add badge now
   if (newBest) {
     const badge = document.createElement('div');
     badge.textContent = '🏆 New Best Score!';
@@ -1296,7 +1347,6 @@ function showRoundEndModal(newBest = false) {
   `;
   playAgainBtn.addEventListener('click', () => {
     overlay.remove();
-    // Reset all round state
     roundEnded           = false;
     isNewBest            = false;
     roundScore           = 0;
@@ -1308,7 +1358,7 @@ function showRoundEndModal(newBest = false) {
     questionAnswered     = false;
     lifelinesDisabled    = false;
     gameRoundActive      = false;
-    oneChanceMissed      = false; // Task 2: reset flag
+    oneChanceMissed      = false;
 
     const urlParams       = new URLSearchParams(window.location.search);
     const exportNameParam = urlParams.get('export');
