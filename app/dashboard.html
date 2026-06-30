@@ -8,10 +8,8 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <title>NaijaGenius • Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
     <link rel="stylesheet" href="/css/dashboard.css" />
 </head>
 <body>
@@ -23,6 +21,17 @@
                 <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
             </div>
             <div class="header-actions">
+                <!-- Coins & Lives counters -->
+                <div class="header-stats">
+                    <span class="stat-badge" id="headerCoins">
+                        <i class="fas fa-coins" style="color:#FFD700;"></i>
+                        <span id="headerCoinsValue">0</span>
+                    </span>
+                    <span class="stat-badge" id="headerLives">
+                        <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+                        <span id="headerLivesValue">2</span>
+                    </span>
+                </div>
                 <button class="icon-btn notification-btn" id="notificationBtn">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge" id="notificationBadge"></span>
@@ -97,7 +106,7 @@
             <!-- ---- CHOOSE A MODE (stacked & centered on mobile) ---- -->
             <div class="mode-section">
                 <h2 class="section-title mode-title">Choose a Mode</h2>
-                <div class="mode-grid">
+                <div class="mode-grid" id="modeGrid">
                     <!-- Jollof Mix -->
                     <button class="mode-btn" id="jollofMixBtn">
                         <div class="mode-icon-wrap">
@@ -106,22 +115,26 @@
                         <span class="mode-name">Jollof Mix</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <!-- Pick Your Lane (renamed from "Choose Your Lane") -->
+                    <!-- Pick Your Lane -->
                     <button class="mode-btn" id="chooseLaneBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-road mode-icon animate-icon"></i>
                         </div>
-                        <span class="mode-name">Pick Your Lane</span> <!-- Task 1: renamed -->
+                        <span class="mode-name">Pick Your Lane</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <!-- One Chance (new) -->
+                    <!-- One Chance -->
                     <button class="mode-btn" id="oneChanceBtn">
                         <div class="mode-icon-wrap">
-                            <i class="fas fa-bolt mode-icon animate-icon"></i> <!-- distinct icon -->
+                            <i class="fas fa-bolt mode-icon animate-icon"></i>
                         </div>
                         <span class="mode-name">One Chance</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
+                </div>
+                <!-- Lives warning (shown when lives === 0) -->
+                <div id="livesWarning" style="display:none; margin-top:1rem; background:rgba(255,107,107,0.15); border:1px solid #ff6b6b; border-radius:12px; padding:0.8rem; color:#ff6b6b; font-weight:600; text-align:center;">
+                    <i class="fas fa-heart-broken"></i> No lives left! Get more from the <button class="shop-link-btn" data-nav="shop">Shop</button>.
                 </div>
             </div>
 
@@ -134,7 +147,7 @@
             <div class="mode-section play-mode-section">
                 <h2 class="section-title mode-title">Choose a Mode</h2>
                 <p class="page-subtitle" style="margin-bottom:1.5rem;">Pick your challenge and start winning</p>
-                <div class="mode-grid">
+                <div class="mode-grid" id="playModeGrid">
                     <button class="mode-btn" id="jollofMixBtnPlay">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-fire mode-icon animate-icon"></i>
@@ -146,7 +159,7 @@
                         <div class="mode-icon-wrap">
                             <i class="fas fa-road mode-icon animate-icon"></i>
                         </div>
-                        <span class="mode-name">Pick Your Lane</span> <!-- Task 1: renamed -->
+                        <span class="mode-name">Pick Your Lane</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                     <button class="mode-btn" id="oneChanceBtnPlay">
@@ -157,6 +170,30 @@
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
+                <!-- Lives warning (shown when lives === 0) -->
+                <div id="livesWarningPlay" style="display:none; margin-top:1rem; background:rgba(255,107,107,0.15); border:1px solid #ff6b6b; border-radius:12px; padding:0.8rem; color:#ff6b6b; font-weight:600; text-align:center;">
+                    <i class="fas fa-heart-broken"></i> No lives left! Get more from the <button class="shop-link-btn" data-nav="shop">Shop</button>.
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SHOP SECTION
+        ============================================================ -->
+        <section id="shopSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-store"></i> Shop</h2>
+                <span class="shop-coins-display">Coins: <strong id="shopCoinsDisplay">0</strong></span>
+            </div>
+            <div class="shop-grid" id="shopGrid">
+                <!-- Items will be rendered by shop.js -->
+            </div>
+            <!-- Ad button for extra life -->
+            <div class="ad-life-container">
+                <button id="watchAdBtn" class="ad-life-btn">
+                    <i class="fas fa-video"></i> Watch Ad for +1 Life
+                </button>
+                <p class="ad-life-note">Watch a short video to earn an extra life (max 1 per day?) – we'll keep it unlimited for now.</p>
             </div>
         </section>
 
@@ -183,6 +220,7 @@
     <nav class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-nav="home"><i class="fas fa-house"></i><span class="nav-dot"></span></button>
         <button class="nav-item" data-nav="play"><i class="fas fa-gamepad"></i><span class="nav-dot"></span></button>
+        <button class="nav-item" data-nav="shop"><i class="fas fa-store"></i><span class="nav-dot"></span></button>
         <button class="nav-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span class="nav-dot"></span></button>
     </nav>
 
@@ -191,6 +229,7 @@
         <div class="sidebar-nav">
             <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
             <button class="sidebar-item" data-nav="play"><i class="fas fa-gamepad"></i><span>Play</span></button>
+            <button class="sidebar-item" data-nav="shop"><i class="fas fa-store"></i><span>Shop</span></button>
             <button class="sidebar-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span>Leaderboard</span></button>
         </div>
     </aside>
