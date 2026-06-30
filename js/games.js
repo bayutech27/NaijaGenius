@@ -1,8 +1,3 @@
-// ========================================================================
-// games.js – Updated: Ask Crowd now shown inside option buttons,
-//             Skip replaced with Call a Friend lifeline.
-// ========================================================================
-
 // ========== IMPORTS ==========
 import { auth, db } from '/js/firebase.config.js';
 import {
@@ -56,16 +51,17 @@ let roundScore = 0;
 let correctCount = 0;
 let timerInterval = null;
 let timeLeft = 15;
-// Updated lifeline counts: fifty_fifty, ask_crowd, callFriend (replaces skip)
 let lifelineCounts = { fifty_fifty: 0, ask_crowd: 0, callFriend: 0 };
 let currentStreak = 0;
-let streakDirection = null; // 'win' | 'loss' | null
+let streakDirection = null;
 let roundEnded = false;
 let isNewBest = false;
 let gameRoundActive = false;
 let questionAnswered = false;
 let lifelinesDisabled = false;
 let oneChanceMissed = false;
+let roundCoins = 0;                 // coins earned in the current round
+let livesRemaining = 0;             // lives read from Firestore at start
 
 const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
@@ -85,12 +81,11 @@ const optionBtns  = { A: $('optionA'),     B: $('optionB'),     C: $('optionC'),
 const optionTexts = { A: $('optionAText'), B: $('optionBText'), C: $('optionCText'), D: $('optionDText') };
 const countFiftyFifty = $('countFiftyFifty');
 const countAskCrowd   = $('countAskCrowd');
-const countCallFriend = $('countCallFriend');      // renamed from countSkip
+const countCallFriend = $('countCallFriend');
 const lifelineFifty   = $('lifelineFiftyFifty');
 const lifelineAsk     = $('lifelineAskCrowd');
-const lifelineCallFriend = $('lifelineCallFriend'); // renamed from lifelineSkip
+const lifelineCallFriend = $('lifelineCallFriend');
 const nextBtn         = $('nextBtn');
-// Removed crowdPanel and its bar refs – they are now inside option buttons.
 
 // ========== DEDICATED ERROR DISPLAY ==========
 function showErrorOnScreen(message) {
@@ -281,6 +276,7 @@ onAuthStateChanged(auth, async (user) => {
 
     currentUserData = userSnap.data();
     console.log('✅ User data loaded:', currentUserData);
+    livesRemaining = currentUserData.lives ?? 2;
 
     if (isTournament) {
       try {
@@ -305,7 +301,6 @@ onAuthStateChanged(auth, async (user) => {
 // ========== LOAD LIFELINES ==========
 async function loadLifelines() {
   if (questionType === 'regular' || questionType === 'one_chance') {
-    // Default: one use each
     lifelineCounts = { fifty_fifty: 1, ask_crowd: 1, callFriend: 1 };
     updateLifelineUI();
     return;
@@ -314,7 +309,7 @@ async function loadLifelines() {
     if (!currentUserData) throw new Error('User data not loaded.');
     lifelineCounts.fifty_fifty = currentUserData.lifeline?.fifty_fifty ?? 3;
     lifelineCounts.ask_crowd   = currentUserData.lifeline?.ask_crowd   ?? 3;
-    lifelineCounts.callFriend  = currentUserData.lifeline?.callFriend ?? 3; // renamed from skip
+    lifelineCounts.callFriend  = currentUserData.lifeline?.callFriend ?? 3;
     updateLifelineUI();
   } catch (err) {
     console.error('Failed to load lifelines:', err);
@@ -329,7 +324,7 @@ function updateLifelineUI() {
 
   if (countFiftyFifty) countFiftyFifty.textContent = lifelineCounts.fifty_fifty;
   if (countAskCrowd)   countAskCrowd.textContent   = lifelineCounts.ask_crowd;
-  if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend; // updated
+  if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend;
 
   lifelineFifty.classList.toggle('disabled', lifelineCounts.fifty_fifty <= 0 || forceDisable);
   lifelineAsk.classList.toggle('disabled',   lifelineCounts.ask_crowd   <= 0 || forceDisable);
@@ -369,7 +364,7 @@ function readParamsFromURL() {
   }
 }
 
-// ========== LOAD QUESTIONS FROM JS BANK (single category) ==========
+// ========== LOAD QUESTIONS FROM JS BANK ==========
 async function loadQuestionsFromJS(exportNameParam) {
   console.log('📚 Loading questions for export:', exportNameParam);
 
@@ -408,6 +403,8 @@ async function loadQuestionsFromJS(exportNameParam) {
       gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     }
 
+    // Reset round coins
+    roundCoins = 0;
     showCountdown(() => loadQuestion(0));
 
   } catch (err) {
@@ -466,6 +463,7 @@ async function loadMixedQuestions() {
     gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
   }
 
+  roundCoins = 0;
   showCountdown(() => loadQuestion(0));
 }
 
@@ -595,7 +593,7 @@ function loadQuestion(index) {
     }
   });
 
-  // NEW: Hide all in‑option crowd bars when loading a new question
+  // Hide crowd bars
   document.querySelectorAll('.option-crowd').forEach(el => {
     el.style.display = 'none';
   });
@@ -645,15 +643,9 @@ function startTimer() {
         applyCorrectStyle(optionBtns[correctAns]);
       }
 
-      handleStreakUpdate(false);
-
-      if (questionType === 'one_chance') {
-        oneChanceMissed = true;
-        nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
-        nextBtn.disabled = false;
-      } else {
-        nextBtn.disabled = false;
-      }
+      // Timeout is treated as a wrong answer – show replay modal
+      // We'll handle it via the replay modal logic
+      handleWrongAnswer();
     }
   }, 1000);
 }
@@ -719,6 +711,153 @@ function handleStreakUpdate(isCorrect) {
   return commentText;
 }
 
+// ========== REPLAY MODAL ==========
+function showReplayModal(onYes, onNo) {
+  // Remove any existing replay modal
+  const existing = document.getElementById('replayModal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'replayModal';
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.85); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    z-index:10004; padding:1rem;
+  `;
+
+  const card = document.createElement('div');
+  card.style.cssText = `
+    background:rgba(20,25,40,0.95);
+    border:1px solid rgba(62,214,183,0.4);
+    border-radius:2rem; padding:2rem 1.5rem;
+    max-width:400px; width:100%;
+    text-align:center; font-family:'Poppins',sans-serif;
+  `;
+
+  const livesLeft = livesRemaining > 0 ? livesRemaining : 0;
+  const canReplay = livesLeft > 0;
+
+  card.innerHTML = `
+    <div style="font-size:3rem; margin-bottom:0.5rem;">
+      <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+    </div>
+    <h3 style="color:#f0f3fa; font-size:1.3rem; margin-bottom:0.3rem;">Oops! Wrong Answer</h3>
+    <p style="color:#a0b3d9; font-size:1rem; margin-bottom:1rem;">
+      You have <strong style="color:#ff6b6b;">${livesLeft}</strong> life${livesLeft !== 1 ? 's' : ''} remaining.
+    </p>
+    ${canReplay ? `
+      <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1.5rem;">
+        Would you like to use one life to replay this question?
+      </p>
+    ` : `
+      <p style="color:#ff6b6b; font-size:0.9rem; margin-bottom:1.5rem;">
+        No lives left! You'll have to continue.
+      </p>
+    `}
+    <div style="display:flex; gap:0.8rem; justify-content:center;">
+      <button id="replayYesBtn" ${!canReplay ? 'disabled' : ''} style="
+        background:${canReplay ? 'linear-gradient(135deg,#3ED6B7,#259c84)' : '#4a4a5a'};
+        border:none; border-radius:40px; padding:0.6rem 1.8rem;
+        font-weight:700; font-size:1rem; color:${canReplay ? '#0a0f1e' : '#888'};
+        cursor:${canReplay ? 'pointer' : 'not-allowed'};
+        font-family:'Poppins',sans-serif;
+        transition: transform 0.2s;
+      ">${canReplay ? 'Yes, Replay' : 'No Lives'}</button>
+      <button id="replayNoBtn" style="
+        background:rgba(255,255,255,0.1);
+        border:1.5px solid #a0b3d9;
+        border-radius:40px; padding:0.6rem 1.8rem;
+        font-weight:700; font-size:1rem; color:#f0f3fa;
+        cursor:pointer; font-family:'Poppins',sans-serif;
+      ">No, Continue</button>
+    </div>
+  `;
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  document.getElementById('replayYesBtn').addEventListener('click', () => {
+    overlay.remove();
+    if (onYes) onYes();
+  });
+
+  document.getElementById('replayNoBtn').addEventListener('click', () => {
+    overlay.remove();
+    if (onNo) onNo();
+  });
+}
+
+// ========== HANDLE WRONG ANSWER (replay or continue) ==========
+function handleWrongAnswer() {
+  // This function is called when the user answers wrong or times out.
+  // We'll show the replay modal.
+  showReplayModal(
+    // Yes callback: replay the question
+    async () => {
+      // Decrement lives in Firestore
+      try {
+        const userRef = doc(db, 'users', currentUserUID);
+        await updateDoc(userRef, {
+          lives: increment(-1)
+        });
+        // Update local lives count
+        livesRemaining = Math.max(0, livesRemaining - 1);
+        // Reload the current question with fresh state
+        // Reset questionAnswered so we can interact again
+        questionAnswered = false;
+        // Re-enable option buttons (they were disabled)
+        ['A', 'B', 'C', 'D'].forEach(letter => {
+          const btn = optionBtns[letter];
+          if (btn) {
+            btn.disabled = false;
+            btn.classList.remove('disabled', 'correct', 'wrong');
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+          }
+        });
+        // Reset timer
+        startTimer();
+        // Re-enable lifelines for this question
+        lifelinesDisabled = false;
+        updateLifelineUI();
+        // Reset next button
+        nextBtn.disabled = true;
+        // Hide crowd bars if any
+        document.querySelectorAll('.option-crowd').forEach(el => {
+          el.style.display = 'none';
+        });
+        // The question index remains the same.
+        console.log('🔄 Replaying question with fresh timer.');
+      } catch (err) {
+        console.error('Failed to decrement lives:', err);
+        showToast('Failed to use life. Please try again.', 'error');
+        // Continue as if no replay? We'll just proceed.
+        proceedAfterWrong();
+      }
+    },
+    // No callback: continue to next question
+    () => {
+      proceedAfterWrong();
+    }
+  );
+}
+
+function proceedAfterWrong() {
+  // Record the wrong answer (score already not added)
+  // Streak update is already done inside handleStreakUpdate(false) when wrong.
+  // But we need to ensure streak is updated. We'll call it here if not already.
+  // In the current flow, handleStreakUpdate(false) is called in the timer branch
+  // and in the click handler for wrong answer. We'll adjust.
+  // Actually we'll handle it in the click handler and timer branch.
+  // This function just enables Next and sets state.
+  questionAnswered = true;
+  lifelinesDisabled = true;
+  updateLifelineUI();
+  nextBtn.disabled = false;
+}
+
 // ========== ANSWER SELECTION ==========
 function attachOptionListener() {
   const optionsGrid = document.querySelector('.options-grid');
@@ -735,9 +874,11 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
+    // ── 1. Stop timer ──
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
+    // ── 2. Lock options ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const b = optionBtns[letter];
       if (b) {
@@ -746,16 +887,18 @@ function attachOptionListener() {
       }
     });
 
+    // ── 3. Validate ──
     const selectedLetter = btn.dataset.option;
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!currentQ) {
-      console.error('❌ No current question found at index', currentQuestionIndex);
+      console.error('❌ No current question at index', currentQuestionIndex);
       return;
     }
 
     const correctLetter = currentQ.correctAnswer;
-    const isCorrect      = (selectedLetter === correctLetter);
+    const isCorrect = (selectedLetter === correctLetter);
 
+    // ── 4. Highlight ──
     if (isCorrect) {
       applyCorrectStyle(btn);
     } else {
@@ -765,32 +908,80 @@ function attachOptionListener() {
       }
     }
 
+    // ── 5. Handle correct answer ──
     if (isCorrect) {
-      roundScore   += pointsEarned;
+      // Calculate coins: 10 if timeLeft <= 7, else 15
+      const coinsEarned = (timeLeft <= 7) ? 10 : 15;
+      roundCoins += coinsEarned;
+      roundScore += pointsEarned;
       correctCount += 1;
-      console.log(`✅ Correct! +${pointsEarned} pts → round total: ${roundScore}`);
+      console.log(`✅ Correct! +${pointsEarned} pts, +${coinsEarned} coins`);
+
+      // Streak update
+      const comment = handleStreakUpdate(true);
+      if (comment) showCommentModal(comment);
+
+      questionAnswered = true;
+      lifelinesDisabled = true;
+      updateLifelineUI();
+      nextBtn.disabled = false;
     } else {
-      console.log(`❌ Wrong. Correct was: ${correctLetter}. +0 pts → round total: ${roundScore}`);
+      // ── 6. Wrong answer – show replay modal ──
+      // Streak update (will be called inside replay flow or on continue)
+      // We'll store the fact that it's wrong and handle it.
+      // We'll call handleStreakUpdate(false) now to update streak state.
+      const comment = handleStreakUpdate(false);
+      if (comment) showCommentModal(comment);
+
+      // Show replay modal
+      showReplayModal(
+        // Yes callback: replay (handled in handleWrongAnswer's Yes)
+        async () => {
+          // Decrement lives in Firestore
+          try {
+            const userRef = doc(db, 'users', currentUserUID);
+            await updateDoc(userRef, {
+              lives: increment(-1)
+            });
+            livesRemaining = Math.max(0, livesRemaining - 1);
+            // Reload question
+            questionAnswered = false;
+            ['A', 'B', 'C', 'D'].forEach(letter => {
+              const b = optionBtns[letter];
+              if (b) {
+                b.disabled = false;
+                b.classList.remove('disabled', 'correct', 'wrong');
+                b.style.background = '';
+                b.style.color = '';
+                b.style.borderColor = '';
+              }
+            });
+            startTimer();
+            lifelinesDisabled = false;
+            updateLifelineUI();
+            nextBtn.disabled = true;
+            document.querySelectorAll('.option-crowd').forEach(el => {
+              el.style.display = 'none';
+            });
+            console.log('🔄 Replaying question after wrong click.');
+          } catch (err) {
+            console.error('Failed to decrement lives:', err);
+            showToast('Failed to use life. Please try again.', 'error');
+            // Continue as if no replay.
+            proceedAfterWrong();
+          }
+        },
+        // No callback: continue
+        () => {
+          proceedAfterWrong();
+        }
+      );
+      // Note: we don't set questionAnswered yet; it will be set in proceedAfterWrong or after replay.
+      // Also we don't enable Next here; it will be enabled in proceedAfterWrong.
     }
-
-    questionAnswered  = true;
-    lifelinesDisabled = true;
-    updateLifelineUI();
-
-    const commentText = handleStreakUpdate(isCorrect);
-    if (commentText) {
-      showCommentModal(commentText);
-    }
-
-    if (questionType === 'one_chance' && !isCorrect) {
-      oneChanceMissed = true;
-      nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Finish';
-    }
-
-    nextBtn.disabled = false;
   });
 
-  console.log('✅ Option click listener attached to .options-grid');
+  console.log('✅ Option click listener attached.');
 }
 
 attachOptionListener();
@@ -819,7 +1010,6 @@ function nextQuestion() {
 }
 
 // ========== LIFELINES ==========
-// 50:50 – unchanged
 lifelineFifty?.addEventListener('click', async () => {
   if (lifelineFifty.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -851,7 +1041,6 @@ lifelineFifty?.addEventListener('click', async () => {
   }
 });
 
-// Ask Crowd – now updates in‑option bars
 lifelineAsk?.addEventListener('click', async () => {
   if (lifelineAsk.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -879,7 +1068,7 @@ lifelineAsk?.addEventListener('click', async () => {
   result[correct] = correctPct;
   others.forEach((letter, idx) => { result[letter] = dist[idx] || 0; });
 
-  // Show in‑option crowd bars for each option
+  // Show in‑option crowd bars
   const letters = ['A', 'B', 'C', 'D'];
   letters.forEach(letter => {
     const container = document.querySelector(`#option${letter} .option-crowd`);
@@ -905,7 +1094,6 @@ lifelineAsk?.addEventListener('click', async () => {
   }
 });
 
-// Call a Friend (replaces Skip)
 lifelineCallFriend?.addEventListener('click', async () => {
   if (lifelineCallFriend.classList.contains('disabled')) return;
   if (questionAnswered) return;
@@ -915,12 +1103,10 @@ lifelineCallFriend?.addEventListener('click', async () => {
 
   const correctLetter = currentQ.correctAnswer;
 
-  // Decrement count and update UI
   lifelineCounts.callFriend--;
   if (countCallFriend) countCallFriend.textContent = lifelineCounts.callFriend;
   if (lifelineCounts.callFriend <= 0) lifelineCallFriend.classList.add('disabled');
 
-  // Firestore update for tournament mode
   if (questionType !== 'regular' && questionType !== 'one_chance') {
     try {
       const userRef = doc(db, 'users', currentUserUID);
@@ -931,13 +1117,11 @@ lifelineCallFriend?.addEventListener('click', async () => {
     }
   }
 
-  // Show modal with correct answer
   showCallFriendModal(correctLetter);
 });
 
 // ========== CALL FRIEND MODAL ==========
 function showCallFriendModal(correctLetter) {
-  // Remove any existing modal
   const existing = document.getElementById('callFriendModal');
   if (existing) existing.remove();
 
@@ -957,34 +1141,9 @@ function showCallFriendModal(correctLetter) {
     border-radius:2rem; padding:2rem 1.5rem;
     max-width:400px; width:100%;
     text-align:center; font-family:'Poppins',sans-serif;
+    position:relative;
   `;
 
-  // Phone icon
-  const icon = document.createElement('div');
-  icon.style.cssText = `
-    font-size:3rem; color:#3ED6B7; margin-bottom:0.5rem;
-  `;
-  icon.innerHTML = '<i class="fas fa-phone-volume"></i>';
-  card.appendChild(icon);
-
-  // Message
-  const msg = document.createElement('p');
-  msg.style.cssText = `
-    font-size:1.2rem; color:#f0f3fa; font-weight:500;
-    margin:0.5rem 0 0.8rem;
-  `;
-  msg.textContent = 'Your friend says:';
-  card.appendChild(msg);
-
-  const answer = document.createElement('p');
-  answer.style.cssText = `
-    font-size:2.5rem; font-weight:800; color:#FFD700;
-    margin:0.2rem 0 0.8rem; letter-spacing:0.05em;
-  `;
-  answer.textContent = `The correct answer is ${correctLetter}!`;
-  card.appendChild(answer);
-
-  // Close button (X)
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = `
@@ -992,19 +1151,30 @@ function showCallFriendModal(correctLetter) {
     background:none; border:none; font-size:1.6rem;
     color:#a0b3d9; cursor:pointer; font-family:'Poppins',sans-serif;
   `;
-  // Position the close button relative to the card
-  card.style.position = 'relative';
-  card.prepend(closeBtn); // put at top right
+  card.appendChild(closeBtn);
 
-  closeBtn.addEventListener('click', () => overlay.remove());
+  const icon = document.createElement('div');
+  icon.style.cssText = `font-size:3rem; color:#3ED6B7; margin-bottom:0.5rem;`;
+  icon.innerHTML = '<i class="fas fa-phone-volume"></i>';
+  card.appendChild(icon);
 
-  // Also allow clicking outside to close? We'll just use the button.
+  const msg = document.createElement('p');
+  msg.style.cssText = `font-size:1.2rem; color:#f0f3fa; font-weight:500; margin:0.5rem 0 0.8rem;`;
+  msg.textContent = 'Your friend says:';
+  card.appendChild(msg);
+
+  const answer = document.createElement('p');
+  answer.style.cssText = `font-size:2.5rem; font-weight:800; color:#FFD700; margin:0.2rem 0 0.8rem; letter-spacing:0.05em;`;
+  answer.textContent = `The correct answer is ${correctLetter}!`;
+  card.appendChild(answer);
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);
+
+  closeBtn.addEventListener('click', () => overlay.remove());
 }
 
-// ========== LOADER (kept) ==========
+// ========== LOADER ==========
 function showLoader(message = 'Wait a moment. Calculating your score...') {
   if (document.getElementById('scoreLoader')) return;
 
@@ -1081,16 +1251,20 @@ async function endRound() {
         correctAnswers:   correctCount,
         totalQuestions:   TOTAL_QUESTIONS,
         questionsReached: currentQuestionIndex + 1,
+        coinsEarned:      roundCoins, // optional field
         time:             serverTimestamp()
       });
 
       const userRef = doc(db, 'users', currentUserUID);
+      // Update lifetime stats and coins
       await updateDoc(userRef, {
         lifetimeRoundPlayed:  increment(1),
         totalScore:           increment(roundScore),
-        totalCorrectAnswers:  increment(correctCount)
+        totalCorrectAnswers:  increment(correctCount),
+        coins:                increment(roundCoins)
       });
 
+      // Update category stats
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const data     = userSnap.data();
@@ -1359,6 +1533,7 @@ function showRoundEndModal(newBest = false) {
     lifelinesDisabled    = false;
     gameRoundActive      = false;
     oneChanceMissed      = false;
+    roundCoins           = 0;
 
     const urlParams       = new URLSearchParams(window.location.search);
     const exportNameParam = urlParams.get('export');
