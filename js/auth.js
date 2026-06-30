@@ -176,7 +176,9 @@ async function createUserProfile(user, userData) {
             nigeria_culture: { played: 0, bestScore: 0, mastery: 0 },
             nigeria_proverbs: { played: 0, bestScore: 0, mastery: 0 }
         },
-        lifeline: { fifty_fifty: 3, ask_crowd: 3, skip: 3 },
+        lifeline: { fifty_fifty: 1, ask_crowd: 1, skip: 1 },
+        coins: 0,
+        lives: 2,
         badges: [],
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
