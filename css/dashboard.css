@@ -682,6 +682,164 @@ body {
     }
 }
 
+/* ===== SHOP SECTION ===== */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.shop-item {
+    background: rgba(20,25,40,0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 16px;
+    padding: 1.2rem;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.shop-item:hover {
+    transform: translateY(-4px);
+    border-color: #FFD700;
+}
+.shop-item-icon {
+    font-size: 2.5rem;
+    color: #FFD700;
+    margin-bottom: 0.5rem;
+}
+.shop-item-info h4 {
+    font-size: 1rem;
+    color: #f0f3fa;
+    margin: 0.3rem 0;
+}
+.shop-item-info p {
+    font-size: 0.9rem;
+    color: #a0b3d9;
+    margin: 0.2rem 0;
+}
+.shop-buy-btn {
+    background: linear-gradient(135deg, #3ED6B7, #259c84);
+    border: none;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    color: #0a0f1e;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+}
+.shop-buy-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.shop-buy-btn:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.shop-coins-display {
+    font-size: 1.2rem;
+    color: #a0b3d9;
+}
+.shop-coins-display strong {
+    color: #FFD700;
+}
+
+.ad-life-container {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(20,25,40,0.5);
+    border-radius: 16px;
+    border: 1px dashed rgba(62,214,183,0.3);
+}
+.ad-life-btn {
+    background: linear-gradient(135deg, #FF6B6B, #ee5a24);
+    border: none;
+    border-radius: 40px;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.ad-life-btn:hover {
+    transform: scale(1.05);
+}
+.ad-life-note {
+    font-size: 0.8rem;
+    color: #a0b3d9;
+    margin-top: 0.5rem;
+}
+
+/* ===== HEADER STATS ===== */
+.header-stats {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-right: 1rem;
+}
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255,255,255,0.08);
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f0f3fa;
+}
+.stat-badge i {
+    font-size: 1rem;
+}
+.stat-badge span {
+    min-width: 20px;
+    text-align: center;
+}
+
+/* ===== LIVES WARNING ===== */
+.shop-link-btn {
+    background: none;
+    border: none;
+    color: #3ED6B7;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ===== MODE BUTTONS DISABLED ===== */
+.mode-btn:disabled {
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 520px) {
+    .header-stats {
+        gap: 0.4rem;
+    }
+    .stat-badge {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.5rem;
+    }
+    .stat-badge i {
+        font-size: 0.8rem;
+    }
+    .shop-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+    }
+    .shop-item {
+        padding: 0.8rem;
+    }
+    .shop-item-icon {
+        font-size: 2rem;
+    }
+}
+
+
 /* ----- TOUCH TARGETS & SMOOTH SCROLL ----- */
 button, .nav-item, .sidebar-item, .challenge-card, .mode-btn, .lane-card {
     min-height: 44px;
