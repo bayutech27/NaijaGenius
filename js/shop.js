@@ -2,7 +2,7 @@
 import { auth, db } from '/js/firebase.config.js';
 import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-// ========== SHOP ITEMS (updated) ==========
+// ========== SHOP ITEMS ==========
 const SHOP_ITEMS = [
     { id: 'extra_life', label: '+3 Lives', icon: 'fa-heart', price: 500, type: 'life' },
     { id: 'fifty_fifty', label: '+1 50:50', icon: 'fa-percent', price: 300, type: 'lifeline', field: 'fifty_fifty' },
@@ -17,6 +17,7 @@ export function renderShop(currentCoins) {
 
     grid.innerHTML = '';
     SHOP_ITEMS.forEach(item => {
+        const hasEnough = currentCoins >= item.price;
         const card = document.createElement('div');
         card.className = 'shop-item';
         card.innerHTML = `
@@ -25,8 +26,8 @@ export function renderShop(currentCoins) {
                 <h4>${item.label}</h4>
                 <p><i class="fas fa-coins" style="color:#FFD700;"></i> ${item.price}</p>
             </div>
-            <button class="shop-buy-btn" data-item-id="${item.id}" ${currentCoins < item.price ? 'disabled' : ''}>
-                ${currentCoins >= item.price ? 'Buy' : 'Need more coins'}
+            <button class="shop-buy-btn" data-item-id="${item.id}" ${!hasEnough ? 'disabled' : ''}>
+                ${hasEnough ? 'Buy' : 'Need more coins'}
             </button>
         `;
         grid.appendChild(card);
@@ -62,7 +63,6 @@ export async function purchaseItem(item) {
         const data = userSnap.data();
         const coins = data.coins || 0;
         if (coins < item.price) {
-            // Show modal: not enough coins
             showNotEnoughCoinsModal();
             return;
         }
@@ -71,10 +71,9 @@ export async function purchaseItem(item) {
         const update = { coins: increment(-item.price) };
 
         if (item.type === 'life') {
-            // +3 Lives
             update.lives = increment(3);
         } else if (item.type === 'lifeline') {
-            // Update nested lifeline field
+            // Increment the correct lifeline field inside the `lifeline` sub‑object
             const field = `lifeline.${item.field}`;
             update[field] = increment(1);
         }
@@ -83,12 +82,12 @@ export async function purchaseItem(item) {
 
         showToast(`Purchased ${item.label}!`, 'success');
 
-        // Refresh UI
+        // Refresh UI – re‑render shop with updated coins
         const newSnap = await getDoc(userRef);
         const newCoins = newSnap.data().coins || 0;
         renderShop(newCoins);
 
-        // Also update header coins – handled by onSnapshot in dashboard
+        // Header coins will update via onSnapshot in dashboard
 
     } catch (err) {
         console.error('Purchase error:', err);
@@ -98,7 +97,6 @@ export async function purchaseItem(item) {
 
 // ========== NOT ENOUGH COINS MODAL ==========
 function showNotEnoughCoinsModal() {
-    // Remove any existing modal
     const existing = document.getElementById('insufficientCoinsModal');
     if (existing) existing.remove();
 
@@ -150,12 +148,11 @@ export function setupAdButton(userRef, updateHeaderUI) {
     if (!adBtn) return;
 
     adBtn.addEventListener('click', () => {
-        // Placeholder for AdMob rewarded video integration
+        // Placeholder for AdMob rewarded video
         if (confirm('Simulate watching ad? (In production, this would trigger a rewarded video ad.)')) {
             updateDoc(userRef, { lives: increment(1) })
                 .then(() => {
                     showToast('🎉 +1 Life earned!', 'success');
-                    // UI will update via onSnapshot
                 })
                 .catch(err => {
                     console.error('Ad reward failed:', err);
