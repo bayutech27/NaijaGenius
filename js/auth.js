@@ -179,6 +179,7 @@ async function createUserProfile(user, userData) {
         lifeline: { fifty_fifty: 1, ask_crowd: 1, skip: 1 },
         coins: 0,
         lives: 2,
+        level: "",
         badges: [],
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
