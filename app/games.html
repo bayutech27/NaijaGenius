@@ -24,7 +24,7 @@
 
     <!-- Main Game Area -->
     <main class="game-container">
-        <!-- Meta Bar – added Difficulty row -->
+        <!-- Meta Bar -->
         <div class="game-meta-bar">
             <div class="meta-item">
                 <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
@@ -62,27 +62,52 @@
             <p class="question-text" id="questionText">Loading question…</p>
         </div>
 
-        <!-- Options Grid -->
+        <!-- Options Grid – each option now includes a crowd bar container -->
         <div class="options-grid">
             <button class="option-btn" id="optionA" data-option="A">
                 <span class="option-letter">A</span>
                 <span class="option-text" id="optionAText">Loading…</span>
+                <!-- In‑option crowd bar (hidden by default) -->
+                <div class="option-crowd" style="display:none;">
+                    <div class="crowd-bar-bg">
+                        <div class="crowd-bar-fill" id="crowdBarA" style="width:0%;"></div>
+                    </div>
+                    <span class="crowd-percent" id="crowdPercentA">0%</span>
+                </div>
             </button>
             <button class="option-btn" id="optionB" data-option="B">
                 <span class="option-letter">B</span>
                 <span class="option-text" id="optionBText">Loading…</span>
+                <div class="option-crowd" style="display:none;">
+                    <div class="crowd-bar-bg">
+                        <div class="crowd-bar-fill" id="crowdBarB" style="width:0%;"></div>
+                    </div>
+                    <span class="crowd-percent" id="crowdPercentB">0%</span>
+                </div>
             </button>
             <button class="option-btn" id="optionC" data-option="C">
                 <span class="option-letter">C</span>
                 <span class="option-text" id="optionCText">Loading…</span>
+                <div class="option-crowd" style="display:none;">
+                    <div class="crowd-bar-bg">
+                        <div class="crowd-bar-fill" id="crowdBarC" style="width:0%;"></div>
+                    </div>
+                    <span class="crowd-percent" id="crowdPercentC">0%</span>
+                </div>
             </button>
             <button class="option-btn" id="optionD" data-option="D">
                 <span class="option-letter">D</span>
                 <span class="option-text" id="optionDText">Loading…</span>
+                <div class="option-crowd" style="display:none;">
+                    <div class="crowd-bar-bg">
+                        <div class="crowd-bar-fill" id="crowdBarD" style="width:0%;"></div>
+                    </div>
+                    <span class="crowd-percent" id="crowdPercentD">0%</span>
+                </div>
             </button>
         </div>
 
-        <!-- Lifelines Row + Next Button (enlarged) -->
+        <!-- Lifelines Row + Next Button -->
         <div class="lifelines-row">
             <button class="lifeline-btn" id="lifelineFiftyFifty">
                 <i class="fas fa-percent"></i>
@@ -94,47 +119,18 @@
                 <span class="lifeline-label">Ask Crowd</span>
                 <span class="lifeline-count" id="countAskCrowd">1</span>
             </button>
-            <button class="lifeline-btn" id="lifelineSkip">
-                <i class="fas fa-forward-step"></i>
-                <span class="lifeline-label">Skip</span>
-                <span class="lifeline-count" id="countSkip">1</span>
+            <!-- Replaced Skip with Call a Friend -->
+            <button class="lifeline-btn" id="lifelineCallFriend">
+                <i class="fas fa-phone"></i>
+                <span class="lifeline-label">Call a Friend</span>
+                <span class="lifeline-count" id="countCallFriend">1</span>
             </button>
             <button class="next-btn" id="nextBtn" disabled>
                 <i class="fas fa-forward"></i> Next
             </button>
         </div>
 
-        <!-- Ask Crowd Panel -->
-        <div class="crowd-panel" id="crowdPanel">
-            <div class="crowd-bar-wrapper">
-                <span class="crowd-label">A</span>
-                <div class="crowd-bar-bg">
-                    <div class="crowd-bar-fill" id="crowdBarA" style="width: 0%;"></div>
-                </div>
-                <span class="crowd-percent" id="crowdPercentA">0%</span>
-            </div>
-            <div class="crowd-bar-wrapper">
-                <span class="crowd-label">B</span>
-                <div class="crowd-bar-bg">
-                    <div class="crowd-bar-fill" id="crowdBarB" style="width: 0%;"></div>
-                </div>
-                <span class="crowd-percent" id="crowdPercentB">0%</span>
-            </div>
-            <div class="crowd-bar-wrapper">
-                <span class="crowd-label">C</span>
-                <div class="crowd-bar-bg">
-                    <div class="crowd-bar-fill" id="crowdBarC" style="width: 0%;"></div>
-                </div>
-                <span class="crowd-percent" id="crowdPercentC">0%</span>
-            </div>
-            <div class="crowd-bar-wrapper">
-                <span class="crowd-label">D</span>
-                <div class="crowd-bar-bg">
-                    <div class="crowd-bar-fill" id="crowdBarD" style="width: 0%;"></div>
-                </div>
-                <span class="crowd-percent" id="crowdPercentD">0%</span>
-            </div>
-        </div>
+        <!-- Ask Crowd panel removed – bars now appear inside each option button -->
     </main>
 
     <!-- Toast Container -->
