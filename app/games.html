@@ -10,64 +10,57 @@
     <link rel="stylesheet" href="/css/games.css" />
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header: back arrow, circular timer, coins -->
     <header class="app-header">
         <div class="header-container">
-            <div class="logo-wrapper">
-                <h1 class="brand-logo"><span class="naija-white">Naija</span><span class="genius-mint">Genius</span></h1>
+            <a href="/app/dashboard.html" class="back-btn" aria-label="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+
+            <div class="header-timer-wrap">
+                <div class="circular-timer" id="timerDisplay">
+                    <svg viewBox="0 0 36 36" class="timer-svg">
+                        <path class="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="timer-progress" id="timerPath" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="timer-center">
+                        <span class="timer-seconds" id="timerSeconds">15</span>
+                        <span class="timer-unit">SEC</span>
+                    </div>
+                </div>
             </div>
+
             <div class="header-actions">
-                <a href="/app/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <span class="game-coins-badge" id="gameCoinsBadge">
+                    <i class="fas fa-coins"></i>
+                    <span id="gameCoinsValue">4,850</span>
+                </span>
             </div>
         </div>
     </header>
 
     <!-- Main Game Area -->
     <main class="game-container">
-        <!-- Meta Bar -->
-        <div class="game-meta-bar">
-            <div class="meta-item">
-                <span class="meta-label"><i class="fas fa-tag"></i> Game Type</span>
-                <span id="gameType" class="meta-value">Regular</span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label"><i class="fas fa-list"></i> Category</span>
-                <span id="gameCategory" class="meta-value">Afrobeats</span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label"><i class="fas fa-signal"></i> Difficulty</span>
-                <span id="gameDifficulty" class="meta-value">Easy</span>
-            </div>
-            <div class="meta-item timer-wrapper">
-                <span class="meta-label"><i class="fas fa-hourglass-half"></i> Time</span>
-                <div class="circular-timer" id="timerDisplay">
-                    <svg viewBox="0 0 36 36" class="timer-svg">
-                        <path class="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="timer-progress" id="timerPath" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <span class="timer-seconds" id="timerSeconds">15</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- Progress Bar -->
-        <div class="progress-wrapper">
-            <div class="progress-bar" id="progressBar" style="width: 10%;"></div>
-            <span class="progress-label" id="progressLabel">Question 1 of 10</span>
-        </div>
-
-        <!-- Question Box -->
+        <!-- Question Box (question number + text + segmented progress) -->
         <div class="question-box glass-card">
-            <div class="question-number" id="questionNumber">Loading…</div>
+            <div class="question-number-row">
+                <i class="fas fa-comment-dots question-number-icon" aria-hidden="true"></i>
+                <div class="question-number" id="questionNumber">Loading…</div>
+            </div>
             <p class="question-text" id="questionText">Loading question…</p>
+
+            <div class="progress-wrapper">
+                <div class="progress-bar" id="progressBar" style="width: 10%;"></div>
+                <span class="progress-label" id="progressLabel">Question 1 of 10</span>
+            </div>
         </div>
 
-        <!-- Options Grid – each option now includes a crowd bar container -->
+        <!-- Options -->
         <div class="options-grid">
             <button class="option-btn" id="optionA" data-option="A">
                 <span class="option-letter">A</span>
                 <span class="option-text" id="optionAText">Loading…</span>
-                <!-- In‑option crowd bar (hidden by default) -->
                 <div class="option-crowd" style="display:none;">
                     <div class="crowd-bar-bg">
                         <div class="crowd-bar-fill" id="crowdBarA" style="width:0%;"></div>
@@ -107,11 +100,11 @@
             </button>
         </div>
 
-        <!-- Lifelines Row + Next Button -->
+        <!-- Lifelines + Next -->
         <div class="lifelines-row">
             <button class="lifeline-btn" id="lifelineFiftyFifty">
                 <i class="fas fa-percent"></i>
-                <span class="lifeline-label">50:50</span>
+                <span class="lifeline-label">50/50</span>
                 <span class="lifeline-count" id="countFiftyFifty">1</span>
             </button>
             <button class="lifeline-btn" id="lifelineAskCrowd">
@@ -119,18 +112,17 @@
                 <span class="lifeline-label">Ask Crowd</span>
                 <span class="lifeline-count" id="countAskCrowd">1</span>
             </button>
-            <!-- Replaced Skip with Call a Friend -->
             <button class="lifeline-btn" id="lifelineCallFriend">
                 <i class="fas fa-phone"></i>
                 <span class="lifeline-label">Call a Friend</span>
                 <span class="lifeline-count" id="countCallFriend">1</span>
             </button>
             <button class="next-btn" id="nextBtn" disabled>
-                <i class="fas fa-forward"></i> Next
+                <i class="fas fa-forward"></i>
+                <span class="next-btn-label">Next</span>
             </button>
         </div>
 
-        <!-- Ask Crowd panel removed – bars now appear inside each option button -->
     </main>
 
     <!-- Toast Container -->
