@@ -28,6 +28,13 @@ const challengeProgressText = document.getElementById("challengeProgressText");
 const challengeRewardAmount = document.querySelector(".challenge-reward-amount");
 const challengeRewardIcon = document.querySelector(".challenge-reward i");
 
+// ----- Avatar elements -----
+const userAvatarBtn = document.getElementById("userAvatarBtn");
+const avatarEditBtn = document.getElementById("avatarEditBtn");
+const avatarFileInput = document.getElementById("avatarFileInput");
+const userAvatarImg = document.getElementById("userAvatarImg");
+const userInitialsSpan = document.getElementById("userInitials");
+
 // ========== LEVEL DEFINITIONS ==========
 const LEVELS = [
     { min: 0, max: 300, name: 'Ajebutter', badge: 'ajebutter.png' },
@@ -56,19 +63,15 @@ function updateLevel(correctCount) {
         };
     }
 
-    // Update XP progress bar and text (no "XP" label)
     const xpBar = document.getElementById("xpBar");
     const xpText = document.getElementById("xpText");
     if (xpBar && xpText) {
-        // Calculate progress: (correctCount - level.min) / (level.max - level.min)
-        // For De Genius (Infinity), we set max to correctCount + 1 to show full bar
         let maxVal = level.max;
         if (maxVal === Infinity) {
-            maxVal = correctCount + 1; // always show full bar
+            maxVal = correctCount + 1;
         }
         const progress = Math.min(100, ((correctCount - level.min) / (maxVal - level.min)) * 100);
         xpBar.style.width = Math.min(100, progress) + '%';
-        // Display "correctCount / level.max" (or "correctCount+" for De Genius)
         if (level.max === Infinity) {
             xpText.textContent = `${correctCount}+ / ∞`;
         } else {
@@ -77,12 +80,76 @@ function updateLevel(correctCount) {
     }
 }
 
-// ========== HELPER: TIME-BASED GREETING (no "Good") ==========
+// ========== HELPER: TIME-BASED GREETING ==========
 function getGreeting() {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "Morning";
     if (hour >= 12 && hour < 17) return "Afternoon";
     return "Evening";
+}
+
+// ========== AVATAR UPLOAD & COMPRESSION ==========
+function compressImage(file, maxSizeMB = 0.8) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                // If image is larger than 1MB, compress
+                if (file.size > 1024 * 1024) {
+                    // Scale down to reduce size
+                    const maxDim = 800;
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height = Math.round(height * (maxDim / width));
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width = Math.round(width * (maxDim / height));
+                            height = maxDim;
+                        }
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                // Try to get under maxSizeMB
+                let quality = 0.9;
+                let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                while (dataUrl.length > maxSizeMB * 1024 * 1024 && quality > 0.1) {
+                    quality -= 0.1;
+                    dataUrl = canvas.toDataURL('image/jpeg', quality);
+                }
+                resolve(dataUrl);
+            };
+            img.onerror = reject;
+        };
+        reader.onerror = reject;
+    });
+}
+
+async function handleAvatarUpload(file, userUID) {
+    try {
+        const compressedBase64 = await compressImage(file, 0.8);
+        // Update Firestore
+        const userRef = doc(db, 'users', userUID);
+        await updateDoc(userRef, { avatar: compressedBase64 });
+        // Update UI
+        userAvatarImg.src = compressedBase64;
+        userAvatarImg.style.display = 'block';
+        userInitialsSpan.style.display = 'none';
+        showToast('Avatar updated successfully!', 'success');
+    } catch (err) {
+        console.error('Avatar upload failed:', err);
+        showToast('Failed to upload avatar. Please try again.', 'error');
+    }
 }
 
 // ========== AUTH GUARD & DATA LOADING ==========
@@ -105,20 +172,30 @@ onAuthStateChanged(auth, async (user) => {
             if (greetingText) greetingText.textContent = greeting + ",";
             if (greetingName) greetingName.textContent = displayName;
             const initials = displayName.slice(0, 2).toUpperCase();
-            if (userInitials) userInitials.textContent = initials;
+            if (userInitialsSpan) userInitialsSpan.textContent = initials;
             return;
         }
 
         const userData = userSnap.data();
         console.log('✅ User data loaded:', userData);
 
-        // ===== GREETING (time‑based, no "Good") =====
-        const displayName = userData.displayName || userData.username || user.email || "Player";
+        // ===== GREETING (username from Firestore) =====
+        const displayName = userData.username || userData.displayName || user.email || "Player";
         const greeting = getGreeting();
         if (greetingText) greetingText.textContent = greeting + ",";
         if (greetingName) greetingName.textContent = displayName;
         const initials = displayName.slice(0, 2).toUpperCase();
-        if (userInitials) userInitials.textContent = initials;
+        if (userInitialsSpan) userInitialsSpan.textContent = initials;
+
+        // ===== AVATAR =====
+        if (userData.avatar) {
+            userAvatarImg.src = userData.avatar;
+            userAvatarImg.style.display = 'block';
+            userInitialsSpan.style.display = 'none';
+        } else {
+            userAvatarImg.style.display = 'none';
+            userInitialsSpan.style.display = 'flex';
+        }
 
         // ===== COINS & LIVES =====
         let coins = userData.coins || 0;
@@ -183,10 +260,37 @@ onAuthStateChanged(auth, async (user) => {
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
                 if (bestScoreValue) bestScoreValue.textContent = newBest;
 
+                // Update avatar if changed
+                if (updated.avatar) {
+                    userAvatarImg.src = updated.avatar;
+                    userAvatarImg.style.display = 'block';
+                    userInitialsSpan.style.display = 'none';
+                }
+
                 getCurrentChallenge(updated, user.uid, db).then(ch => {
                     displayActiveChallenge(ch, updated);
                 });
             }
+        });
+
+        // ===== AVATAR UPLOAD HANDLERS =====
+        avatarFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file.', 'error');
+                return;
+            }
+            await handleAvatarUpload(file, user.uid);
+            avatarFileInput.value = '';
+        });
+
+        userAvatarBtn.addEventListener('click', () => {
+            avatarFileInput.click();
+        });
+        avatarEditBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarFileInput.click();
         });
 
     } catch (error) {
