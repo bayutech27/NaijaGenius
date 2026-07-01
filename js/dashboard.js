@@ -4,6 +4,7 @@ import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { showFunFactModal } from './fun-facts.js';
 import { renderShop, setupAdButton } from './shop.js';
+import { getCurrentChallenge } from './challenge.js';
 
 // ========== DOM ELEMENTS ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
@@ -17,6 +18,7 @@ const headerLivesValue = document.getElementById("headerLivesValue");
 const shopCoinsDisplay = document.getElementById("shopCoinsDisplay");
 const levelNameEl = document.getElementById("levelName");
 const levelBadgeEl = document.getElementById("levelBadge");
+const activeChallengesContainer = document.getElementById("activeChallenges");
 
 // ========== LEVEL DEFINITIONS ==========
 const LEVELS = [
@@ -126,6 +128,10 @@ onAuthStateChanged(auth, async (user) => {
         renderShop(coins);
         setupAdButton(userRef, updateHeaderUI);
 
+        // ===== CHALLENGE =====
+        const challenge = await getCurrentChallenge(userData, user.uid, db);
+        displayActiveChallenge(challenge, userData);
+
         // ===== FUN FACT =====
         setTimeout(() => {
             showFunFactModal(displayName, true);
@@ -148,6 +154,11 @@ onAuthStateChanged(auth, async (user) => {
                 const cats = updated.categoryStats || {};
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
                 if (bestScoreValue) bestScoreValue.textContent = newBest;
+
+                // Update challenge display (in case it changed)
+                getCurrentChallenge(updated, user.uid, db).then(ch => {
+                    displayActiveChallenge(ch, updated);
+                });
             }
         });
 
@@ -164,6 +175,45 @@ function updateHeaderUI(coins, lives) {
     if (headerLivesValue) headerLivesValue.textContent = lives;
 }
 
+// ========== DISPLAY ACTIVE CHALLENGE ==========
+function displayActiveChallenge(challenge, userData) {
+    if (!activeChallengesContainer) return;
+
+    // Remove any existing "View All" button (the section-link)
+    const viewAll = activeChallengesContainer.querySelector('.section-link');
+    if (viewAll) viewAll.remove();
+
+    if (!challenge) {
+        activeChallengesContainer.innerHTML = `
+            <div class="challenge-card" style="background:rgba(20,25,40,0.6);">
+                <i class="fas fa-tasks" style="font-size:1.5rem; color:#a0b3d9; margin-right:0.8rem;"></i>
+                <span style="color:#a0b3d9;">Complete a round to unlock your first challenge!</span>
+            </div>
+        `;
+        return;
+    }
+
+    const isCompleted = userData.challenge?.completed || false;
+    const rewardText = challenge.rewardType === 'coins' 
+        ? `+${challenge.rewardValue} coins` 
+        : `+1 ${challenge.rewardValue}`;
+    const statusText = isCompleted ? '✅ Completed!' : '🔥 Incomplete';
+    const statusColor = isCompleted ? '#3ED6B7' : '#FF6B6B';
+
+    activeChallengesContainer.innerHTML = `
+        <div class="challenge-card" style="display:flex; align-items:center; gap:0.8rem; background:rgba(20,25,40,0.6); border:1px solid rgba(255,215,0,0.15);">
+            <i class="fas ${challenge.icon}" style="font-size:2rem; color:#FFD700; flex-shrink:0;"></i>
+            <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:1rem; color:#f0f3fa;">${challenge.title}</div>
+                <div style="font-size:0.8rem; color:#a0b3d9;">${rewardText}</div>
+            </div>
+            <div style="font-size:0.8rem; font-weight:600; color:${statusColor}; flex-shrink:0;">
+                ${statusText}
+            </div>
+        </div>
+    `;
+}
+
 // ========== MODE BUTTON NAVIGATION ==========
 document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
     window.location.href = "games.html";
@@ -171,15 +221,12 @@ document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
 document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
     window.location.href = "games.html";
 });
-
-// Updated to point to pick-your-lane.html
 document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
     window.location.href = "pick-your-lane.html";
 });
 document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
     window.location.href = "pick-your-lane.html";
 });
-
 document.getElementById("oneChanceBtn")?.addEventListener("click", () => {
     window.location.href = "games.html?type=one_chance";
 });
