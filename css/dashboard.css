@@ -1137,32 +1137,34 @@ body {
 .lane-card:hover .lane-arrow {
     transform: translateX(4px);
 }
-/* Back arrow */
+
+/* Back arrow – now on the extreme right, gold */
 .back-arrow-wrapper {
     position: fixed;
     top: 1rem;
-    left: 1rem;
+    right: 1rem;
     z-index: 1100;
 }
 .back-arrow-btn {
     background: rgba(20, 24, 46, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.4);
     border-radius: 50%;
     width: 44px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFFFFF;
+    color: #FFD700;
     font-size: 1.2rem;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
     backdrop-filter: blur(6px);
 }
 .back-arrow-btn:hover {
-    background: rgba(0, 229, 160, 0.2);
-    border-color: #00E5A0;
+    background: rgba(255, 215, 0, 0.15);
+    border-color: #FFD700;
 }
+
 /* Adjust main-content padding for lane page (no header) */
 .lane-page .main-content {
     padding-top: 20px;
@@ -1179,7 +1181,6 @@ body {
     color: #FFFFFF;
     letter-spacing: -0.02em;
     line-height: 1.2;
-    /* remove gradient, keep solid white */
     background: none;
     -webkit-background-clip: unset;
     background-clip: unset;
@@ -1486,7 +1487,7 @@ body {
     }
     .back-arrow-wrapper {
         top: 0.5rem;
-        left: 0.5rem;
+        right: 0.5rem;
     }
     .back-arrow-btn {
         width: 36px;
