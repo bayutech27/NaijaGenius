@@ -1,4 +1,5 @@
 // challenge.js – 50 daily challenges for NaijaGenius
+import { doc, updateDoc, increment, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 // ========== CHALLENGE DEFINITIONS ==========
 export const CHALLENGES = [
