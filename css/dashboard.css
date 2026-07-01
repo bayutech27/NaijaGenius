@@ -216,7 +216,7 @@ body {
     opacity: 0;
 }
 
-/* ----- GREETING (+ hero logo) ----- */
+/* ----- GREETING (time‑based, no "Good") ----- */
 .greeting-wrapper {
     display: flex;
     align-items: center;
@@ -226,20 +226,19 @@ body {
 }
 .greeting-copy { flex: 1; min-width: 0; }
 .greeting-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: #D7DCEC;
     line-height: 1.2;
 }
 .greeting-text span#greetingName {
-    display: block;
-    font-size: 2rem;
+    display: inline;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.02em;
-    margin-top: 0.1rem;
+    margin-left: 0.2rem;
 }
-.wave-emoji { font-size: 1.4rem; vertical-align: middle; }
 .greeting-sub {
     font-size: 0.8rem;
     font-weight: 400;
@@ -294,11 +293,11 @@ body {
 }
 .hero-logo-text em { font-style: normal; }
 
-/* ----- LEVEL DISPLAY (avatar + shield badge + XP progress) ----- */
+/* ----- LEVEL DISPLAY (avatar + level side‑by‑side) ----- */
 .level-display {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 1.2rem;
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, rgba(30, 20, 60, 0.55), rgba(15, 30, 60, 0.55));
     backdrop-filter: blur(8px);
@@ -355,28 +354,41 @@ body {
     cursor: pointer;
 }
 
-.level-badge-container {
+/* Level info container (badge + name + progress) */
+.level-info-container {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.shield-badge {
     flex-shrink: 0;
-    position: relative;
-    width: 60px;
-    height: 66px;
+    width: 50px;
+    height: 56px;
+    background: #1A1D2E;
+    clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    border: 2px solid #FFD700;
+    box-shadow: 0 0 14px rgba(255,215,0,0.25);
 }
-.level-badge-img {
-    width: 100%;
-    height: 100%;
+.shield-badge .level-badge-img {
+    width: 70%;
+    height: 70%;
     object-fit: contain;
 }
 .level-number-badge {
     position: absolute;
-    top: 46%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: 'Orbitron', monospace;
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: 0.8rem;
     color: #FFFFFF;
     text-shadow: 0 2px 4px rgba(0,0,0,0.6);
 }
@@ -385,35 +397,30 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.1rem;
     min-width: 0;
 }
 .level-label {
     align-self: flex-start;
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     font-weight: 600;
     text-transform: uppercase;
     color: #C9B6FF;
     letter-spacing: 0.05em;
     background: rgba(140, 90, 255, 0.25);
     border: 1px solid rgba(180, 140, 255, 0.4);
-    padding: 0.15rem 0.6rem;
+    padding: 0.1rem 0.6rem;
     border-radius: 20px;
-    margin-bottom: 0.15rem;
 }
 .level-name {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.15;
 }
-.level-star { font-size: 1.05rem; }
-.xp-text {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #E4E8F5;
-    margin: 0.15rem 0 0.3rem;
-}
+.level-star { font-size: 0.9rem; }
+
+/* XP progress (no "XP" text) */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -421,33 +428,40 @@ body {
     width: 100%;
 }
 .xp-bar {
-    height: 8px;
+    flex: 1;
+    height: 6px;
     background: linear-gradient(90deg, #7C5CFF, #2E9BFF);
-    border-radius: 8px;
+    border-radius: 6px;
     transition: width 0.3s ease;
-    box-shadow: 0 0 10px rgba(124, 92, 255, 0.6);
+    box-shadow: 0 0 8px rgba(124, 92, 255, 0.5);
+}
+.xp-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #E4E8F5;
+    white-space: nowrap;
 }
 .xp-progress {
     background: rgba(255,255,255,0.08);
-    border-radius: 8px;
-    height: 8px;
+    border-radius: 6px;
+    height: 6px;
 }
 
-/* ----- STATS ROW (single light pill card, two stats) ----- */
+/* ----- STATS ROW (reduced height) ----- */
 .stats-row {
     display: flex;
     align-items: stretch;
     background: linear-gradient(135deg, #F3EFFF 0%, #EDEBFF 100%);
-    border-radius: 22px;
-    padding: 0.9rem 1.2rem;
-    margin-bottom: 1.5rem;
+    border-radius: 18px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.2rem;
     width: 100%;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 .stats-divider {
     width: 1px;
     background: rgba(60, 40, 100, 0.15);
-    margin: 0.2rem 1rem;
+    margin: 0.2rem 0.8rem;
     flex-shrink: 0;
 }
 .stat-card {
@@ -456,7 +470,7 @@ body {
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.5rem;
     opacity: 0;
     animation: fadeUp 0.4s ease-out forwards;
     width: auto;
@@ -464,11 +478,11 @@ body {
     min-width: 0;
 }
 .stat-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #fff;
     flex-shrink: 0;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -485,66 +499,66 @@ body {
     flex: 1;
 }
 .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 500;
     color: #5B5478;
     order: -1;
 }
 .stat-value {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #1A1230;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 .stat-caption {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 400;
     color: #8A82A6;
 }
 
-/* ----- ACTIVE CHALLENGE (single large card) ----- */
+/* ----- ACTIVE CHALLENGE (reduced height) ----- */
 .challenge-section {
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 1.2rem 0;
 }
 .challenge-section > .section-title {
-    display: none; /* title now lives inside the card as "Daily Challenge" + pill */
+    display: none;
 }
 .challenge-card-large {
     background: linear-gradient(135deg, #6A3FE0 0%, #3E63E8 60%, #2E9BFF 100%);
-    border-radius: 24px;
-    padding: 1rem;
+    border-radius: 20px;
+    padding: 0.8rem;
     border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    box-shadow: 0 10px 28px rgba(50, 60, 200, 0.35);
+    gap: 0.6rem;
+    box-shadow: 0 8px 22px rgba(50, 60, 200, 0.35);
     position: relative;
     overflow: hidden;
 }
 .challenge-icon-graphic {
     flex-shrink: 0;
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .challenge-icon-graphic .fa-gift {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     color: #FFD700;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
 }
 .challenge-graphic-badge {
     position: absolute;
-    bottom: -6px;
-    right: -8px;
-    font-size: 1rem;
+    bottom: -4px;
+    right: -6px;
+    font-size: 0.9rem;
     background: #9B6BFF;
     color: #fff;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -555,33 +569,33 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.1rem;
     min-width: 0;
 }
 .challenge-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 .challenge-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.25rem;
     background: rgba(255, 215, 0, 0.9);
     color: #3A2A00;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    padding: 0.2rem 0.6rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 20px;
 }
-.challenge-icon { font-size: 0.7rem; }
+.challenge-icon { font-size: 0.6rem; }
 .challenge-arrow-btn {
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
     border-radius: 50%;
     border: none;
     background: rgba(255, 255, 255, 0.18);
@@ -594,38 +608,38 @@ body {
 }
 .challenge-title {
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     color: #FFFFFF;
     line-height: 1.15;
 }
 .challenge-desc {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 400;
     color: rgba(255,255,255,0.85);
-    line-height: 1.3;
+    line-height: 1.2;
     margin: 0;
 }
 .challenge-progress {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    height: 5px;
-    margin-top: 0.25rem;
+    border-radius: 4px;
+    height: 4px;
+    margin-top: 0.15rem;
 }
 .challenge-progress-bar {
-    height: 5px;
+    height: 4px;
     background: linear-gradient(90deg, #FFD700, #FFB800);
-    border-radius: 6px;
+    border-radius: 4px;
     transition: width 0.3s ease;
 }
 .challenge-progress-text {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: rgba(255,255,255,0.85);
     font-weight: 500;
 }
 .challenge-reward {
     flex-shrink: 0;
-    width: 58px;
-    height: 58px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.12);
     border: 2px solid rgba(255, 215, 0, 0.6);
@@ -636,17 +650,17 @@ body {
     gap: 0;
     text-align: center;
 }
-.challenge-reward i { font-size: 0.8rem; }
+.challenge-reward i { font-size: 0.7rem; }
 .challenge-reward-text {
     font-weight: 700;
     color: #FFD700;
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     line-height: 1.1;
     text-transform: uppercase;
 }
 .challenge-reward-amount {
     font-family: 'Orbitron', monospace;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 /* ----- CHOOSE A MODE (colorful square cards) ----- */
@@ -759,7 +773,7 @@ body {
     font-size: 0.7rem;
     color: #FFFFFF;
     font-weight: 700;
-    background: transparent; /* invisible background per request */
+    background: transparent;
     padding: 0.4rem 0.3rem;
     margin-top: auto;
 }
@@ -767,7 +781,7 @@ body {
     display: none;
 }
 
-/* Disabled mode buttons (when lives = 0) – keep for consistency */
+/* Disabled mode buttons (when lives = 0) */
 .mode-btn:disabled {
     cursor: not-allowed;
     filter: grayscale(0.5);
@@ -796,7 +810,7 @@ body {
     font-size: 1rem;
 }
 
-/* ----- SHOP SECTION – compact for mobile ----- */
+/* ----- SHOP SECTION ----- */
 .shop-coins-display {
     font-size: 0.8rem;
     font-weight: 600;
@@ -873,7 +887,6 @@ body {
 .shop-buy-btn:not(:disabled):hover {
     transform: scale(1.05);
 }
-/* Ad life container – compact */
 .ad-life-container {
     margin-top: 1rem;
     text-align: center;
@@ -913,7 +926,7 @@ body {
     margin-top: 0.3rem;
 }
 
-/* ----- MY STATS SECTION (playSection) – compact ----- */
+/* ----- MY STATS SECTION (playSection) ----- */
 .stats-full {
     padding: 0.5rem 0;
 }
@@ -1107,7 +1120,7 @@ body {
     margin-top: 0.2rem;
 }
 
-/* ----- BOTTOM NAVIGATION (Mobile) – uniform icons, no central play ----- */
+/* ----- BOTTOM NAVIGATION (Mobile) ----- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
