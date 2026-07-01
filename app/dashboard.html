@@ -23,7 +23,7 @@
                     <span class="stat-badge" id="headerCoins">
                         <i class="fas fa-coins" style="color:#FFD700;"></i>
                         <span class="stat-label-text">Coins</span>
-                        <span id="headerCoinsValue">4,850</span>
+                        <span id="headerCoinsValue">Loading...</span>
                         <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
                     </span>
                     <span class="header-divider"></span>
@@ -31,7 +31,7 @@
                     <span class="stat-badge" id="headerLives">
                         <i class="fas fa-heart" style="color:#ff6b6b;"></i>
                         <span class="stat-label-text">Lives</span>
-                        <span id="headerLivesValue">5/5</span>
+                        <span id="headerLivesValue">Loading...</span>
                         <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
                     </span>
                 </div>
@@ -55,7 +55,7 @@
             <!-- ---- GREETING ---- -->
             <div class="greeting-wrapper fade-in-up">
                 <div class="greeting-copy">
-                    <p class="greeting-text" id="greetingText">Morning, <span id="greetingName">Amaka</span></p>
+                    <p class="greeting-text" id="greetingText"> <span id="greetingName"></span></p>
                     <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
                 </div>
                 <div class="hero-logo-wrap" id="heroLogoWrap">
@@ -84,7 +84,7 @@
                     <div class="user-avatar" id="userAvatarBtn">
                         <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <span id="userInitials" class="avatar-fallback">AM</span>
+                        <span id="userInitials" class="avatar-fallback"></span>
                     </div>
                     <button class="avatar-edit-btn" id="avatarEditBtn" aria-label="Edit avatar"><i class="fas fa-pencil"></i></button>
                     <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
@@ -97,10 +97,10 @@
                     </div>
                     <div class="level-info">
                         <span class="level-label" id="levelLabel">Current Level</span>
-                        <span class="level-name" id="levelName">Trivia Star <span class="level-star" aria-hidden="true">⭐</span></span>
+                        <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
                         <div class="xp-progress">
                             <div class="xp-bar" id="xpBar" style="width: 67%;"></div>
-                            <span class="xp-text" id="xpText">89 / 300</span>
+                            <span class="xp-text" id="xpText">0/0</span>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                     <i class="fas fa-arrow-trend-up stat-icon"></i>
                     <div class="stat-info">
                         <span class="stat-label" id="correctAnswersLabel">Answers</span>
-                        <span class="stat-value" id="correctAnswers">218</span>
+                        <span class="stat-value" id="correctAnswers">Loading...</span>
                         <span class="stat-caption">Total Correct</span>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                     <i class="fas fa-trophy stat-icon"></i>
                     <div class="stat-info">
                         <span class="stat-label" id="bestScoreLabel">Best Score</span>
-                        <span class="stat-value" id="bestScoreValue">3,420</span>
+                        <span class="stat-value" id="bestScoreValue">Loading...</span>
                         <span class="stat-caption">Your Highest</span>
                     </div>
                 </div>
@@ -145,16 +145,16 @@
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
-                        <span class="challenge-title" id="challengeTitle">Daily Challenge</span>
-                        <p class="challenge-desc" id="challengeDesc">Answer 10 questions and earn amazing rewards!</p>
+                        <span class="challenge-title" id="challengeTitle"></span>
+                        <p class="challenge-desc" id="challengeDesc">Loading active challenge. Please wait...</p>
                         <div class="challenge-progress">
                             <div class="challenge-progress-bar" id="challengeProgressBar" style="width: 60%;"></div>
                         </div>
-                        <span class="challenge-progress-text" id="challengeProgressText">6 / 10 Questions</span>
+                        <span class="challenge-progress-text" id="challengeProgressText"></span>
                     </div>
                     <div class="challenge-reward" id="challengeReward">
                         <i class="fas fa-coins" style="color:#FFD700;"></i>
-                        <span class="challenge-reward-text">Win<br /><span class="challenge-reward-amount">250</span><br />Coins</span>
+                        <span class="challenge-reward-text">Win<br /><span class="challenge-reward-amount">0</span><br />Coins</span>
                     </div>
                 </div>
             </div>
