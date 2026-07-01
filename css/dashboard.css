@@ -216,7 +216,7 @@ body {
     opacity: 0;
 }
 
-/* ----- GREETING (time‑based, no "Good") ----- */
+/* ----- GREETING ----- */
 .greeting-wrapper {
     display: flex;
     align-items: center;
@@ -290,8 +290,41 @@ body {
     line-height: 1.05;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     letter-spacing: -0.02em;
+    position: relative;
+    display: inline-block;
 }
 .hero-logo-text em { font-style: normal; }
+
+/* ----- SPARKLE / FIREWORKS ANIMATION ----- */
+.sparkle-text {
+    position: relative;
+}
+.sparkle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+.sparkle {
+    position: absolute;
+    font-size: 1.2rem;
+    animation: sparkleFloat 3s ease-in-out infinite;
+}
+.sparkle-1 { top: -10%; left: -10%; animation-delay: 0s; }
+.sparkle-2 { top: -15%; right: -5%; animation-delay: 0.6s; }
+.sparkle-3 { bottom: 10%; left: -8%; animation-delay: 1.2s; }
+.sparkle-4 { bottom: 5%; right: -6%; animation-delay: 1.8s; }
+.sparkle-5 { top: 30%; left: 50%; animation-delay: 2.4s; }
+
+@keyframes sparkleFloat {
+    0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
+}
 
 /* ----- LEVEL DISPLAY (avatar + level side‑by‑side) ----- */
 .level-display {
@@ -325,6 +358,7 @@ body {
     border: 3px solid #FFFFFF;
     overflow: hidden;
     box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    position: relative;
 }
 .avatar-img {
     width: 100%;
@@ -381,17 +415,7 @@ body {
     height: 70%;
     object-fit: contain;
 }
-.level-number-badge {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Orbitron', monospace;
-    font-weight: 800;
-    font-size: 0.8rem;
-    color: #FFFFFF;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-}
+/* Level number badge removed */
 
 .level-info {
     flex: 1;
@@ -420,7 +444,7 @@ body {
 }
 .level-star { font-size: 0.9rem; }
 
-/* XP progress (no "XP" text) */
+/* XP progress */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -447,7 +471,7 @@ body {
     height: 6px;
 }
 
-/* ----- STATS ROW (reduced height) ----- */
+/* ----- STATS ROW ----- */
 .stats-row {
     display: flex;
     align-items: stretch;
@@ -517,7 +541,7 @@ body {
     color: #8A82A6;
 }
 
-/* ----- ACTIVE CHALLENGE (reduced height) ----- */
+/* ----- ACTIVE CHALLENGE ----- */
 .challenge-section {
     margin: 0 0 1.2rem 0;
 }
@@ -663,7 +687,7 @@ body {
     font-size: 0.7rem;
 }
 
-/* ----- CHOOSE A MODE (colorful square cards) ----- */
+/* ----- CHOOSE A MODE ----- */
 .mode-section {
     margin-top: 0.5rem;
 }
