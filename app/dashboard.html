@@ -54,22 +54,20 @@
 
             <!-- ---- GREETING (+ hero logo graphic) ---- -->
             <div class="greeting-wrapper fade-in-up">
-   
+                <div class="greeting-copy">
+                    <p class="greeting-text" id="greetingText">Good Evening, <span id="greetingName">Amaka</span> <span class="wave-emoji" aria-hidden="true">👋</span></p>
+                    <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
+                </div>
                 <div class="hero-logo-wrap" id="heroLogoWrap">
                     <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-trivia-hero.png" alt="Naija Trivia"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div class="hero-logo-fallback">
                         <span class="hero-flag" aria-hidden="true">🇳🇬</span>
                         <span class="hero-bulb" aria-hidden="true">💡</span>
-                        <span class="hero-logo-text"><span class="naija-white">Naija</span><br /><em class="genius-mint">Genius</em></span>
+                        <span class="hero-logo-text"><span class="naija-white">Naija</span><br /><em class="genius-mint">Trivia</em></span>
                     </div>
-
-<button class="avatar-edit-btn" id="avatarEditBtn" aria-label="Edit avatar"><i class="fas fa-pencil"></i></button>
-
                 </div>
             </div>
-
-
 
             <!-- ---- LEVEL DISPLAY (avatar + level badge + XP progress) ---- -->
             <div class="level-display fade-in-up">
@@ -79,7 +77,7 @@
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                         <span id="userInitials" class="avatar-fallback">AM</span>
                     </div>
-                    
+                    <button class="avatar-edit-btn" id="avatarEditBtn" aria-label="Edit avatar"><i class="fas fa-pencil"></i></button>
                 </div>
 
                 <div class="level-badge-container">
@@ -90,8 +88,8 @@
 
                 <div class="level-info">
                     <span class="level-label" id="levelLabel">Current Level</span>
-                    <span class="level-name" id="levelName"> <span class="level-star" aria-hidden="true"></span></span>
-                    <span class="xp-text" id="xpText">89 / 1,000</span>
+                    <span class="level-name" id="levelName">Trivia Star <span class="level-star" aria-hidden="true">⭐</span></span>
+                    <span class="xp-text" id="xpText">2,350 / 3,500 XP</span>
                     <div class="xp-progress">
                         <div class="xp-bar" id="xpBar" style="width: 67%;"></div>
                     </div>
