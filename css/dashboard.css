@@ -913,7 +913,7 @@ body {
     transform: scale(1.03);
 }
 .ad-life-container {
-    margin-top: 1.8rem; /* vertical gap from items */
+    margin-top: 1.8rem;
     text-align: center;
     padding: 1rem 0.8rem;
     background: linear-gradient(135deg, #FF5757 0%, #C21E1E 100%);
@@ -1081,56 +1081,114 @@ body {
     50% { opacity: 1; }
 }
 
-/* ----- CHOOSE-YOUR-LANE PAGE (Lane Cards) ----- */
+/* ----- PICK-YOUR-LANE PAGE (Lane Cards) ----- */
 .lane-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
     margin-top: 1.5rem;
 }
 .lane-card {
-    background: #12151E;
-    border-radius: 20px;
-    padding: 1.2rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg, rgba(45, 40, 80, 0.85), rgba(20, 24, 46, 0.95));
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-bottom: 4px solid rgba(0, 0, 0, 0.35);
+    border-radius: 16px;
+    padding: 1rem 0.6rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s, border-color 0.2s;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
 }
 .lane-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(0, 229, 160, 0.4);
-    background: #1A1D2E;
+    border-color: #FFD700;
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 .lane-icon {
-    font-size: 2rem;
-    width: 3rem;
-    text-align: center;
-    flex-shrink: 0;
+    font-size: 2.2rem;
+    margin-bottom: 0.3rem;
 }
 .lane-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
 }
 .lane-name {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     color: #FFFFFF;
     letter-spacing: -0.01em;
 }
 .lane-desc {
-    font-size: 0.8rem;
-    color: #B0B8C8;
-    line-height: 1.3;
+    font-size: 0.7rem;
+    color: #9AA5C7;
+    line-height: 1.2;
 }
 .lane-arrow {
     color: #00E5A0;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-top: 0.3rem;
     transition: transform 0.2s ease;
 }
 .lane-card:hover .lane-arrow {
     transform: translateX(4px);
+}
+/* Back arrow */
+.back-arrow-wrapper {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100;
+}
+.back-arrow-btn {
+    background: rgba(20, 24, 46, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    backdrop-filter: blur(6px);
+}
+.back-arrow-btn:hover {
+    background: rgba(0, 229, 160, 0.2);
+    border-color: #00E5A0;
+}
+/* Adjust main-content padding for lane page (no header) */
+.lane-page .main-content {
+    padding-top: 20px;
+}
+
+/* ----- CHOOSE-YOUR-LANE PAGE (Lane Cards) – legacy styles (kept for safety, but overridden above) ----- */
+.lane-grid {
+    /* already redefined above */;
+}
+.lane-card {
+    /* already redefined above */;
+}
+.lane-icon {
+    /* already redefined above */;
+}
+.lane-info {
+    /* already redefined above */;
+}
+.lane-name {
+    /* already redefined above */;
+}
+.lane-desc {
+    /* already redefined above */;
+}
+.lane-arrow {
+    /* already redefined above */;
 }
 
 /* ----- HERO (used on lane page) ----- */
@@ -1305,9 +1363,16 @@ body {
         grid-template-columns: repeat(3, 1fr);
     }
     .lane-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+    }
+    .lane-card {
+        padding: 1.2rem 0.6rem;
+    }
+    .lane-name {
+        font-size: 1rem;
+    }
+    .lane-desc {
+        font-size: 0.75rem;
     }
 }
 
@@ -1422,6 +1487,36 @@ body {
     .nav-label {
         font-size: 0.55rem;
     }
+
+    /* Lane page mobile */
+    .lane-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+    .lane-card {
+        padding: 0.8rem 0.3rem;
+    }
+    .lane-icon {
+        font-size: 1.8rem;
+    }
+    .lane-name {
+        font-size: 0.8rem;
+    }
+    .lane-desc {
+        font-size: 0.6rem;
+    }
+    .back-arrow-wrapper {
+        top: 0.5rem;
+        left: 0.5rem;
+    }
+    .back-arrow-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    .lane-page .main-content {
+        padding-top: 12px;
+    }
 }
 
 @media (max-width: 380px) {
@@ -1445,6 +1540,9 @@ body {
     }
     .shop-item {
         max-width: 130px;
+    }
+    .lane-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
