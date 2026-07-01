@@ -967,4 +967,4 @@ button, .nav-item, .sidebar-item, .challenge-card, .mode-btn, .lane-card {
     min-height: 44px;
     cursor: pointer;
 }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth;}
