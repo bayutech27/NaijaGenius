@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-            <!-- ---- ACTIVE CHALLENGE (single card) ---- -->
+            <!-- ---- ACTIVE CHALLENGE (single card, dynamic) ---- -->
             <div class="challenge-section">
                 <h2 class="section-title">Active Challenge</h2>
                 <div class="challenge-card-large" id="activeChallengeCard">
@@ -135,14 +135,14 @@
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
-                        <span class="challenge-title">Daily Challenge</span>
+                        <span class="challenge-title" id="challengeTitle">Daily Challenge</span>
                         <p class="challenge-desc" id="challengeDesc">Answer 10 questions and earn amazing rewards!</p>
                         <div class="challenge-progress">
                             <div class="challenge-progress-bar" id="challengeProgressBar" style="width: 60%;"></div>
                         </div>
                         <span class="challenge-progress-text" id="challengeProgressText">6 / 10 Questions</span>
                     </div>
-                    <div class="challenge-reward">
+                    <div class="challenge-reward" id="challengeReward">
                         <i class="fas fa-coins" style="color:#FFD700;"></i>
                         <span class="challenge-reward-text">Win<br /><span class="challenge-reward-amount">250</span><br />Coins</span>
                     </div>
@@ -175,7 +175,7 @@
                         <div class="mode-details">
                             <span class="mode-name">Pick Your Lane</span>
                         </div>
-                        <span class="mode-questions">15 Questions</span>
+                        <span class="mode-questions">10 Categories</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                     <button class="mode-btn mode-btn-green" id="oneChanceBtn">
@@ -185,7 +185,7 @@
                         <div class="mode-details">
                             <span class="mode-name">One Chance</span>
                         </div>
-                        <span class="mode-questions">20 Questions</span>
+                        <span class="mode-questions">One miss, game ends</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
@@ -273,7 +273,7 @@
 
     </main>
 
-    <!-- ===== BOTTOM NAVIGATION (Mobile) ===== -->
+    <!-- ===== BOTTOM NAVIGATION (Mobile) – all icons uniform, center play removed ===== -->
     <nav class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-nav="home">
             <i class="fas fa-house"></i>
@@ -284,9 +284,6 @@
             <i class="fas fa-chart-simple"></i>
             <span class="nav-label">My Stats</span>
             <span class="nav-dot"></span>
-        </button>
-        <button class="nav-item nav-play-cta" id="quickPlayBtn" data-nav="quickplay" aria-label="Quick Play">
-            <i class="fas fa-play"></i>
         </button>
         <button class="nav-item" data-nav="shop">
             <i class="fas fa-store"></i>
