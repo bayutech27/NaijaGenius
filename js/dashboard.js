@@ -164,8 +164,10 @@ onAuthStateChanged(auth, async (user) => {
             console.warn("User profile not found in Firestore.");
             const displayName = user.email || "Player";
             const greeting = getGreeting();
-            if (greetingText) greetingText.textContent = greeting + ",";
-            if (greetingName) greetingName.textContent = displayName;
+            // FIX: Use innerHTML to preserve the span for the name
+            if (greetingText) {
+                greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
+            }
             const initials = displayName.slice(0, 2).toUpperCase();
             if (userInitialsSpan) userInitialsSpan.textContent = initials;
             return;
@@ -175,11 +177,12 @@ onAuthStateChanged(auth, async (user) => {
         console.log('✅ User data loaded:', userData);
 
         // ===== GREETING – load displayName from Firestore =====
-        // Prioritize displayName, fallback to username, then email, then "Player"
         const displayName = userData.displayName || userData.username || user.email || "Player";
         const greeting = getGreeting();
-        if (greetingText) greetingText.textContent = greeting + ",";
-        if (greetingName) greetingName.textContent = displayName;
+        // FIX: Reconstruct the greeting with the name inside the span
+        if (greetingText) {
+            greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
+        }
         const initials = displayName.slice(0, 2).toUpperCase();
         if (userInitialsSpan) userInitialsSpan.textContent = initials;
 
@@ -265,7 +268,11 @@ onAuthStateChanged(auth, async (user) => {
 
                 // Update greeting name if displayName changed
                 const newName = updated.displayName || updated.username || user.email || "Player";
-                if (greetingName) greetingName.textContent = newName;
+                const currentGreeting = getGreeting();
+                // Reconstruct the greeting HTML
+                if (greetingText) {
+                    greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
+                }
 
                 getCurrentChallenge(updated, user.uid, db).then(ch => {
                     displayActiveChallenge(ch, updated);
@@ -295,7 +302,7 @@ onAuthStateChanged(auth, async (user) => {
 
     } catch (error) {
         console.error("Error loading user data:", error);
-        if (greetingText) greetingText.textContent = "Good Day,";
+        if (greetingText) greetingText.textContent = "Good Day, Player";
         if (greetingName) greetingName.textContent = "Player";
     }
 });
