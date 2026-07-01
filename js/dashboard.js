@@ -100,9 +100,7 @@ function compressImage(file, maxSizeMB = 0.8) {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                // If image is larger than 1MB, compress
                 if (file.size > 1024 * 1024) {
-                    // Scale down to reduce size
                     const maxDim = 800;
                     if (width > height) {
                         if (width > maxDim) {
@@ -120,7 +118,6 @@ function compressImage(file, maxSizeMB = 0.8) {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                // Try to get under maxSizeMB
                 let quality = 0.9;
                 let dataUrl = canvas.toDataURL('image/jpeg', quality);
                 while (dataUrl.length > maxSizeMB * 1024 * 1024 && quality > 0.1) {
@@ -138,10 +135,8 @@ function compressImage(file, maxSizeMB = 0.8) {
 async function handleAvatarUpload(file, userUID) {
     try {
         const compressedBase64 = await compressImage(file, 0.8);
-        // Update Firestore
         const userRef = doc(db, 'users', userUID);
         await updateDoc(userRef, { avatar: compressedBase64 });
-        // Update UI
         userAvatarImg.src = compressedBase64;
         userAvatarImg.style.display = 'block';
         userInitialsSpan.style.display = 'none';
@@ -179,8 +174,9 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userSnap.data();
         console.log('✅ User data loaded:', userData);
 
-        // ===== GREETING (username from Firestore) =====
-        const displayName = userData.username || userData.displayName || user.email || "Player";
+        // ===== GREETING – load displayName from Firestore =====
+        // Prioritize displayName, fallback to username, then email, then "Player"
+        const displayName = userData.displayName || userData.username || user.email || "Player";
         const greeting = getGreeting();
         if (greetingText) greetingText.textContent = greeting + ",";
         if (greetingName) greetingName.textContent = displayName;
@@ -266,6 +262,10 @@ onAuthStateChanged(auth, async (user) => {
                     userAvatarImg.style.display = 'block';
                     userInitialsSpan.style.display = 'none';
                 }
+
+                // Update greeting name if displayName changed
+                const newName = updated.displayName || updated.username || user.email || "Player";
+                if (greetingName) greetingName.textContent = newName;
 
                 getCurrentChallenge(updated, user.uid, db).then(ch => {
                     displayActiveChallenge(ch, updated);
