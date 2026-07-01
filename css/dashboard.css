@@ -35,8 +35,8 @@ body {
 .naija-white { color: #FFFFFF; }
 .genius-mint { color: #00E5A0; }
 
-.balance-amount-compact,
-.stat-value {
+.stat-value,
+.best-score-value {
     font-family: 'Orbitron', monospace;
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -50,11 +50,12 @@ body {
 .stat-label,
 .greeting-text,
 .greeting-sub,
-.section-link {
+.section-link,
+.mode-questions {
     font-family: 'Poppins', sans-serif;
 }
 
-/* ----- HEADER (no brand, equal spacing) ----- */
+/* ----- HEADER ----- */
 .app-header {
     position: fixed;
     top: 0;
@@ -80,35 +81,40 @@ body {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1.2rem; /* increased from 0.8rem → 200% more spacing */
+    gap: 1.2rem;
 }
 
-/* Stats badges – larger icons and text */
+/* Stats badges – with labels */
 .stat-badge {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     background: rgba(255, 255, 255, 0.08);
-    padding: 0.4rem 1.2rem; /* more padding */
+    padding: 0.3rem 1rem;
     border-radius: 30px;
-    font-size: 1.1rem; /* larger text */
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #f0f3fa;
 }
 .stat-badge i {
-    font-size: 1.4rem; /* larger icon */
+    font-size: 1.2rem;
 }
-.stat-badge span {
-    min-width: 24px;
-    text-align: center;
+.stat-label-text {
+    font-weight: 400;
+    color: #a0b3d9;
+    margin-right: 0.2rem;
+}
+.stat-badge span:last-child {
+    font-weight: 700;
+    min-width: 20px;
 }
 
-/* Bell icon – larger */
+/* Bell */
 .icon-btn {
     background: transparent;
     border: none;
     color: #FFD700;
-    font-size: 1.6rem; /* bigger bell */
+    font-size: 1.5rem;
     cursor: pointer;
     position: relative;
     padding: 0.5rem;
@@ -119,14 +125,14 @@ body {
     position: absolute;
     top: 0;
     right: 0;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     background: #FFD700;
     border-radius: 50%;
     border: 2px solid #0D1117;
 }
 
-/* Avatar unchanged */
+/* Avatar */
 .user-avatar {
     width: 40px;
     height: 40px;
@@ -172,7 +178,31 @@ body {
     opacity: 0;
 }
 
-/* ----- LEVEL DISPLAY (replaces greeting & wallet) ----- */
+/* ----- GREETING ----- */
+.greeting-wrapper {
+    margin-bottom: 1.2rem;
+}
+.greeting-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+.greeting-text span {
+    background: linear-gradient(135deg, #FFD700, #00E5A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.greeting-sub {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #B0B8C8;
+    margin-top: 0.1rem;
+}
+
+/* ----- LEVEL DISPLAY (with XP progress) ----- */
 .level-display {
     display: flex;
     align-items: center;
@@ -182,12 +212,12 @@ body {
     backdrop-filter: blur(8px);
     border-radius: 20px;
     padding: 0.8rem 1.2rem;
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    border: 1px solid rgba(255, 215, 0, 0.15);
 }
 .level-badge-container {
     flex-shrink: 0;
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: #1A1D2E;
     border: 2px solid #FFD700;
@@ -202,17 +232,19 @@ body {
     object-fit: cover;
 }
 .level-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 0.2rem;
 }
 .level-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     text-transform: uppercase;
     color: #B0B8C8;
     letter-spacing: 0.05em;
 }
 .level-name {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
     background: linear-gradient(135deg, #FFD700, #00E5A0);
     -webkit-background-clip: text;
@@ -220,11 +252,29 @@ body {
     color: transparent;
     line-height: 1.2;
 }
+.xp-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.1rem;
+}
+.xp-bar {
+    flex: 1;
+    height: 6px;
+    background: #00E5A0;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+.xp-text {
+    font-size: 0.65rem;
+    color: #B0B8C8;
+    white-space: nowrap;
+}
 
-/* ----- STATS ROW ----- */
+/* ----- STATS ROW (two stats) ----- */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
     width: 100%;
@@ -232,7 +282,7 @@ body {
 .stat-card {
     background: #12151E;
     border-radius: 16px;
-    padding: 1rem;
+    padding: 0.8rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -253,7 +303,8 @@ body {
     flex: 1;
 }
 .stat-value {
-    font-size: 1.125rem;
+    font-size: 1.2rem;
+    font-weight: 700;
     color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: break-word;
@@ -265,73 +316,64 @@ body {
     letter-spacing: 0.02em;
 }
 
-/* ----- SECTION HEADER ----- */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+/* ----- ACTIVE CHALLENGE (single large card) ----- */
+.challenge-section {
     margin: 1.5rem 0 1rem 0;
-    flex-wrap: wrap;
+}
+.challenge-card-large {
+    background: #12151E;
+    border-radius: 20px;
+    padding: 1.2rem 1.2rem 1.2rem 1.5rem;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.challenge-header {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
+.challenge-icon {
+    font-size: 1.2rem;
+    color: #FFD700;
+}
+.challenge-title {
+    font-weight: 600;
+    font-size: 0.95rem;
     color: #FFFFFF;
-    letter-spacing: -0.01em;
 }
-.section-link {
-    color: #00E5A0;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-/* ----- ACTIVE CHALLENGES (Horizontal Scroll) ----- */
-.horizontal-scroll {
+.challenge-progress {
     display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    padding-bottom: 0.5rem;
-    width: 100%;
-    -webkit-overflow-scrolling: touch;
+    align-items: center;
+    gap: 0.5rem;
 }
-.horizontal-scroll::-webkit-scrollbar { height: 4px; }
-.horizontal-scroll::-webkit-scrollbar-track { background: #1A1D2E; border-radius: 10px; }
-.horizontal-scroll::-webkit-scrollbar-thumb { background: #00E5A0; border-radius: 10px; }
-.challenge-card {
-    flex: 0 0 280px;
-    background: #12151E;
-    border-radius: 16px;
-    padding: 1.25rem;
-    min-height: 140px;
-    cursor: pointer;
+.challenge-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #00E5A0;
+    border-radius: 6px;
+    transition: width 0.3s ease;
 }
-.empty-placeholder {
-    background: #1A1D2E;
-    border-radius: 12px;
-    padding: 2rem 1rem;
-    text-align: center;
+.challenge-progress-text {
+    font-size: 0.8rem;
     color: #B0B8C8;
-    font-size: 0.875rem;
-    border: 1px dashed rgba(255,255,255,0.1);
 }
-.loading-skeleton {
-    background: #1A1D2E;
-    border-radius: 12px;
-    padding: 1rem;
-    text-align: center;
-    color: #B0B8C8;
-    width: 100%;
+.challenge-reward {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.challenge-reward-text {
+    font-weight: 600;
+    color: #FFD700;
+    font-size: 0.9rem;
 }
 
-/* ----- CHOOSE A MODE (mobile: stacked & centered; desktop: row) ----- */
+/* ----- CHOOSE A MODE (with question counts) ----- */
 .mode-section {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 .mode-title {
     margin-bottom: 1rem;
@@ -347,11 +389,10 @@ body {
     background: #12151E;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 0.5rem 0.3rem;
+    padding: 0.5rem 0.8rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
+    gap: 0.8rem;
     width: 100%;
     max-width: 320px;
     cursor: pointer;
@@ -370,8 +411,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
     background: rgba(0, 229, 160, 0.08);
     border-radius: 50%;
@@ -391,14 +432,23 @@ body {
 .mode-btn:first-child .animate-icon { animation-delay: 0s; }
 .mode-btn:last-child .animate-icon { animation-delay: 0.6s; }
 
-.mode-name {
-    font-weight: 800;
-    font-size: 1.1rem;
-    text-align: center;
+.mode-details {
     flex: 1;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.mode-name {
+    font-weight: 700;
+    font-size: 1.05rem;
     color: #FFFFFF;
     letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+.mode-questions {
+    font-size: 0.75rem;
+    color: #B0B8C8;
+    font-weight: 400;
 }
 .mode-arrow {
     color: #00E5A0;
@@ -410,7 +460,7 @@ body {
     transform: translateX(4px);
 }
 
-/* Disabled mode buttons (when lives = 0) */
+/* Disabled mode buttons (when lives = 0) – keep for consistency */
 .mode-btn:disabled {
     cursor: not-allowed;
     filter: grayscale(0.5);
@@ -472,7 +522,6 @@ body {
 .shop-buy-btn:not(:disabled):hover {
     transform: scale(1.05);
 }
-
 .shop-coins-display {
     font-size: 1.2rem;
     color: #a0b3d9;
@@ -480,8 +529,6 @@ body {
 .shop-coins-display strong {
     color: #FFD700;
 }
-
-/* Ad life container */
 .ad-life-container {
     margin-top: 1.5rem;
     text-align: center;
@@ -508,6 +555,36 @@ body {
     font-size: 0.7rem;
     color: #a0b3d9;
     margin-top: 0.3rem;
+}
+
+/* ----- MY STATS SECTION (playSection) ----- */
+.stats-full {
+    padding: 0.5rem 0;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.stat-detail {
+    background: #12151E;
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+}
+.stat-detail-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #B0B8C8;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+.stat-detail-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    font-family: 'Orbitron', monospace;
 }
 
 /* ----- LEADERBOARD ----- */
@@ -715,10 +792,8 @@ body {
     .main-content { max-width: 800px; padding-bottom: 2rem; }
     .stats-row { gap: 1rem; }
     .level-display { padding: 1rem 1.5rem; }
-    .level-badge-container { width: 80px; height: 80px; }
-    .level-name { font-size: 1.8rem; }
-
-    /* Mode buttons: side by side on desktop */
+    .level-badge-container { width: 70px; height: 70px; }
+    .level-name { font-size: 1.6rem; }
     .mode-grid {
         flex-direction: row;
         justify-content: center;
@@ -728,12 +803,17 @@ body {
         width: 50%;
         max-width: none;
         min-height: 80px;
-        padding: 0.6rem 0.4rem;
+        padding: 0.6rem 0.8rem;
     }
     .mode-name {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
-
+    .mode-questions {
+        font-size: 0.8rem;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
     .lane-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -774,7 +854,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS (hide stat icons on small screens) ----- */
+/* ----- MOBILE ADJUSTMENTS ----- */
 @media (max-width: 600px) {
     .stat-icon {
         display: none;
@@ -791,22 +871,24 @@ body {
     .stat-label {
         font-size: 0.6rem;
     }
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
-/* Responsive: header stats on very small screens */
 @media (max-width: 520px) {
     .header-actions {
-        gap: 0.8rem; /* still bigger than before */
+        gap: 0.6rem;
     }
     .stat-badge {
-        font-size: 0.9rem;
-        padding: 0.2rem 0.8rem;
+        font-size: 0.75rem;
+        padding: 0.15rem 0.6rem;
     }
     .stat-badge i {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
     }
     .icon-btn {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
     .shop-grid {
         grid-template-columns: 1fr 1fr;
@@ -837,11 +919,46 @@ body {
         gap: 0.6rem;
     }
     .level-badge-container {
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
     }
     .level-name {
         font-size: 1.1rem;
+    }
+    .xp-text {
+        font-size: 0.55rem;
+    }
+    .challenge-card-large {
+        padding: 1rem;
+    }
+    .challenge-title {
+        font-size: 0.9rem;
+    }
+    .challenge-progress-text {
+        font-size: 0.7rem;
+    }
+    .challenge-reward-text {
+        font-size: 0.8rem;
+    }
+    .mode-btn {
+        min-height: 56px;
+        padding: 0.4rem 0.6rem;
+    }
+    .mode-name {
+        font-size: 0.95rem;
+    }
+    .mode-questions {
+        font-size: 0.7rem;
+    }
+    .mode-icon-wrap {
+        width: 30px;
+        height: 30px;
+    }
+    .mode-icon {
+        font-size: 1rem;
+    }
+    .mode-arrow {
+        font-size: 0.9rem;
     }
 }
 
