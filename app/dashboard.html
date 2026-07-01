@@ -22,13 +22,13 @@
                 <span class="stat-badge" id="headerCoins">
                     <i class="fas fa-coins" style="color:#FFD700;"></i>
                     <span class="stat-label-text">Coins</span>
-                    <span id="headerCoinsValue">0</span>
+                    <span id="headerCoinsValue">4,850</span>
                 </span>
                 <!-- Lives -->
                 <span class="stat-badge" id="headerLives">
                     <i class="fas fa-heart" style="color:#ff6b6b;"></i>
                     <span class="stat-label-text">Lives</span>
-                    <span id="headerLivesValue">2</span>
+                    <span id="headerLivesValue">5/5</span>
                 </span>
                 <!-- Notification Bell -->
                 <button class="icon-btn notification-btn" id="notificationBtn">
@@ -37,7 +37,7 @@
                 </button>
                 <!-- Avatar -->
                 <div class="user-avatar" id="userAvatarBtn">
-                    <span id="userInitials">NG</span>
+                    <span id="userInitials">AM</span>
                 </div>
             </div>
         </div>
@@ -60,6 +60,7 @@
             <!-- ---- LEVEL DISPLAY (with XP progress) ---- -->
             <div class="level-display fade-in-up">
                 <div class="level-badge-container">
+                    <!-- Placeholder for level badge (star) – will be replaced by JS -->
                     <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23333%22/><text x=%2250%22 y=%2258%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%23FFD700%22>⭐</text></svg>'">
                 </div>
                 <div class="level-info">
@@ -72,20 +73,20 @@
                 </div>
             </div>
 
-            <!-- ---- STATS ROW (compact, two stats as in image) ---- -->
+            <!-- ---- STATS ROW (two stats) ---- -->
             <div class="stats-row">
                 <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
                     <i class="fas fa-check-circle stat-icon"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="correctAnswers">218</span>
-                        <span class="stat-label">Total Correct</span>
+                        <span class="stat-label">Answers</span>
                     </div>
                 </div>
                 <div class="stat-card fade-in-up" style="animation-delay: 0.15s">
                     <i class="fas fa-star stat-icon"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="bestScoreValue">3,420</span>
-                        <span class="stat-label">Your Highest</span>
+                        <span class="stat-label">Best Score</span>
                     </div>
                 </div>
             </div>
@@ -149,7 +150,7 @@
         </section>
 
         <!-- ============================================================
-        MY STATS SECTION (renamed from playSection; ID unchanged)
+        PLAY SECTION (renamed to "My Stats" in nav, but ID unchanged)
         ============================================================ -->
         <section id="playSection" class="page-section">
             <div class="stats-full">
@@ -180,7 +181,6 @@
                         <span class="stat-detail-value" id="levelStats">Ajebutter</span>
                     </div>
                 </div>
-                <!-- Optional: add a chart or recent activity later -->
             </div>
         </section>
 
