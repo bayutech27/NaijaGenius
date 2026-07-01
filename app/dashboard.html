@@ -52,26 +52,34 @@
         ============================================================ -->
         <section id="homeSection" class="page-section active-section">
 
-            <!-- ---- GREETING (time‑based, no "Good") ---- -->
+            <!-- ---- GREETING ---- -->
             <div class="greeting-wrapper fade-in-up">
                 <div class="greeting-copy">
                     <p class="greeting-text" id="greetingText">Morning, <span id="greetingName">Amaka</span></p>
                     <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
                 </div>
                 <div class="hero-logo-wrap" id="heroLogoWrap">
-                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-trivia-hero.png" alt="Naija Trivia"
+                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div class="hero-logo-fallback">
                         <span class="hero-flag" aria-hidden="true">🇳🇬</span>
                         <span class="hero-bulb" aria-hidden="true">💡</span>
-                        <span class="hero-logo-text"><span class="naija-white">Naija</span><br /><em class="genius-mint">Trivia</em></span>
+                        <span class="hero-logo-text sparkle-text">
+                            <span class="naija-white">Naija</span><br /><em class="genius-mint">Genius</em>
+                            <span class="sparkle-container" aria-hidden="true">
+                                <span class="sparkle sparkle-1">✨</span>
+                                <span class="sparkle sparkle-2">🎆</span>
+                                <span class="sparkle sparkle-3">✨</span>
+                                <span class="sparkle sparkle-4">🎇</span>
+                                <span class="sparkle sparkle-5">✨</span>
+                            </span>
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY (avatar + level side‑by‑side) ---- -->
+            <!-- ---- LEVEL DISPLAY ---- -->
             <div class="level-display fade-in-up">
-                <!-- Avatar container (with edit pen) -->
                 <div class="avatar-level-wrap">
                     <div class="user-avatar" id="userAvatarBtn">
                         <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
@@ -79,19 +87,18 @@
                         <span id="userInitials" class="avatar-fallback">AM</span>
                     </div>
                     <button class="avatar-edit-btn" id="avatarEditBtn" aria-label="Edit avatar"><i class="fas fa-pencil"></i></button>
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
                 </div>
 
-                <!-- Level info container (badge, name, progress) -->
                 <div class="level-info-container">
                     <div class="level-badge-container shield-badge">
                         <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
                              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
-                        <span class="level-number-badge" id="levelNumber">12</span>
+                        <!-- Level number removed -->
                     </div>
                     <div class="level-info">
                         <span class="level-label" id="levelLabel">Current Level</span>
                         <span class="level-name" id="levelName">Trivia Star <span class="level-star" aria-hidden="true">⭐</span></span>
-                        <!-- XP progress bar (no "XP" text, just fraction) -->
                         <div class="xp-progress">
                             <div class="xp-bar" id="xpBar" style="width: 67%;"></div>
                             <span class="xp-text" id="xpText">89 / 300</span>
@@ -100,7 +107,7 @@
                 </div>
             </div>
 
-            <!-- ---- STATS ROW (reduced height) ---- -->
+            <!-- ---- STATS ROW ---- -->
             <div class="stats-row">
                 <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
                     <i class="fas fa-arrow-trend-up stat-icon"></i>
@@ -121,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- ---- ACTIVE CHALLENGE (reduced height) ---- -->
+            <!-- ---- ACTIVE CHALLENGE ---- -->
             <div class="challenge-section">
                 <h2 class="section-title">Active Challenge</h2>
                 <div class="challenge-card-large" id="activeChallengeCard">
