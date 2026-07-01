@@ -6,7 +6,7 @@ import { showFunFactModal } from './fun-facts.js';
 import { renderShop, setupAdButton } from './shop.js';
 import { getCurrentChallenge } from './challenge.js';
 
-// ========== DOM ELEMENTS ==========
+// ========== DOM ELEMENTS (Home page) ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
 const correctAnswersEl = document.getElementById("correctAnswers");
 const bestScoreValue = document.getElementById("bestScoreValue");
@@ -19,6 +19,13 @@ const shopCoinsDisplay = document.getElementById("shopCoinsDisplay");
 const levelNameEl = document.getElementById("levelName");
 const levelBadgeEl = document.getElementById("levelBadge");
 const activeChallengesContainer = document.getElementById("activeChallenges");
+
+// ========== DOM ELEMENTS (My Stats page) ==========
+const correctAnswersStats = document.getElementById("correctAnswersStats");
+const bestScoreStats = document.getElementById("bestScoreStats");
+const livesStats = document.getElementById("livesStats");
+const coinsStats = document.getElementById("coinsStats");
+const levelStats = document.getElementById("levelStats");
 
 // ----- Challenge card elements -----
 const challengeTitle = document.getElementById("challengeTitle");
@@ -164,7 +171,6 @@ onAuthStateChanged(auth, async (user) => {
             console.warn("User profile not found in Firestore.");
             const displayName = user.email || "Player";
             const greeting = getGreeting();
-            // FIX: Use innerHTML to preserve the span for the name
             if (greetingText) {
                 greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
             }
@@ -176,10 +182,9 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userSnap.data();
         console.log('✅ User data loaded:', userData);
 
-        // ===== GREETING – load displayName from Firestore =====
+        // ===== GREETING =====
         const displayName = userData.displayName || userData.username || user.email || "Player";
         const greeting = getGreeting();
-        // FIX: Reconstruct the greeting with the name inside the span
         if (greetingText) {
             greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
         }
@@ -212,6 +217,7 @@ onAuthStateChanged(auth, async (user) => {
             console.log('🔄 Lives renewed to 2');
         }
 
+        // Update header and shop
         updateHeaderUI(coins, lives);
         if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
 
@@ -227,6 +233,16 @@ onAuthStateChanged(auth, async (user) => {
             if (cat.bestScore > best) best = cat.bestScore;
         });
         if (bestScoreValue) bestScoreValue.textContent = best;
+
+        // ===== UPDATE MY STATS PAGE =====
+        if (correctAnswersStats) correctAnswersStats.textContent = totalCorrect;
+        if (bestScoreStats) bestScoreStats.textContent = best;
+        if (livesStats) livesStats.textContent = lives;
+        if (coinsStats) coinsStats.textContent = coins;
+        if (levelStats) {
+            const level = getLevel(totalCorrect);
+            levelStats.textContent = level.name;
+        }
 
         // ===== SHOP INIT =====
         renderShop(coins);
@@ -247,10 +263,14 @@ onAuthStateChanged(auth, async (user) => {
                 const updated = docSnap.data();
                 const newCoins = updated.coins || 0;
                 const newLives = updated.lives ?? 2;
+                const newCorrect = updated.totalCorrectAnswers || 0;
+
+                // Update header & shop
                 updateHeaderUI(newCoins, newLives);
                 if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
+
+                // Update home page stats
                 if (totalGamesPlayed) totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
-                const newCorrect = updated.totalCorrectAnswers || 0;
                 if (correctAnswersEl) correctAnswersEl.textContent = newCorrect;
                 updateLevel(newCorrect);
 
@@ -258,6 +278,16 @@ onAuthStateChanged(auth, async (user) => {
                 const cats = updated.categoryStats || {};
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
                 if (bestScoreValue) bestScoreValue.textContent = newBest;
+
+                // Update My Stats page
+                if (correctAnswersStats) correctAnswersStats.textContent = newCorrect;
+                if (bestScoreStats) bestScoreStats.textContent = newBest;
+                if (livesStats) livesStats.textContent = newLives;
+                if (coinsStats) coinsStats.textContent = newCoins;
+                if (levelStats) {
+                    const level = getLevel(newCorrect);
+                    levelStats.textContent = level.name;
+                }
 
                 // Update avatar if changed
                 if (updated.avatar) {
@@ -268,9 +298,8 @@ onAuthStateChanged(auth, async (user) => {
 
                 // Update greeting name if displayName changed
                 const newName = updated.displayName || updated.username || user.email || "Player";
-                const currentGreeting = getGreeting();
-                // Reconstruct the greeting HTML
                 if (greetingText) {
+                    const currentGreeting = getGreeting();
                     greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
                 }
 
