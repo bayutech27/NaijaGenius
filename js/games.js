@@ -13,6 +13,7 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
+import { evaluateChallenge, applyReward, markChallengeCompleted, showCongratulationsModal } from './challenge.js';
 
 console.log('🎮 games.js loaded');
 
@@ -62,6 +63,10 @@ let oneChanceMissed = false;
 let roundCoins = 0;
 let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+
+// Challenge tracking
+let lifelineUsed = null;             // 'fifty_fifty', 'ask_crowd', 'callFriend', 'both', 'all'
+let isCorrectAfterLifeline = false;
 
 // Variables for delayed feedback (used only in non‑One‑Chance modes)
 let pendingSelectedLetter = null;
@@ -422,6 +427,8 @@ async function loadQuestionsFromJS(exportNameParam) {
     }
 
     roundCoins = 0;
+    lifelineUsed = null;
+    isCorrectAfterLifeline = false;
     showCountdown(() => loadQuestion(0));
 
   } catch (err) {
@@ -481,6 +488,8 @@ async function loadMixedQuestions() {
   }
 
   roundCoins = 0;
+  lifelineUsed = null;
+  isCorrectAfterLifeline = false;
   showCountdown(() => loadQuestion(0));
 }
 
@@ -562,6 +571,10 @@ function loadQuestion(index) {
   lifelinesDisabled = false;
   oneChanceMissed = false;
   nextBtn.disabled  = true;
+
+  // Reset lifeline usage tracking for the new question
+  lifelineUsed = null;
+  isCorrectAfterLifeline = false;
 
   nextBtn.innerHTML = (index === TOTAL_QUESTIONS - 1)
     ? '<i class="fas fa-flag-checkered"></i> Finish'
@@ -948,6 +961,11 @@ function attachOptionListener() {
       correctCount += 1;
       console.log(`✅ Correct! +${pointsEarned} pts, +${coinsEarned} coins`);
 
+      // If a lifeline was used and the answer is correct, mark it
+      if (lifelineUsed) {
+        isCorrectAfterLifeline = true;
+      }
+
       const comment = handleStreakUpdate(true);
       if (comment) showCommentModal(comment);
 
@@ -1022,6 +1040,13 @@ lifelineFifty?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
+  // Track lifeline usage for challenge
+  if (lifelineUsed === null) lifelineUsed = 'fifty_fifty';
+  else if (lifelineUsed === 'ask_crowd') lifelineUsed = 'both';
+  else if (lifelineUsed === 'callFriend') lifelineUsed = 'both';
+  else if (lifelineUsed === 'both') lifelineUsed = 'all';
+  // else remains 'all' or whatever
+
   if (lifelineCounts.fifty_fifty <= 0) return;
   lifelineCounts.fifty_fifty--;
   updateLifelineUI();
@@ -1056,6 +1081,12 @@ lifelineAsk?.addEventListener('click', async () => {
 
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
+
+  // Track lifeline usage
+  if (lifelineUsed === null) lifelineUsed = 'ask_crowd';
+  else if (lifelineUsed === 'fifty_fifty') lifelineUsed = 'both';
+  else if (lifelineUsed === 'callFriend') lifelineUsed = 'both';
+  else if (lifelineUsed === 'both') lifelineUsed = 'all';
 
   if (lifelineCounts.ask_crowd <= 0) return;
   lifelineCounts.ask_crowd--;
@@ -1111,6 +1142,12 @@ lifelineCallFriend?.addEventListener('click', async () => {
 
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
+
+  // Track lifeline usage
+  if (lifelineUsed === null) lifelineUsed = 'callFriend';
+  else if (lifelineUsed === 'fifty_fifty') lifelineUsed = 'both';
+  else if (lifelineUsed === 'ask_crowd') lifelineUsed = 'both';
+  else if (lifelineUsed === 'both') lifelineUsed = 'all';
 
   if (lifelineCounts.callFriend <= 0) return;
   lifelineCounts.callFriend--;
@@ -1240,6 +1277,7 @@ async function endRound() {
 
   showRoundEndModal(false);
 
+  // --- Background Firestore saves + challenge check ---
   (async () => {
     try {
       let previousBest = 0;
@@ -1304,6 +1342,50 @@ async function endRound() {
           setTimeout(() => showFireworks(), 300);
         }
       }
+
+      // ========== CHALLENGE EVALUATION ==========
+      // Build round stats (use what we have)
+      const roundStats = {
+        correctCount,
+        wrongCount: Math.max(0, (currentQuestionIndex + 1) - correctCount),
+        currentStreak,
+        streakDirection,
+        previousStreak: 0, // not tracked; kept for compatibility
+        lifelinesUsed: lifelineUsed !== null ? (lifelineUsed === 'both' || lifelineUsed === 'all' ? 2 : 1) : 0,
+        lifelineUsed: lifelineUsed,
+        isCorrectAfterLifeline,
+        lastAnswerTimeLeft: timeLeft,
+        fastestAnswer: 0,
+        totalTime: 0,
+        totalQuestions: TOTAL_QUESTIONS,
+        firstThreeCorrect: false,
+        firstFiveCorrect: false,
+        fastAnswersCount: 0,
+        slowAnswersCount: 0,
+        averageTime: 0,
+        finalTimer: timeLeft,
+      };
+
+      // Re-fetch user data to get the latest challenge state
+      const freshUserSnap = await getDoc(userRef);
+      const freshUserData = freshUserSnap.exists() ? freshUserSnap.data() : currentUserData;
+
+      const challengeResult = evaluateChallenge(roundStats, freshUserData);
+      if (challengeResult && challengeResult.completed) {
+        try {
+          // Apply reward
+          await applyReward(currentUserUID, challengeResult.rewardType, challengeResult.rewardValue, db);
+          // Mark challenge completed
+          await markChallengeCompleted(currentUserUID, db);
+          // Show congratulations modal (after a short delay)
+          setTimeout(() => {
+            showCongratulationsModal(challengeResult.rewardType, challengeResult.rewardValue);
+          }, 600);
+        } catch (err) {
+          console.error('Failed to apply challenge reward:', err);
+        }
+      }
+
     } catch (err) {
       console.error('Error saving round data:', err);
       showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
@@ -1553,6 +1635,8 @@ function showRoundEndModal(newBest = false) {
     gameRoundActive      = false;
     oneChanceMissed      = false;
     roundCoins           = 0;
+    lifelineUsed         = null;
+    isCorrectAfterLifeline = false;
 
     const urlParams       = new URLSearchParams(window.location.search);
     const exportNameParam = urlParams.get('export');
