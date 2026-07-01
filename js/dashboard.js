@@ -20,7 +20,7 @@ const levelNameEl = document.getElementById("levelName");
 const levelBadgeEl = document.getElementById("levelBadge");
 const activeChallengesContainer = document.getElementById("activeChallenges");
 
-// ----- Challenge card elements (new IDs) -----
+// ----- Challenge card elements -----
 const challengeTitle = document.getElementById("challengeTitle");
 const challengeDesc = document.getElementById("challengeDesc");
 const challengeProgressBar = document.getElementById("challengeProgressBar");
@@ -52,17 +52,37 @@ function updateLevel(correctCount) {
     if (levelBadgeEl) {
         levelBadgeEl.src = `/assets/${level.badge}`;
         levelBadgeEl.onerror = function() {
-            this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23333'/><text x='50' y='58' font-size='40' text-anchor='middle' fill='%23FFD700'>?</text></svg>";
+            this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 90,25 90,65 50,95 10,65 10,25' fill='%231A1D2E' stroke='%23FFD700' stroke-width='4'/></svg>";
         };
+    }
+
+    // Update XP progress bar and text (no "XP" label)
+    const xpBar = document.getElementById("xpBar");
+    const xpText = document.getElementById("xpText");
+    if (xpBar && xpText) {
+        // Calculate progress: (correctCount - level.min) / (level.max - level.min)
+        // For De Genius (Infinity), we set max to correctCount + 1 to show full bar
+        let maxVal = level.max;
+        if (maxVal === Infinity) {
+            maxVal = correctCount + 1; // always show full bar
+        }
+        const progress = Math.min(100, ((correctCount - level.min) / (maxVal - level.min)) * 100);
+        xpBar.style.width = Math.min(100, progress) + '%';
+        // Display "correctCount / level.max" (or "correctCount+" for De Genius)
+        if (level.max === Infinity) {
+            xpText.textContent = `${correctCount}+ / ∞`;
+        } else {
+            xpText.textContent = `${correctCount} / ${level.max}`;
+        }
     }
 }
 
-// ========== HELPER: TIME-BASED GREETING ==========
+// ========== HELPER: TIME-BASED GREETING (no "Good") ==========
 function getGreeting() {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Good Morning";
-    if (hour >= 12 && hour < 17) return "Good Afternoon";
-    return "Good Evening";
+    if (hour >= 5 && hour < 12) return "Morning";
+    if (hour >= 12 && hour < 17) return "Afternoon";
+    return "Evening";
 }
 
 // ========== AUTH GUARD & DATA LOADING ==========
@@ -92,7 +112,7 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userSnap.data();
         console.log('✅ User data loaded:', userData);
 
-        // ===== GREETING =====
+        // ===== GREETING (time‑based, no "Good") =====
         const displayName = userData.displayName || userData.username || user.email || "Player";
         const greeting = getGreeting();
         if (greetingText) greetingText.textContent = greeting + ",";
@@ -163,7 +183,6 @@ onAuthStateChanged(auth, async (user) => {
                 Object.values(cats).forEach(c => { if (c.bestScore > newBest) newBest = c.bestScore; });
                 if (bestScoreValue) bestScoreValue.textContent = newBest;
 
-                // Update challenge display (in case it changed)
                 getCurrentChallenge(updated, user.uid, db).then(ch => {
                     displayActiveChallenge(ch, updated);
                 });
@@ -183,35 +202,26 @@ function updateHeaderUI(coins, lives) {
     if (headerLivesValue) headerLivesValue.textContent = lives;
 }
 
-// ========== DISPLAY ACTIVE CHALLENGE (UPDATED) ==========
+// ========== DISPLAY ACTIVE CHALLENGE ==========
 function displayActiveChallenge(challenge, userData) {
-    // If no challenge, show a placeholder message (hide card or show fallback)
     if (!challenge) {
-        if (activeChallengesContainer) {
-            // Optionally hide the card or show a placeholder inside it
-            // For now, we'll just set the title and description to a fallback.
-            if (challengeTitle) challengeTitle.textContent = "No Active Challenge";
-            if (challengeDesc) challengeDesc.textContent = "Complete a round to unlock your first challenge!";
-            if (challengeProgressBar) challengeProgressBar.style.width = "0%";
-            if (challengeProgressText) challengeProgressText.textContent = "0 / 0 Questions";
-        }
+        if (challengeTitle) challengeTitle.textContent = "No Active Challenge";
+        if (challengeDesc) challengeDesc.textContent = "Complete a round to unlock your first challenge!";
+        if (challengeProgressBar) challengeProgressBar.style.width = "0%";
+        if (challengeProgressText) challengeProgressText.textContent = "0 / 0 Questions";
         return;
     }
 
-    // Update title and description
     if (challengeTitle) challengeTitle.textContent = challenge.title || "Daily Challenge";
     if (challengeDesc) {
         challengeDesc.textContent = challenge.description || "Answer questions and earn rewards!";
     }
 
-    // Update reward (icon and amount)
     if (challengeRewardIcon) {
-        // Change icon based on reward type
         if (challenge.rewardType === 'coins') {
             challengeRewardIcon.className = 'fas fa-coins';
             challengeRewardIcon.style.color = '#FFD700';
         } else {
-            // Lifeline reward
             const icons = {
                 fifty_fifty: 'fa-percent',
                 ask_crowd: 'fa-users',
@@ -225,7 +235,6 @@ function displayActiveChallenge(challenge, userData) {
         if (challenge.rewardType === 'coins') {
             challengeRewardAmount.textContent = challenge.rewardValue;
         } else {
-            // For lifeline, show "+1" or the lifeline name
             const labels = {
                 fifty_fifty: '50:50',
                 ask_crowd: 'Crowd',
@@ -235,26 +244,12 @@ function displayActiveChallenge(challenge, userData) {
         }
     }
 
-    // Determine progress – we don't have actual progress in the challenge object.
-    // We can either show a static 0% or infer from user's current stats (e.g., correctCount)
-    // For simplicity, we'll show a placeholder "0 / X" or use the user's current streak.
-    // The challenge.condition may be complex; we'll just show a generic progress.
-    // However, to keep it simple, we can set progress based on some dummy value,
-    // but we'll leave it as is (60% width and "6 / 10" as example) and let the dashboard update it if needed.
-    // In a real implementation, you could compute progress based on the user's stats.
-    // For now, we'll keep the existing progress bar width and text.
-    // We can set it to a default "Incomplete" state.
     const isCompleted = userData.challenge?.completed || false;
     if (isCompleted) {
         if (challengeProgressBar) challengeProgressBar.style.width = "100%";
         if (challengeProgressText) challengeProgressText.textContent = "Completed!";
     } else {
-        // If not completed, we could show "0%", but we'll leave it as is (the HTML has a default 60%)
-        // We'll set a generic text.
-        if (challengeProgressText) {
-            // Optionally set a default like "0 / 1" or something
-            challengeProgressText.textContent = "Incomplete";
-        }
+        if (challengeProgressText) challengeProgressText.textContent = "Incomplete";
     }
 }
 
