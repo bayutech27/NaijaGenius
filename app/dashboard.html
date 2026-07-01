@@ -18,27 +18,28 @@
     <header class="app-header">
         <div class="header-container">
             <div class="header-actions">
-                <!-- Coins -->
-                <span class="stat-badge" id="headerCoins">
-                    <i class="fas fa-coins" style="color:#FFD700;"></i>
-                    <span class="stat-label-text">Coins</span>
-                    <span id="headerCoinsValue">4,850</span>
-                </span>
-                <!-- Lives -->
-                <span class="stat-badge" id="headerLives">
-                    <i class="fas fa-heart" style="color:#ff6b6b;"></i>
-                    <span class="stat-label-text">Lives</span>
-                    <span id="headerLivesValue">5/5</span>
-                </span>
+                <div class="stat-badge-group">
+                    <!-- Coins -->
+                    <span class="stat-badge" id="headerCoins">
+                        <i class="fas fa-coins" style="color:#FFD700;"></i>
+                        <span class="stat-label-text">Coins</span>
+                        <span id="headerCoinsValue">4,850</span>
+                        <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
+                    </span>
+                    <span class="header-divider"></span>
+                    <!-- Lives -->
+                    <span class="stat-badge" id="headerLives">
+                        <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+                        <span class="stat-label-text">Lives</span>
+                        <span id="headerLivesValue">5/5</span>
+                        <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
+                    </span>
+                </div>
                 <!-- Notification Bell -->
                 <button class="icon-btn notification-btn" id="notificationBtn">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notificationBadge"></span>
+                    <span class="notification-badge" id="notificationBadge">3</span>
                 </button>
-                <!-- Avatar -->
-                <div class="user-avatar" id="userAvatarBtn">
-                    <span id="userInitials">AM</span>
-                </div>
             </div>
         </div>
     </header>
@@ -51,42 +52,67 @@
         ============================================================ -->
         <section id="homeSection" class="page-section active-section">
 
-            <!-- ---- GREETING ---- -->
+            <!-- ---- GREETING (+ hero logo graphic) ---- -->
             <div class="greeting-wrapper fade-in-up">
-                <p class="greeting-text" id="greetingText">Good Evening, <span id="greetingName">Amaka</span></p>
-                <p class="greeting-sub">Ready to test your Naija knowledge?</p>
+                <div class="greeting-copy">
+                    <p class="greeting-text" id="greetingText">Good Evening, <span id="greetingName">Amaka</span> <span class="wave-emoji" aria-hidden="true">👋</span></p>
+                    <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
+                </div>
+                <div class="hero-logo-wrap" id="heroLogoWrap">
+                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-trivia-hero.png" alt="Naija Trivia"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="hero-logo-fallback">
+                        <span class="hero-flag" aria-hidden="true">🇳🇬</span>
+                        <span class="hero-bulb" aria-hidden="true">💡</span>
+                        <span class="hero-logo-text"><span class="naija-white">Naija</span><br /><em class="genius-mint">Trivia</em></span>
+                    </div>
+                </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY (with XP progress) ---- -->
+            <!-- ---- LEVEL DISPLAY (avatar + level badge + XP progress) ---- -->
             <div class="level-display fade-in-up">
-                <div class="level-badge-container">
-                    <!-- Placeholder for level badge (star) – will be replaced by JS -->
-                    <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23333%22/><text x=%2250%22 y=%2258%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%23FFD700%22>⭐</text></svg>'">
+                <div class="avatar-level-wrap">
+                    <div class="user-avatar" id="userAvatarBtn">
+                        <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <span id="userInitials" class="avatar-fallback">AM</span>
+                    </div>
+                    <button class="avatar-edit-btn" id="avatarEditBtn" aria-label="Edit avatar"><i class="fas fa-pencil"></i></button>
                 </div>
+
+                <div class="level-badge-container">
+                    <!-- Placeholder for level badge (shield) – will be replaced by JS -->
+                    <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
+                    <span class="level-number-badge" id="levelNumber">12</span>
+                </div>
+
                 <div class="level-info">
-                    <span class="level-label">Current Level</span>
-                    <span class="level-name" id="levelName">Trivia Star</span>
+                    <span class="level-label" id="levelLabel">Current Level</span>
+                    <span class="level-name" id="levelName">Trivia Star <span class="level-star" aria-hidden="true">⭐</span></span>
+                    <span class="xp-text" id="xpText">2,350 / 3,500 XP</span>
                     <div class="xp-progress">
                         <div class="xp-bar" id="xpBar" style="width: 67%;"></div>
-                        <span class="xp-text" id="xpText">2,350 / 3,500 XP</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ---- STATS ROW (two stats) ---- -->
+            <!-- ---- STATS ROW (two stats in one light pill card) ---- -->
             <div class="stats-row">
                 <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
-                    <i class="fas fa-check-circle stat-icon"></i>
+                    <i class="fas fa-arrow-trend-up stat-icon"></i>
                     <div class="stat-info">
+                        <span class="stat-label" id="correctAnswersLabel">Answers</span>
                         <span class="stat-value" id="correctAnswers">218</span>
-                        <span class="stat-label">Answers</span>
+                        <span class="stat-caption">Total Correct</span>
                     </div>
                 </div>
+                <div class="stats-divider" aria-hidden="true"></div>
                 <div class="stat-card fade-in-up" style="animation-delay: 0.15s">
-                    <i class="fas fa-star stat-icon"></i>
+                    <i class="fas fa-trophy stat-icon"></i>
                     <div class="stat-info">
+                        <span class="stat-label" id="bestScoreLabel">Best Score</span>
                         <span class="stat-value" id="bestScoreValue">3,420</span>
-                        <span class="stat-label">Best Score</span>
+                        <span class="stat-caption">Your Highest</span>
                     </div>
                 </div>
             </div>
@@ -95,53 +121,71 @@
             <div class="challenge-section">
                 <h2 class="section-title">Active Challenge</h2>
                 <div class="challenge-card-large" id="activeChallengeCard">
-                    <div class="challenge-header">
-                        <i class="fas fa-trophy challenge-icon"></i>
-                        <span class="challenge-title">Daily Challenge</span>
+                    <div class="challenge-icon-graphic" aria-hidden="true">
+                        <i class="fas fa-gift"></i>
+                        <i class="fas fa-clipboard-question challenge-graphic-badge"></i>
                     </div>
-                    <div class="challenge-progress">
-                        <div class="challenge-progress-bar" id="challengeProgressBar" style="width: 60%;"></div>
+                    <div class="challenge-body">
+                        <div class="challenge-header">
+                            <span class="challenge-pill">
+                                <i class="fas fa-trophy challenge-icon"></i>
+                                <span class="challenge-pill-text">Active Challenge</span>
+                            </span>
+                            <button class="challenge-arrow-btn" id="challengeArrowBtn" aria-label="View challenge">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <span class="challenge-title">Daily Challenge</span>
+                        <p class="challenge-desc" id="challengeDesc">Answer 10 questions and earn amazing rewards!</p>
+                        <div class="challenge-progress">
+                            <div class="challenge-progress-bar" id="challengeProgressBar" style="width: 60%;"></div>
+                        </div>
                         <span class="challenge-progress-text" id="challengeProgressText">6 / 10 Questions</span>
                     </div>
                     <div class="challenge-reward">
                         <i class="fas fa-coins" style="color:#FFD700;"></i>
-                        <span class="challenge-reward-text">Win 250 Coins</span>
+                        <span class="challenge-reward-text">Win<br /><span class="challenge-reward-amount">250</span><br />Coins</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ---- CHOOSE A MODE (with question counts) ---- -->
+            <!-- ---- CHOOSE A MODE (colorful square cards) ---- -->
             <div class="mode-section">
-                <h2 class="section-title mode-title">Choose a Mode</h2>
+                <h2 class="section-title mode-title">
+                    <span class="title-line" aria-hidden="true"></span>
+                    <i class="fas fa-crown"></i>
+                    <span class="mode-title-text">Choose a Mode</span>
+                    <span class="title-line" aria-hidden="true"></span>
+                </h2>
                 <div class="mode-grid">
-                    <button class="mode-btn" id="jollofMixBtn">
+                    <button class="mode-btn mode-btn-red" id="jollofMixBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-fire mode-icon animate-icon"></i>
                         </div>
                         <div class="mode-details">
                             <span class="mode-name">Jollof Mix</span>
-                            <span class="mode-questions">10 Questions</span>
                         </div>
+                        <span class="mode-questions">10 Questions</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <button class="mode-btn" id="chooseLaneBtn">
+                    <button class="mode-btn mode-btn-blue" id="chooseLaneBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-road mode-icon animate-icon"></i>
                         </div>
                         <div class="mode-details">
                             <span class="mode-name">Pick Your Lane</span>
-                            <span class="mode-questions">15 Questions</span>
                         </div>
+                        <span class="mode-questions">15 Questions</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
-                    <button class="mode-btn" id="oneChanceBtn">
+                    <button class="mode-btn mode-btn-green" id="oneChanceBtn">
                         <div class="mode-icon-wrap">
                             <i class="fas fa-bolt mode-icon animate-icon"></i>
                         </div>
                         <div class="mode-details">
                             <span class="mode-name">One Chance</span>
-                            <span class="mode-questions">20 Questions</span>
                         </div>
+                        <span class="mode-questions">20 Questions</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
@@ -224,10 +268,29 @@
 
     <!-- ===== BOTTOM NAVIGATION (Mobile) ===== -->
     <nav class="bottom-nav" id="bottomNav">
-        <button class="nav-item active" data-nav="home"><i class="fas fa-house"></i><span class="nav-dot"></span></button>
-        <button class="nav-item" data-nav="play"><i class="fas fa-chart-simple"></i><span class="nav-dot"></span></button>
-        <button class="nav-item" data-nav="shop"><i class="fas fa-store"></i><span class="nav-dot"></span></button>
-        <button class="nav-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span class="nav-dot"></span></button>
+        <button class="nav-item active" data-nav="home">
+            <i class="fas fa-house"></i>
+            <span class="nav-label">Home</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item" data-nav="play">
+            <i class="fas fa-chart-simple"></i>
+            <span class="nav-label">My Stats</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item nav-play-cta" id="quickPlayBtn" data-nav="quickplay" aria-label="Quick Play">
+            <i class="fas fa-play"></i>
+        </button>
+        <button class="nav-item" data-nav="shop">
+            <i class="fas fa-store"></i>
+            <span class="nav-label">Shop</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item" data-nav="leaderboard">
+            <i class="fas fa-trophy"></i>
+            <span class="nav-label">Leaderboard</span>
+            <span class="nav-dot"></span>
+        </button>
     </nav>
 
     <!-- ===== DESKTOP SIDEBAR ===== -->
