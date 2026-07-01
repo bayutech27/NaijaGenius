@@ -1168,48 +1168,27 @@ body {
     padding-top: 20px;
 }
 
-/* ----- CHOOSE-YOUR-LANE PAGE (Lane Cards) – legacy styles (kept for safety, but overridden above) ----- */
-.lane-grid {
-    /* already redefined above */;
+/* ----- HERO (used on lane page) – CENTRED & WHITE ----- */
+.lane-page .hero-section {
+    text-align: center;
+    margin-bottom: 1.8rem;
 }
-.lane-card {
-    /* already redefined above */;
-}
-.lane-icon {
-    /* already redefined above */;
-}
-.lane-info {
-    /* already redefined above */;
-}
-.lane-name {
-    /* already redefined above */;
-}
-.lane-desc {
-    /* already redefined above */;
-}
-.lane-arrow {
-    /* already redefined above */;
-}
-
-/* ----- HERO (used on lane page) ----- */
-.hero-section {
-    text-align: left;
-    margin-bottom: 1.5rem;
-}
-.page-title {
+.lane-page .page-title {
     font-size: 1.8rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #FFF, #00E5A0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #FFFFFF;
     letter-spacing: -0.02em;
     line-height: 1.2;
+    /* remove gradient, keep solid white */
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    -webkit-text-fill-color: unset;
 }
-.page-subtitle {
+.lane-page .page-subtitle {
     font-size: 0.9rem;
-    font-weight: 300;
-    color: #B0B8C8;
+    font-weight: 400;
+    color: #FFFFFF;
     margin-top: 0.2rem;
 }
 
