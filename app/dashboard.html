@@ -169,31 +169,31 @@
                 </h2>
                 <div class="mode-grid">
                     <button class="mode-btn mode-btn-red" id="jollofMixBtn">
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-fire mode-icon animate-icon"></i>
-                        </div>
                         <div class="mode-details">
                             <span class="mode-name">Jollof Mix</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-fire mode-icon animate-icon"></i>
                         </div>
                         <span class="mode-questions">10 Questions</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                     <button class="mode-btn mode-btn-blue" id="chooseLaneBtn">
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-road mode-icon animate-icon"></i>
-                        </div>
                         <div class="mode-details">
                             <span class="mode-name">Pick Your Lane</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-road mode-icon animate-icon"></i>
                         </div>
                         <span class="mode-questions">10 Categories</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                     <button class="mode-btn mode-btn-green" id="oneChanceBtn">
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-bolt mode-icon animate-icon"></i>
-                        </div>
                         <div class="mode-details">
                             <span class="mode-name">One Chance</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-bolt mode-icon animate-icon"></i>
                         </div>
                         <span class="mode-questions">One miss, game ends</span>
                         <i class="fas fa-arrow-right mode-arrow"></i>
@@ -201,6 +201,105 @@
                 </div>
             </div>
 
+        </section>
+
+        <!-- ============================================================
+        PICK YOUR LANE SECTION (merged in — was pick-your-lane.html)
+        Reached only via the "Pick Your Lane" mode card, not via bottom nav.
+        ============================================================ -->
+        <section id="laneSection" class="page-section">
+            <div class="lane-top-row">
+                <button class="back-arrow-btn" id="laneBackBtn" aria-label="Back to Home">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="hero-section" id="laneHero">
+                    <h2 class="page-title">Test Your Skill</h2>
+                    <p class="page-subtitle">Pick a category that suits your vibe</p>
+                </div>
+            </div>
+
+            <div class="lane-grid">
+                <div class="lane-card" data-category="afrobeats" data-export="afrobeats">
+                    <div class="lane-icon">🎵</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Afrobeats</div>
+                        <div class="lane-desc">From Fela to Burna Boy</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nollywood" data-export="nollywood">
+                    <div class="lane-icon">🎬</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Nollywood</div>
+                        <div class="lane-desc">Movies, actors, iconic lines</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="lagos_slang" data-export="lagosSlang">
+                    <div class="lane-icon">🗣️</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Lagos Slang</div>
+                        <div class="lane-desc">Street language &amp; pidgin</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="super_eagles" data-export="superEagles">
+                    <div class="lane-icon">⚽</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Super Eagles</div>
+                        <div class="lane-desc">History, players, World Cup</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_proverbs" data-export="nigeriaProverbs">
+                    <div class="lane-icon">📖</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Proverbs</div>
+                        <div class="lane-desc">Yoruba, Igbo, Hausa wisdom</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_history" data-export="nigeriaHistory">
+                    <div class="lane-icon">🏛️</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija History</div>
+                        <div class="lane-desc">Independence &amp; key events</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_food" data-export="nigeriaFood">
+                    <div class="lane-icon">🍲</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Food</div>
+                        <div class="lane-desc">Dishes, ingredients, street food</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_geography" data-export="nigeriaGeography">
+                    <div class="lane-icon">🌍</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Geography</div>
+                        <div class="lane-desc">States, capitals, rivers</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_culture" data-export="nigeriaCulture">
+                    <div class="lane-icon">🎭</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Culture</div>
+                        <div class="lane-desc">Festivals &amp; traditions</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_sports" data-export="nigeriaSports">
+                    <div class="lane-icon">🏏</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Sports</div>
+                        <div class="lane-desc">Athletes, teams, and sporting glory</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+            </div>
         </section>
 
         <!-- ============================================================
