@@ -63,6 +63,7 @@ let oneChanceMissed = false;
 let roundCoins = 0;
 let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
+let displayedCoins = 0;
 
 // Challenge tracking
 let lifelineUsed = null;             // 'fifty_fifty', 'ask_crowd', 'callFriend', 'both', 'all'
@@ -77,15 +78,13 @@ const TOTAL_QUESTIONS = 10;
 
 // ========== DOM REFS ==========
 const $ = (id) => document.getElementById(id);
-const gameType       = $('gameType');
-const gameCategory   = $('gameCategory');
-const gameDifficulty = $('gameDifficulty');
 const timerSeconds   = $('timerSeconds');
 const timerPath      = $('timerPath');
 const progressBar    = $('progressBar');
 const progressLabel  = $('progressLabel');
 const questionNumber = $('questionNumber');
 const questionText   = $('questionText');
+const gameCoinsValue = $('gameCoinsValue');
 const optionBtns  = { A: $('optionA'),     B: $('optionB'),     C: $('optionC'),     D: $('optionD')     };
 const optionTexts = { A: $('optionAText'), B: $('optionBText'), C: $('optionCText'), D: $('optionDText') };
 const countFiftyFifty = $('countFiftyFifty');
@@ -287,6 +286,10 @@ onAuthStateChanged(auth, async (user) => {
     console.log('✅ User data loaded:', currentUserData);
     livesRemaining = currentUserData.lives ?? 2;
 
+    // ===== COINS (Firestore users/{uid}.coins → header badge) =====
+    displayedCoins = currentUserData.coins || 0;
+    if (gameCoinsValue) gameCoinsValue.textContent = displayedCoins.toLocaleString();
+
     if (isTournament) {
       try {
         await import('./tournament.js');
@@ -367,10 +370,6 @@ function readParamsFromURL() {
     category     = rawCat;
     questionType = rawT;
 
-    const displayName = formatCategoryName(category);
-    if (gameCategory) gameCategory.textContent = displayName;
-    if (gameType)     gameType.textContent     = questionType === 'regular' ? 'Regular' : 'Tournament';
-
     if (exportNameParam) {
       loadQuestionsFromJS(exportNameParam);
     } else {
@@ -381,8 +380,6 @@ function readParamsFromURL() {
   } else {
     questionType = rawT;
     category = 'mixed';
-    if (gameCategory) gameCategory.textContent = 'Mixed';
-    if (gameType)     gameType.textContent     = questionType === 'one_chance' ? 'One Chance' : 'Jollof Mix';
     loadMixedQuestions();
   }
 }
@@ -419,12 +416,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     }
 
     currentQuestions = selected;
-
-    if (currentQuestions.length > 0 && gameDifficulty) {
-      const firstQ = currentQuestions[0];
-      const raw = firstQ.difficulty || 'Easy';
-      gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-    }
 
     roundCoins = 0;
     lifelineUsed = null;
@@ -480,12 +471,6 @@ async function loadMixedQuestions() {
   }
 
   currentQuestions = selected;
-
-  if (currentQuestions.length > 0 && gameDifficulty) {
-    const firstQ = currentQuestions[0];
-    const raw = firstQ.difficulty || 'Easy';
-    gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-  }
 
   roundCoins = 0;
   lifelineUsed = null;
@@ -593,11 +578,6 @@ function loadQuestion(index) {
     questionText.textContent    = q.question;
     questionText.style.color    = '';
     questionText.style.fontWeight = '';
-  }
-
-  if (gameDifficulty) {
-    const raw = q.difficulty || 'Easy';
-    gameDifficulty.textContent = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
   }
 
   if (optionTexts.A) optionTexts.A.textContent = q.optionA;
@@ -960,6 +940,10 @@ function attachOptionListener() {
       roundScore += pointsEarned;
       correctCount += 1;
       console.log(`✅ Correct! +${pointsEarned} pts, +${coinsEarned} coins`);
+
+      // Live-update the coins badge immediately (Firestore write happens in background at endRound)
+      displayedCoins += coinsEarned;
+      if (gameCoinsValue) gameCoinsValue.textContent = displayedCoins.toLocaleString();
 
       // If a lifeline was used and the answer is correct, mark it
       if (lifelineUsed) {
@@ -1334,7 +1318,7 @@ async function endRound() {
           const container = document.getElementById('newBestBadgeContainer');
           if (container) {
             container.innerHTML = `
-              <div style="font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; color:#FFD700; background:rgba(255,215,0,0.12); border:1px solid rgba(255,215,0,0.3); border-radius:40px; padding:0.4rem 1.2rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 0 30px rgba(255,215,0,0.15);">
+              <div style="font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);">
                 🏆 New Best Score!
               </div>
             `;
@@ -1518,66 +1502,104 @@ function showFireworks() {
   });
 }
 
-// ========== ROUND END MODAL ==========
+// ========== ROUND END MODAL (3D, themed to match games.html/css) ==========
 function showRoundEndModal(newBest = false) {
+  // Inject the 3D pop-in keyframes once
+  if (!document.getElementById('roundEndModalAnimStyle')) {
+    const style = document.createElement('style');
+    style.id = 'roundEndModalAnimStyle';
+    style.textContent = `
+      @keyframes roundEndPopIn3D {
+        0%   { transform: perspective(1000px) rotateX(28deg) scale(0.75); opacity: 0; }
+        60%  { transform: perspective(1000px) rotateX(-4deg) scale(1.03); opacity: 1; }
+        100% { transform: perspective(1000px) rotateX(0deg) scale(1); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   const overlay = document.createElement('div');
   overlay.id = 'roundEndModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+    background:rgba(6,4,16,0.85); backdrop-filter:blur(8px);
     display:flex; align-items:center; justify-content:center;
-    z-index:9999; padding:1rem;
+    z-index:9999; padding:1rem; perspective:1200px;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background:rgba(20,25,40,0.95); backdrop-filter:blur(12px);
-    border:1px solid rgba(62,214,183,0.3); border-radius:2rem;
-    padding:2rem 1.5rem; max-width:500px; width:100%;
-    position:relative; text-align:center; color:#f0f3fa;
-    font-family:'Poppins',sans-serif;
+    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
+    backdrop-filter: blur(14px);
+    border-radius: 28px;
+    padding: 2rem 1.6rem;
+    max-width: 440px; width: 100%;
+    position: relative; text-align: center; color: #f0f3fa;
+    font-family: 'Poppins', sans-serif;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,0.55),
+      0 8px 20px rgba(255,154,62,0.15),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    transform-style: preserve-3d;
+    animation: roundEndPopIn3D 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   `;
+
+  // Gradient border ring (matches question-box treatment)
+  const borderRing = document.createElement('div');
+  borderRing.style.cssText = `
+    position:absolute; inset:-2px; border-radius:28px; padding:2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events:none; opacity:0.85; z-index:0;
+  `;
+  card.appendChild(borderRing);
+
+  const inner = document.createElement('div');
+  inner.style.cssText = `position:relative; z-index:1;`;
+  card.appendChild(inner);
 
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
-    position:absolute; top:0.8rem; right:1.2rem;
-    background:none; border:none; font-size:2rem;
-    color:#a0b3d9; cursor:pointer; font-family:'Poppins',sans-serif;
+    position:absolute; top:0.6rem; right:1rem;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
+    width:34px; height:34px; border-radius:50%;
+    font-size:1.4rem; line-height:1;
+    color:#e4e8f5; cursor:pointer; font-family:'Poppins',sans-serif;
+    z-index:2;
   `;
   closeBtn.addEventListener('click', () => {
     window.location.href = '/app/dashboard.html#play';
   });
   card.appendChild(closeBtn);
 
-  const logo = document.createElement('div');
-  logo.style.cssText = `font-family:'Orbitron',monospace;font-weight:800;font-size:1.8rem;margin-bottom:0.5rem;`;
-  logo.innerHTML = `<span style="color:#ffffff;">Naija</span><span style="color:#3ED6B7;">Genius</span>`;
-  card.appendChild(logo);
-
   const badgeContainer = document.createElement('div');
   badgeContainer.id = 'newBestBadgeContainer';
   if (newBest) {
     const badge = document.createElement('div');
     badge.textContent = '🏆 New Best Score!';
-    badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:700; color:#FFD700; background:rgba(255,215,0,0.12); border:1px solid rgba(255,215,0,0.3); border-radius:40px; padding:0.4rem 1.2rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 0 30px rgba(255,215,0,0.15);`;
+    badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);`;
     badgeContainer.appendChild(badge);
   }
-  card.appendChild(badgeContainer);
+  inner.appendChild(badgeContainer);
 
   const title = document.createElement('h2');
   title.textContent = 'Round Complete!';
-  title.style.cssText = `font-size:1.8rem;color:#FFD700;margin:0.5rem 0 0.8rem;`;
-  card.appendChild(title);
+  title.style.cssText = `font-family:'Orbitron',monospace; font-size:1.5rem; font-weight:800; color:#ffffff; margin:0.3rem 0 0.9rem; text-shadow:0 2px 8px rgba(0,0,0,0.4);`;
+  inner.appendChild(title);
 
   const maxPossible = TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION;
   const scoreDiv    = document.createElement('div');
   scoreDiv.style.cssText = `
     font-family:'Orbitron',monospace; font-size:3rem; font-weight:800;
-    color:#3ED6B7; margin:0.5rem 0;
+    background: linear-gradient(135deg, #FFB020, #FF6B6B);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin:0.4rem 0; text-shadow: 0 6px 18px rgba(255,107,107,0.25);
   `;
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
-  card.appendChild(scoreDiv);
+  inner.appendChild(scoreDiv);
 
   // For One Chance, show correct count out of attempted questions
   let attempted = TOTAL_QUESTIONS;
@@ -1586,39 +1608,41 @@ function showRoundEndModal(newBest = false) {
     attempted = Math.min(currentQuestionIndex + 1, TOTAL_QUESTIONS);
     correctOutOfText = `${correctCount} of ${attempted} correct`;
     const reachedDiv = document.createElement('div');
-    reachedDiv.style.cssText = `
-      font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
-    `;
+    reachedDiv.style.cssText = `font-size:0.9rem; color:#a9b3d6; margin-bottom:0.4rem;`;
     reachedDiv.textContent = `You reached question ${attempted} of ${TOTAL_QUESTIONS}`;
-    card.appendChild(reachedDiv);
+    inner.appendChild(reachedDiv);
   } else {
     correctOutOfText = `${correctCount} of ${TOTAL_QUESTIONS} correct`;
   }
 
   const correctDiv = document.createElement('div');
   correctDiv.style.cssText = `
-    font-size:0.95rem; color:#a0b3d9; margin-bottom:0.5rem;
+    display:inline-block; font-size:0.85rem; font-weight:700; color:#ffffff;
+    background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px; padding:0.3rem 0.9rem; margin-bottom:0.9rem;
   `;
   correctDiv.textContent = correctOutOfText;
-  card.appendChild(correctDiv);
+  inner.appendChild(correctDiv);
 
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
   msgP.textContent = endComment;
-  msgP.style.cssText = `font-size:1.1rem;color:#f0f3fa;margin:0.8rem 0 1.5rem;font-weight:500;`;
-  card.appendChild(msgP);
+  msgP.style.cssText = `font-size:1.02rem; color:#e4e8f5; margin:0.6rem 0 1.5rem; font-weight:500; line-height:1.4;`;
+  inner.appendChild(msgP);
 
   const btnContainer = document.createElement('div');
-  btnContainer.style.cssText = `display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;`;
+  btnContainer.style.cssText = `display:flex; gap:0.7rem; justify-content:center; flex-wrap:wrap;`;
 
   const playAgainBtn = document.createElement('button');
-  playAgainBtn.textContent = 'Play Again';
+  playAgainBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Play Again';
   playAgainBtn.style.cssText = `
-    background:linear-gradient(135deg,#3ED6B7,#259c84);
-    border:none; padding:0.7rem 1.8rem; border-radius:40px;
-    font-weight:700; font-size:0.95rem; color:#0a0f1e;
+    background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+    border:none; padding:0.75rem 1.6rem; border-radius:20px;
+    font-weight:700; font-size:0.9rem; color:#ffffff;
     cursor:pointer; font-family:'Poppins',sans-serif;
-    flex:1; min-width:140px;
+    display:flex; align-items:center; gap:0.5rem; justify-content:center;
+    box-shadow: 0 8px 20px rgba(62,123,255,0.35);
+    flex:1; min-width:150px;
   `;
   playAgainBtn.addEventListener('click', () => {
     overlay.remove();
@@ -1650,20 +1674,22 @@ function showRoundEndModal(newBest = false) {
   btnContainer.appendChild(playAgainBtn);
 
   const dashBtn = document.createElement('button');
-  dashBtn.textContent = 'Back to Dashboard';
+  dashBtn.innerHTML = '<i class="fas fa-house"></i> Dashboard';
   dashBtn.style.cssText = `
-    background:transparent; border:1.5px solid #3ED6B7;
-    padding:0.7rem 1.8rem; border-radius:40px;
-    font-weight:700; font-size:0.95rem; color:#3ED6B7;
+    background: rgba(255,255,255,0.06);
+    border:1.5px solid rgba(255,255,255,0.15);
+    padding:0.75rem 1.6rem; border-radius:20px;
+    font-weight:700; font-size:0.9rem; color:#ffffff;
     cursor:pointer; font-family:'Poppins',sans-serif;
-    flex:1; min-width:140px;
+    display:flex; align-items:center; gap:0.5rem; justify-content:center;
+    flex:1; min-width:150px;
   `;
   dashBtn.addEventListener('click', () => {
     window.location.href = '/app/dashboard.html';
   });
   btnContainer.appendChild(dashBtn);
 
-  card.appendChild(btnContainer);
+  inner.appendChild(btnContainer);
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 }
