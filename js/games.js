@@ -1377,8 +1377,24 @@ async function endRound() {
   })();
 }
 
-// ========== COMMENT MODAL ==========
+// ========== COMMENT MODAL (3D, themed to match games.html/css) ==========
+function ensureCommentModalAnimStyle() {
+  if (document.getElementById('commentModalAnimStyle')) return;
+  const style = document.createElement('style');
+  style.id = 'commentModalAnimStyle';
+  style.textContent = `
+    @keyframes commentPopIn3D {
+      0%   { transform: perspective(1000px) rotateX(-25deg) scale(0.7); opacity: 0; }
+      60%  { transform: perspective(1000px) rotateX(5deg) scale(1.04); opacity: 1; }
+      100% { transform: perspective(1000px) rotateX(0deg) scale(1); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function showCommentModal(comment) {
+  ensureCommentModalAnimStyle();
+
   const existing = document.getElementById('commentModal');
   if (existing) existing.remove();
 
@@ -1386,45 +1402,77 @@ function showCommentModal(comment) {
   overlay.id = 'commentModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+    background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    z-index:10002;
-    padding:1rem;
+    z-index:10002; padding:1rem; perspective:1000px;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background:rgba(20,25,40,0.95);
-    border:1px solid rgba(62,214,183,0.3);
-    border-radius:1.5rem; padding:2rem;
-    max-width:420px; width:100%;
-    text-align:center; font-family:'Poppins',sans-serif;
+    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
+    backdrop-filter: blur(14px);
+    border-radius: 24px;
+    padding: 1.8rem 1.6rem;
+    max-width: 400px; width: 100%;
+    position: relative; text-align: center; color: #f0f3fa;
+    font-family: 'Poppins', sans-serif;
+    box-shadow:
+      0 24px 50px rgba(0,0,0,0.5),
+      0 6px 16px rgba(124,79,224,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    transform-style: preserve-3d;
+    animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   `;
+
+  const borderRing = document.createElement('div');
+  borderRing.style.cssText = `
+    position:absolute; inset:-2px; border-radius:24px; padding:2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events:none; opacity:0.85; z-index:0;
+  `;
+  card.appendChild(borderRing);
+
+  const inner = document.createElement('div');
+  inner.style.cssText = `position:relative; z-index:1;`;
+  card.appendChild(inner);
+
+  const icon = document.createElement('div');
+  icon.innerHTML = '<i class="fas fa-bolt"></i>';
+  icon.style.cssText = `
+    font-size:2.2rem; color:#FFD700; margin-bottom:0.7rem;
+    filter: drop-shadow(0 4px 10px rgba(255,215,0,0.4));
+  `;
+  inner.appendChild(icon);
 
   const textP = document.createElement('p');
   textP.style.cssText = `
-    font-size:1.3rem; font-weight:600; color:#f0f3fa;
-    line-height:1.6; margin-bottom:1.5rem;
+    font-size:1.2rem; font-weight:600; color:#ffffff;
+    line-height:1.55; margin-bottom:1.5rem;
   `;
   textP.textContent = comment;
-  card.appendChild(textP);
+  inner.appendChild(textP);
 
   const btn = document.createElement('button');
-  btn.textContent = 'Got it! 👊';
+  btn.innerHTML = '<i class="fas fa-check"></i> Got it';
   btn.style.cssText = `
-    background:linear-gradient(135deg,#3ED6B7,#259c84);
-    border:none; padding:0.65rem 2rem; border-radius:40px;
-    font-weight:700; font-size:0.95rem; color:#0a0f1e;
+    background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+    border:none; padding:0.65rem 2rem; border-radius:20px;
+    font-weight:700; font-size:0.9rem; color:#ffffff;
     cursor:pointer; font-family:'Poppins',sans-serif;
+    display:inline-flex; align-items:center; gap:0.5rem;
+    box-shadow: 0 8px 20px rgba(62,123,255,0.35);
   `;
   btn.addEventListener('click', () => overlay.remove());
-  card.appendChild(btn);
+  inner.appendChild(btn);
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 }
 
-// ========== FIREWORKS ==========
+// ========== FIREWORKS (themed rocket-launch display, ~5s) ==========
 function showFireworks() {
   const canvas = document.createElement('canvas');
   canvas.id = 'fireworksCanvas';
@@ -1438,26 +1486,36 @@ function showFireworks() {
   let w = canvas.width  = window.innerWidth;
   let h = canvas.height = window.innerHeight;
 
-  class Particle {
+  // Palette pulled straight from the games theme (question-box gradient border,
+  // timer/coins gold, correct green, lifeline blue) instead of generic colors.
+  const THEME_COLORS = ['#FFD700', '#FFB020', '#FF9A3E', '#7C4FE0', '#3E7BFF', '#2FBF5B'];
+
+  class Spark {
     constructor(x, y, color) {
       this.x = x; this.y = y; this.color = color;
-      const angle = Math.random() * 2 * Math.PI;
-      const speed = Math.random() * 8 + 2;
-      this.vx    = Math.cos(angle) * speed;
-      this.vy    = Math.sin(angle) * speed;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 6 + 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
       this.alpha = 1;
-      this.decay = 0.015 + Math.random() * 0.02;
-      this.size  = 4 + Math.random() * 6;
+      this.decay = 0.008 + Math.random() * 0.012;
+      this.size = 2 + Math.random() * 3;
+      this.gravity = 0.045;
     }
     update() {
-      this.x += this.vx; this.y += this.vy;
-      this.vx *= 0.98;   this.vy *= 0.98;
+      this.vy += this.gravity;
+      this.vx *= 0.985;
+      this.vy *= 0.985;
+      this.x += this.vx;
+      this.y += this.vy;
       this.alpha -= this.decay;
     }
     draw(ctx) {
       ctx.save();
-      ctx.globalAlpha = this.alpha;
-      ctx.fillStyle   = this.color;
+      ctx.globalAlpha = Math.max(this.alpha, 0);
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = this.color;
+      ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -1465,32 +1523,84 @@ function showFireworks() {
     }
   }
 
-  let particles = [];
-  const colors  = ['#FFD700','#3ED6B7','#FFFFFF','#FF6B6B','#FFA94D','#A29BFE','#FFEAA7'];
-
-  for (let e = 0; e < 6; e++) {
-    const cx    = Math.random() * w * 0.6 + w * 0.2;
-    const cy    = Math.random() * h * 0.5 + h * 0.1;
-    const count = 80 + Math.floor(Math.random() * 60);
-    for (let i = 0; i < count; i++) {
-      particles.push(new Particle(cx, cy, colors[Math.floor(Math.random() * colors.length)]));
+  class Rocket {
+    constructor(x, targetY) {
+      this.x = x;
+      this.y = h + 10;
+      this.targetY = targetY;
+      this.vy = -(Math.random() * 3 + 9);
+      this.color = THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)];
+      this.exploded = false;
+      this.trail = [];
+    }
+    update() {
+      this.trail.push({ x: this.x, y: this.y });
+      if (this.trail.length > 8) this.trail.shift();
+      this.y += this.vy;
+      this.vy += 0.05;
+      if (this.y <= this.targetY) this.exploded = true;
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = this.color;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      this.trail.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+      ctx.lineTo(this.x, this.y);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
-  let frameId   = null;
+  let rockets = [];
+  let sparks = [];
+
+  function launchRocket() {
+    const x = w * 0.15 + Math.random() * w * 0.7;
+    const targetY = h * 0.15 + Math.random() * h * 0.35;
+    rockets.push(new Rocket(x, targetY));
+  }
+
+  function explode(x, y, color) {
+    const count = 60 + Math.floor(Math.random() * 40);
+    for (let i = 0; i < count; i++) sparks.push(new Spark(x, y, color));
+    // white sparkle ring layered on top for a brighter, more premium burst
+    for (let i = 0; i < 18; i++) sparks.push(new Spark(x, y, '#FFFFFF'));
+  }
+
+  const duration = 5000;
+  launchRocket();
+  const launchInterval = setInterval(launchRocket, 550);
+  // Stop launching new rockets before the end so the last bursts can fade out cleanly
+  setTimeout(() => clearInterval(launchInterval), duration - 1200);
+
+  let frameId = null;
   const startTime = performance.now();
-  const duration  = 3000;
 
   function animate(timestamp) {
     if (timestamp - startTime > duration) {
+      clearInterval(launchInterval);
       if (frameId) cancelAnimationFrame(frameId);
       canvas.remove();
       return;
     }
+
     ctx.clearRect(0, 0, w, h);
-    particles.forEach(p => { p.update(); p.draw(ctx); });
-    particles = particles.filter(p => p.alpha > 0);
-    if (particles.length === 0) { canvas.remove(); return; }
+
+    rockets.forEach(r => { r.update(); r.draw(ctx); });
+    rockets = rockets.filter(r => {
+      if (r.exploded) { explode(r.x, r.y, r.color); return false; }
+      return true;
+    });
+
+    sparks.forEach(s => { s.update(); s.draw(ctx); });
+    sparks = sparks.filter(s => s.alpha > 0);
+
     frameId = requestAnimationFrame(animate);
   }
 
