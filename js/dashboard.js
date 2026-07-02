@@ -323,6 +323,49 @@ onAuthStateChanged(auth, async (user) => {
             avatarFileInput.click();
         });
 
+        // ===== SETTINGS: VOLUME, SOUND, EDIT NAME =====
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        if (volumeSlider && volumeValue) {
+            volumeSlider.addEventListener('input', () => {
+                volumeValue.textContent = volumeSlider.value + '%';
+            });
+        }
+
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            soundToggle.addEventListener('change', () => {
+                console.log('Sound:', soundToggle.checked ? 'ON' : 'OFF');
+            });
+        }
+
+        const editNameInput = document.getElementById('editNameInput');
+        const saveNameBtn = document.getElementById('saveNameBtn');
+        if (editNameInput && saveNameBtn) {
+            saveNameBtn.addEventListener('click', async () => {
+                const newName = editNameInput.value.trim();
+                if (!newName) {
+                    showToast('Please enter a name.', 'error');
+                    return;
+                }
+                try {
+                    await updateDoc(userRef, { displayName: newName });
+                    showToast('Name updated successfully!', 'success');
+                    editNameInput.value = '';
+                    // Update greeting immediately
+                    const currentGreeting = getGreeting();
+                    greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
+                    // Also update initials and My Stats level (if changed?)
+                    const initials = newName.slice(0, 2).toUpperCase();
+                    if (userInitialsSpan) userInitialsSpan.textContent = initials;
+                    // Real-time update will also handle it.
+                } catch (err) {
+                    console.error('Update name failed:', err);
+                    showToast('Failed to update name. Please try again.', 'error');
+                }
+            });
+        }
+
     } catch (error) {
         console.error("Error loading user data:", error);
         if (greetingText) greetingText.textContent = "Good Day, Player";
@@ -437,6 +480,40 @@ document.querySelectorAll('#laneSection .lane-card').forEach(card => {
         }
     });
 });
+
+// ========== SETTINGS: OPEN/CLOSE ==========
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+
+function openSettings() {
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active-section");
+    });
+    document.getElementById("settingsSection")?.classList.add("active-section");
+    document.querySelectorAll(".nav-item, .sidebar-item").forEach(item => {
+        item.classList.remove("active");
+    });
+}
+
+function closeSettings() {
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active-section");
+    });
+    document.getElementById("homeSection")?.classList.add("active-section");
+    document.querySelectorAll(".nav-item, .sidebar-item").forEach(item => {
+        item.classList.remove("active");
+    });
+    document.querySelectorAll('[data-nav="home"]').forEach(item => {
+        item.classList.add("active");
+    });
+}
+
+if (settingsBtn) {
+    settingsBtn.addEventListener('click', openSettings);
+}
+if (settingsCloseBtn) {
+    settingsCloseBtn.addEventListener('click', closeSettings);
+}
 
 // ========== NAVIGATION ==========
 document.querySelectorAll("[data-nav]").forEach(btn => {
