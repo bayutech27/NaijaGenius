@@ -213,7 +213,7 @@ body {
 }
 
 .question-text {
-    font-size: 1.55rem;
+    font-size: 2.325rem;
     font-weight: 700;
     line-height: 1.4;
     color: #ffffff;
@@ -320,7 +320,7 @@ body {
 .option-btn .option-text {
     flex: 1;
     text-align: left;
-    font-size: 1.05rem;
+    font-size: 1.575rem;
     font-weight: 600;
     color: #ffffff;
     position: relative;
@@ -545,7 +545,7 @@ body {
         gap: 1.2rem;
     }
     .question-text {
-        font-size: 1.3rem;
+        font-size: 1.95rem;
     }
     .option-btn {
         font-size: 0.9rem;
@@ -553,7 +553,7 @@ body {
         min-height: 58px;
     }
     .option-btn .option-text {
-        font-size: 0.9rem;
+        font-size: 1.35rem;
     }
     .lifeline-btn,
     .next-btn {
@@ -594,7 +594,7 @@ body {
         padding: 1.4rem 1rem 1.1rem;
     }
     .question-text {
-        font-size: 1.1rem;
+        font-size: 1.65rem;
     }
     .option-btn {
         padding: 0.7rem 0.8rem;
@@ -608,7 +608,7 @@ body {
         font-size: 0.85rem;
     }
     .option-btn .option-text {
-        font-size: 0.85rem;
+        font-size: 1.275rem;
     }
     .option-btn.correct::after,
     .option-btn.wrong::after {
@@ -648,7 +648,7 @@ body {
 
 @media (max-width: 400px) {
     .question-box { padding: 1.2rem 0.8rem 1rem; }
-    .question-text { font-size: 0.95rem; }
+    .question-text { font-size: 1.425rem; }
     .option-btn {
         font-size: 0.8rem;
         padding: 0.6rem 0.7rem;
@@ -660,7 +660,7 @@ body {
         font-size: 0.75rem;
     }
     .option-btn .option-text {
-        font-size: 0.8rem;
+        font-size: 1.2rem;
     }
     .lifeline-btn,
     .next-btn {
