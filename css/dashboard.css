@@ -14,6 +14,7 @@
 html, body {
     overflow-x: hidden;
     max-width: 100%;
+    -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
 }
 
 body {
@@ -72,7 +73,8 @@ body {
 .shop-item,
 .leaderboard-item,
 .lane-card,
-.ad-life-container {
+.ad-life-container,
+.settings-item {
     box-shadow:
         inset 0 4px 12px rgba(0, 0, 0, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.25);
@@ -168,7 +170,7 @@ body {
     margin-left: 0.15rem;
 }
 
-/* Bell */
+/* Settings Gear – same styling as old bell */
 .icon-btn {
     background: rgba(20, 24, 46, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -188,23 +190,6 @@ body {
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 .icon-btn:hover { color: #3E7BFF; }
-.notification-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    min-width: 17px;
-    height: 17px;
-    padding: 0 3px;
-    background: #FF3B3B;
-    border-radius: 50%;
-    border: 2px solid #0A0A0F;
-    font-size: 0.6rem;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-}
 
 /* ----- MAIN LAYOUT ----- */
 .main-content {
@@ -347,7 +332,7 @@ body {
     100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
 }
 
-/* ----- LEVEL DISPLAY (avatar + level side‑by‑side) — gradient border ring, like games question-box ----- */
+/* ----- LEVEL DISPLAY (avatar + level side‑by‑by) — gradient border ring, like games question-box ----- */
 .level-display {
     display: flex;
     align-items: center;
@@ -456,7 +441,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.5rem;  /* increased from 0.1rem to push items apart */
     min-width: 0;
 }
 .level-label {
@@ -470,6 +455,7 @@ body {
     border: 1px solid rgba(124, 79, 224, 0.4);
     padding: 0.1rem 0.6rem;
     border-radius: 20px;
+    margin-bottom: 0.1rem;  /* add a little extra space below */
 }
 .level-name {
     font-size: 1.1rem;
@@ -479,7 +465,7 @@ body {
 }
 .level-star { font-size: 0.9rem; }
 
-/* XP progress */
+/* XP progress – pushed down by the gap above */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -1231,6 +1217,146 @@ body {
     border-color: #FFD700;
 }
 
+/* ----- SETTINGS SECTION (new) ----- */
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-top: 1rem;
+}
+.settings-item {
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
+    border-radius: 16px;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+}
+.settings-item label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #FFFFFF;
+    min-width: 80px;
+}
+.settings-control {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 1;
+    justify-content: flex-end;
+}
+.settings-control input[type="range"] {
+    -webkit-appearance: none;
+    width: 120px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    outline: none;
+    transition: background 0.2s;
+}
+.settings-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+.settings-control input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    border: none;
+}
+#volumeValue {
+    font-weight: 600;
+    color: #FFD700;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Toggle switch */
+.toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 26px;
+    transition: 0.3s;
+}
+.toggle-label::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+.toggle-switch input:checked + .toggle-label {
+    background: #3E7BFF;
+}
+.toggle-switch input:checked + .toggle-label::before {
+    transform: translateX(22px);
+}
+
+/* Edit name input & button */
+.settings-name-control {
+    gap: 0.5rem;
+}
+.settings-name-control input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 0.3rem 0.8rem;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 100px;
+    outline: none;
+}
+.settings-name-control input::placeholder {
+    color: #9AA5C7;
+}
+.settings-name-control input:focus {
+    border-color: #FFD700;
+}
+.settings-name-control button {
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
+    border: none;
+    border-radius: 20px;
+    padding: 0.3rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.settings-name-control button:hover {
+    opacity: 0.8;
+}
+
 /* ----- BOTTOM NAVIGATION (Mobile) — recolored to the games.css accent palette ----- */
 .bottom-nav {
     position: fixed;
@@ -1525,6 +1651,26 @@ body {
         width: 36px;
         height: 36px;
         font-size: 1rem;
+    }
+
+    /* Settings mobile */
+    .settings-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    .settings-item label {
+        min-width: auto;
+    }
+    .settings-control {
+        justify-content: flex-start;
+    }
+    .settings-name-control {
+        flex-wrap: wrap;
+    }
+    .settings-name-control input {
+        min-width: 80px;
+        flex: 1;
     }
 }
 
