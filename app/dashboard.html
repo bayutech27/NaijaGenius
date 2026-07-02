@@ -35,10 +35,9 @@
                         <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
                     </span>
                 </div>
-                <!-- Notification Bell -->
-                <button class="icon-btn notification-btn" id="notificationBtn">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notificationBadge">0</span>
+                <!-- Settings Gear (replaces notification bell) -->
+                <button class="icon-btn settings-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
                 </button>
             </div>
         </div>
@@ -205,7 +204,6 @@
 
         <!-- ============================================================
         PICK YOUR LANE SECTION (merged in — was pick-your-lane.html)
-        Reached only via the "Pick Your Lane" mode card, not via bottom nav.
         ============================================================ -->
         <section id="laneSection" class="page-section">
             <div class="lane-top-row">
@@ -377,6 +375,46 @@
             </div>
             <div class="leaderboard-full" id="fullLeaderboard">
                 <div class="loading-skeleton">Loading leaderboard…</div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SETTINGS SECTION (new – accessed via gear icon)
+        ============================================================ -->
+        <section id="settingsSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-cog"></i> Settings</h2>
+                <button class="back-arrow-btn settings-close-btn" id="settingsCloseBtn" aria-label="Close settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="settings-container">
+                <!-- Volume -->
+                <div class="settings-item">
+                    <label for="volumeSlider">Volume</label>
+                    <div class="settings-control">
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70" />
+                        <span id="volumeValue">70%</span>
+                    </div>
+                </div>
+                <!-- Sound toggle -->
+                <div class="settings-item">
+                    <label for="soundToggle">Sound</label>
+                    <div class="settings-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="soundToggle" checked />
+                            <label for="soundToggle" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Edit Name -->
+                <div class="settings-item">
+                    <label for="editNameInput">Edit Name</label>
+                    <div class="settings-control settings-name-control">
+                        <input type="text" id="editNameInput" placeholder="Enter new name" />
+                        <button id="saveNameBtn">Save</button>
+                    </div>
+                </div>
             </div>
         </section>
 
