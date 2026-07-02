@@ -1382,7 +1382,7 @@ async function endRound() {
         }
       }
 
-      // ========== CHALLENGE EVALUATION ==========
+      // ========== CHALLENGE EVALUATION (with debug logs) ==========
       // Build round stats (use what we have)
       const roundStats = {
         correctCount,
@@ -1405,17 +1405,26 @@ async function endRound() {
         finalTimer: timeLeft,
       };
 
+      console.log('🏆 CHALLENGE DEBUG: roundStats =', roundStats);
+
       // Re-fetch user data to get the latest challenge state
       const freshUserSnap = await getDoc(userRef);
       const freshUserData = freshUserSnap.exists() ? freshUserSnap.data() : currentUserData;
 
+      // Log the current challenge from Firestore
+      const challengeData = freshUserData.challenge || { currentIndex: 0, completed: false };
+      console.log('🏆 CHALLENGE DEBUG: challengeData from Firestore =', challengeData);
+
       const challengeResult = evaluateChallenge(roundStats, freshUserData);
+      console.log('🏆 CHALLENGE DEBUG: evaluateChallenge result =', challengeResult);
+
       if (challengeResult && challengeResult.completed) {
         try {
           // Apply reward
           await applyReward(currentUserUID, challengeResult.rewardType, challengeResult.rewardValue, db);
           // Mark challenge completed
           await markChallengeCompleted(currentUserUID, db);
+          console.log('🏆 CHALLENGE DEBUG: Challenge completed and reward applied!');
           // Show congratulations modal (after a short delay)
           setTimeout(() => {
             showCongratulationsModal(challengeResult.rewardType, challengeResult.rewardValue);
@@ -1423,6 +1432,8 @@ async function endRound() {
         } catch (err) {
           console.error('Failed to apply challenge reward:', err);
         }
+      } else {
+        console.log('🏆 CHALLENGE DEBUG: Challenge not completed or already completed.');
       }
 
     } catch (err) {
