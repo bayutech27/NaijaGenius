@@ -1,5 +1,7 @@
 /* ============================================================
-   NAIJAGENIUS DASHBOARD — restyled to match reference mock
+   NAIJAGENIUS DASHBOARD — themed to match games.html/css
+   (same background gradient, same accent palette, same inset
+   "platter" card treatment used across the game screen)
    ============================================================ */
 
 /* ----- RESET & BASE ----- */
@@ -22,10 +24,11 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Same formula as games.css: identical radial glows + linear base gradient */
     background:
-        radial-gradient(ellipse 900px 500px at 15% 0%, rgba(80, 50, 150, 0.35), transparent 60%),
-        radial-gradient(ellipse 700px 500px at 100% 10%, rgba(0, 100, 180, 0.25), transparent 55%),
-        linear-gradient(180deg, #0B0E23 0%, #0A0A16 40%, #0A0A0F 100%);
+        radial-gradient(circle at 6% 0%, rgba(120, 160, 255, 0.16), transparent 32%),
+        radial-gradient(circle at 94% 0%, rgba(255, 150, 200, 0.12), transparent 32%),
+        linear-gradient(180deg, #120B2E 0%, #1A1030 22%, #2A1035 50%, #3D1420 78%, #4A1A18 100%);
     background-attachment: fixed;
 }
 
@@ -37,7 +40,7 @@ body {
     letter-spacing: -0.5px;
 }
 .naija-white { color: #FFFFFF; }
-.genius-mint { color: #00E5A0; font-style: normal; }
+.genius-mint { color: #FFD700; font-style: normal; }
 
 .stat-value,
 .best-score-value {
@@ -59,6 +62,22 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Shared "platter" inset treatment — identical formula to games.css .option-btn:
+   an inner shadow to read as recessed/hollow, plus a soft outer lift shadow. */
+.level-display,
+.stats-row,
+.challenge-card-large,
+.mode-btn,
+.stat-detail,
+.shop-item,
+.leaderboard-item,
+.lane-card,
+.ad-life-container {
+    box-shadow:
+        inset 0 4px 12px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
 /* ----- HEADER ----- */
 .app-header {
     position: fixed;
@@ -66,7 +85,7 @@ body {
     left: 0;
     right: 0;
     height: 72px;
-    background: rgba(10, 12, 28, 0.55);
+    background: rgba(10, 8, 24, 0.55);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     z-index: 1000;
@@ -98,6 +117,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 40px;
     padding: 0.3rem 0.5rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .header-divider {
@@ -137,8 +157,8 @@ body {
     min-height: 20px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, #2FE083, #17B96B);
-    color: #06210F;
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
+    color: #FFFFFF;
     font-size: 0.6rem;
     display: flex;
     align-items: center;
@@ -165,8 +185,9 @@ body {
     justify-content: center;
     transition: color 0.2s;
     flex-shrink: 0;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
-.icon-btn:hover { color: #00E5A0; }
+.icon-btn:hover { color: #3E7BFF; }
 .notification-badge {
     position: absolute;
     top: -2px;
@@ -326,17 +347,32 @@ body {
     100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
 }
 
-/* ----- LEVEL DISPLAY (avatar + level side‑by‑side) ----- */
+/* ----- LEVEL DISPLAY (avatar + level side‑by‑side) — gradient border ring, like games question-box ----- */
 .level-display {
     display: flex;
     align-items: center;
     gap: 1.2rem;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, rgba(30, 20, 60, 0.55), rgba(15, 30, 60, 0.55));
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
     border-radius: 22px;
     padding: 0.9rem 1rem;
-    border: 1px solid rgba(255, 215, 0, 0.15);
+    border: none;
+    position: relative;
+}
+.level-display::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    padding: 2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.7;
 }
 
 .avatar-level-wrap {
@@ -346,7 +382,7 @@ body {
 .user-avatar {
     width: 74px;
     height: 74px;
-    background: linear-gradient(135deg, #FFD700, #00E5A0);
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -357,7 +393,7 @@ body {
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35), inset 0 2px 8px rgba(0,0,0,0.2);
     position: relative;
 }
 .avatar-img {
@@ -378,7 +414,7 @@ body {
     height: 24px;
     min-height: 24px;
     border-radius: 50%;
-    background: #2E9BFF;
+    background: #3E7BFF;
     border: 2px solid #0A0A0F;
     color: #fff;
     font-size: 0.6rem;
@@ -408,7 +444,7 @@ body {
     justify-content: center;
     position: relative;
     border: 2px solid #FFD700;
-    box-shadow: 0 0 14px rgba(255,215,0,0.25);
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.25);
 }
 .shield-badge .level-badge-img {
     width: 70%;
@@ -430,8 +466,8 @@ body {
     text-transform: uppercase;
     color: #C9B6FF;
     letter-spacing: 0.05em;
-    background: rgba(140, 90, 255, 0.25);
-    border: 1px solid rgba(180, 140, 255, 0.4);
+    background: rgba(124, 79, 224, 0.25);
+    border: 1px solid rgba(124, 79, 224, 0.4);
     padding: 0.1rem 0.6rem;
     border-radius: 20px;
 }
@@ -449,14 +485,17 @@ body {
     align-items: center;
     gap: 0.5rem;
     width: 100%;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    height: 6px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 .xp-bar {
-    flex: 1;
     height: 6px;
-    background: linear-gradient(90deg, #7C5CFF, #2E9BFF);
+    background: linear-gradient(90deg, #7C4FE0, #3E7BFF);
     border-radius: 6px;
     transition: width 0.3s ease;
-    box-shadow: 0 0 8px rgba(124, 92, 255, 0.5);
+    box-shadow: 0 0 8px rgba(124, 79, 224, 0.5);
 }
 .xp-text {
     font-size: 0.7rem;
@@ -464,26 +503,20 @@ body {
     color: #E4E8F5;
     white-space: nowrap;
 }
-.xp-progress {
-    background: rgba(255,255,255,0.08);
-    border-radius: 6px;
-    height: 6px;
-}
 
 /* ----- STATS ROW ----- */
 .stats-row {
     display: flex;
     align-items: stretch;
-    background: linear-gradient(135deg, #F3EFFF 0%, #EDEBFF 100%);
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border-radius: 18px;
     padding: 0.6rem 1rem;
     margin-bottom: 1.2rem;
     width: 100%;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 .stats-divider {
     width: 1px;
-    background: rgba(60, 40, 100, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     margin: 0.2rem 0.8rem;
     flex-shrink: 0;
 }
@@ -510,10 +543,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #4C8DFF, #2E5FE0);
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
 .stat-card:last-child .stat-icon {
-    background: linear-gradient(135deg, #FFC94C, #FF9A2E);
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
 }
 .stat-info {
     display: flex;
@@ -523,24 +557,24 @@ body {
 }
 .stat-label {
     font-size: 0.65rem;
-    font-weight: 500;
-    color: #5B5478;
+    font-weight: 600;
+    color: #C9D3EE;
     order: -1;
 }
 .stat-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1A1230;
+    color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 .stat-caption {
     font-size: 0.55rem;
     font-weight: 400;
-    color: #8A82A6;
+    color: #9AA5C7;
 }
 
-/* ----- ACTIVE CHALLENGE ----- */
+/* ----- ACTIVE CHALLENGE — gradient border ring, same technique as games result modal ----- */
 .challenge-section {
     margin: 0 0 1.2rem 0;
 }
@@ -548,14 +582,13 @@ body {
     display: none;
 }
 .challenge-card-large {
-    background: linear-gradient(135deg, #6A3FE0 0%, #3E63E8 60%, #2E9BFF 100%);
+    background: linear-gradient(150deg, #3E63E8 0%, #7C4FE0 55%, #FF9A3E 130%);
     border-radius: 20px;
     padding: 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: none;
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    box-shadow: 0 8px 22px rgba(50, 60, 200, 0.35);
     position: relative;
     overflow: hidden;
 }
@@ -578,7 +611,7 @@ body {
     bottom: -4px;
     right: -6px;
     font-size: 0.9rem;
-    background: #9B6BFF;
+    background: #7C4FE0;
     color: #fff;
     width: 20px;
     height: 20px;
@@ -643,14 +676,15 @@ body {
     margin: 0;
 }
 .challenge-progress {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     height: 4px;
     margin-top: 0.15rem;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
 }
 .challenge-progress-bar {
     height: 4px;
-    background: linear-gradient(90deg, #FFD700, #FFB800);
+    background: linear-gradient(90deg, #FFD700, #FFB020);
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -664,8 +698,9 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.2);
     border: 2px solid rgba(255, 215, 0, 0.6);
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -712,43 +747,55 @@ body {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201, 182, 255, 0.5), transparent);
 }
+
+/* perspective context so the two side cards can tilt "toward" the middle card */
 .mode-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: stretch;
     gap: 0.7rem;
     width: 100%;
+    perspective: 900px;
 }
 .mode-btn {
     border: none;
     border-radius: 20px;
-    padding: 0.8rem 0.3rem 0;
+    padding: 0.8rem 0.3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 0.2rem;
     width: 100%;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.25s ease, box-shadow 0.2s ease;
     text-decoration: none;
     color: #FFFFFF;
     min-height: 160px;
     position: relative;
     overflow: hidden;
 }
-.mode-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.3);
-}
 .mode-btn-red {
     background: linear-gradient(160deg, #FF5757 0%, #C21E1E 100%);
+    transform-origin: right center;
+    transform: perspective(900px) rotateY(30deg);
+}
+.mode-btn-red:hover {
+    transform: perspective(900px) rotateY(30deg) translateY(-6px);
 }
 .mode-btn-blue {
     background: linear-gradient(160deg, #3E8BFF 0%, #1440C2 100%);
 }
+.mode-btn-blue:hover {
+    transform: translateY(-6px);
+}
 .mode-btn-green {
     background: linear-gradient(160deg, #3FE07E 0%, #0F9C4E 100%);
+    transform-origin: left center;
+    transform: perspective(900px) rotateY(-30deg);
+}
+.mode-btn-green:hover {
+    transform: perspective(900px) rotateY(-30deg) translateY(-6px);
 }
 .mode-icon-wrap {
     display: flex;
@@ -797,8 +844,7 @@ body {
     color: #FFFFFF;
     font-weight: 700;
     background: transparent;
-    padding: 0.4rem 0.3rem;
-    margin-top: auto;
+    padding: 0.2rem 0.3rem 0;
 }
 .mode-arrow {
     display: none;
@@ -810,6 +856,16 @@ body {
     filter: grayscale(0.5);
     opacity: 0.6;
     pointer-events: none;
+}
+
+/* Reduce the tilt on narrow screens — at 30deg on a ~120px-wide card, small
+   viewports foreshorten hard enough that the mode name can start clipping
+   against the middle card. This is a real tradeoff, not a cosmetic nicety. */
+@media (max-width: 420px) {
+    .mode-btn-red { transform: perspective(700px) rotateY(18deg); }
+    .mode-btn-red:hover { transform: perspective(700px) rotateY(18deg) translateY(-4px); }
+    .mode-btn-green { transform: perspective(700px) rotateY(-18deg); }
+    .mode-btn-green:hover { transform: perspective(700px) rotateY(-18deg) translateY(-4px); }
 }
 
 /* ----- SECTION HEADER (shared: Shop / Leaderboard) ----- */
@@ -833,7 +889,7 @@ body {
     font-size: 1rem;
 }
 
-/* ----- SHOP SECTION (3D cards + full‑width buttons + centered on mobile) ----- */
+/* ----- SHOP SECTION — hollow inset "platter" cards ----- */
 .shop-coins-display {
     font-size: 0.8rem;
     font-weight: 600;
@@ -854,19 +910,16 @@ body {
     margin-top: 1rem;
 }
 .shop-item {
-    background: linear-gradient(145deg, rgba(45, 40, 80, 0.85), rgba(20, 24, 46, 0.95));
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border: 1px solid rgba(255, 215, 0, 0.15);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.35);
     border-radius: 16px;
     padding: 0.7rem 0.4rem;
     text-align: center;
     transition: transform 0.2s, border-color 0.2s;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
 }
 .shop-item:hover {
     transform: translateY(-3px);
     border-color: #FFD700;
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 .shop-item-icon {
     font-size: 1.6rem;
@@ -876,7 +929,7 @@ body {
     height: 48px;
     line-height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FFD700, #FF9A2E);
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -893,13 +946,13 @@ body {
     margin: 0.1rem 0;
 }
 .shop-buy-btn {
-    background: linear-gradient(135deg, #00E5A0, #17B96B);
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
     border: none;
     border-radius: 40px;
     padding: 0.4rem 0.5rem;
     font-weight: 700;
     font-size: 0.75rem;
-    color: #06210F;
+    color: #FFFFFF;
     cursor: pointer;
     margin-top: 0.3rem;
     transition: opacity 0.2s, transform 0.2s;
@@ -916,10 +969,9 @@ body {
     margin-top: 1.8rem;
     text-align: center;
     padding: 1rem 0.8rem;
-    background: linear-gradient(135deg, #FF5757 0%, #C21E1E 100%);
+    background: linear-gradient(150deg, #FF5757 0%, #C21E1E 100%);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 24px rgba(200, 30, 30, 0.3);
+    border: none;
     position: relative;
     overflow: hidden;
     max-width: 50%;
@@ -953,7 +1005,7 @@ body {
     margin-top: 0.2rem;
 }
 
-/* ----- MY STATS SECTION (3D cards + centered on mobile) ----- */
+/* ----- MY STATS SECTION — hollow inset "platter" cards ----- */
 .stats-full {
     padding: 0.5rem 0;
 }
@@ -969,13 +1021,11 @@ body {
     margin-top: 0.8rem;
 }
 .stat-detail {
-    background: linear-gradient(145deg, rgba(45, 40, 80, 0.85), rgba(20, 24, 46, 0.95));
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.35);
     border-radius: 16px;
     padding: 0.8rem 0.6rem;
     text-align: center;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -991,13 +1041,14 @@ body {
     font-size: 0.9rem;
     color: #fff;
     margin-bottom: 0.1rem;
-    background: linear-gradient(135deg, #4C8DFF, #2E5FE0);
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
 .stat-detail:nth-child(2) .stat-detail-icon { background: linear-gradient(135deg, #3FE07E, #0F9C4E); }
-.stat-detail:nth-child(3) .stat-detail-icon { background: linear-gradient(135deg, #FFC94C, #FF9A2E); }
+.stat-detail:nth-child(3) .stat-detail-icon { background: linear-gradient(135deg, #FFD700, #FF9A3E); }
 .stat-detail:nth-child(4) .stat-detail-icon { background: linear-gradient(135deg, #FF6B6B, #C21E1E); }
 .stat-detail:nth-child(5) .stat-detail-icon { background: linear-gradient(135deg, #FFD700, #E0A400); }
-.stat-detail:nth-child(6) .stat-detail-icon { background: linear-gradient(135deg, #C9B6FF, #7C5CFF); }
+.stat-detail:nth-child(6) .stat-detail-icon { background: linear-gradient(135deg, #C9B6FF, #7C4FE0); }
 .stat-detail-label {
     display: block;
     font-size: 0.65rem;
@@ -1011,7 +1062,7 @@ body {
     font-family: 'Orbitron', monospace;
 }
 
-/* ----- LEADERBOARD SECTION (centered on mobile) ----- */
+/* ----- LEADERBOARD SECTION — hollow inset "platter" cards ----- */
 .leaderboard-full {
     display: flex;
     flex-direction: column;
@@ -1019,16 +1070,14 @@ body {
     width: 100%;
 }
 .leaderboard-item {
-    background: linear-gradient(145deg, rgba(35, 30, 70, 0.85), rgba(15, 18, 38, 0.9));
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-bottom: 3px solid rgba(0, 0, 0, 0.3);
     border-radius: 16px;
     padding: 0.8rem 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
     width: 100%;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
 }
 .rank-badge {
     width: 38px;
@@ -1041,10 +1090,11 @@ body {
     font-weight: 800;
     font-family: 'Orbitron', monospace;
     flex-shrink: 0;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
 }
 .rank-1 {
     color: #0A0A0F;
-    background: linear-gradient(135deg, #FFD700, #FF9A2E);
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
     box-shadow: 0 0 14px rgba(255, 215, 0, 0.55);
 }
 .rank-2 {
@@ -1081,17 +1131,39 @@ body {
     50% { opacity: 1; }
 }
 
-/* ----- PICK-YOUR-LANE PAGE (Lane Cards) ----- */
+/* ----- PICK YOUR LANE (now an in-page tab: #laneSection, not a body-class page) ----- */
+#laneSection .lane-top-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+#laneSection .hero-section {
+    flex: 1;
+    text-align: left;
+}
+#laneSection .page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+#laneSection .page-subtitle {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #C9D3EE;
+    margin-top: 0.2rem;
+}
+
 .lane-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.8rem;
-    margin-top: 1.5rem;
 }
 .lane-card {
-    background: linear-gradient(145deg, rgba(45, 40, 80, 0.85), rgba(20, 24, 46, 0.95));
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border: 1px solid rgba(255, 215, 0, 0.15);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.35);
     border-radius: 16px;
     padding: 1rem 0.6rem;
     display: flex;
@@ -1100,12 +1172,10 @@ body {
     text-align: center;
     cursor: pointer;
     transition: transform 0.2s, border-color 0.2s;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
 }
 .lane-card:hover {
     transform: translateY(-3px);
     border-color: #FFD700;
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 .lane-icon {
     font-size: 2.2rem;
@@ -1129,7 +1199,7 @@ body {
     line-height: 1.2;
 }
 .lane-arrow {
-    color: #00E5A0;
+    color: #3E7BFF;
     font-size: 1rem;
     margin-top: 0.3rem;
     transition: transform 0.2s ease;
@@ -1138,62 +1208,30 @@ body {
     transform: translateX(4px);
 }
 
-/* Back arrow – now on the extreme right, gold */
-.back-arrow-wrapper {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1100;
-}
+/* Back button — inline within the lane tab's top row (not fixed/floating,
+   since this tab now shares the app-header with every other tab). */
 .back-arrow-btn {
+    flex-shrink: 0;
     background: rgba(20, 24, 46, 0.8);
     border: 1px solid rgba(255, 215, 0, 0.4);
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #FFD700;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
-    backdrop-filter: blur(6px);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
 }
 .back-arrow-btn:hover {
     background: rgba(255, 215, 0, 0.15);
     border-color: #FFD700;
 }
 
-/* Adjust main-content padding for lane page (no header) */
-.lane-page .main-content {
-    padding-top: 20px;
-}
-
-/* ----- HERO (used on lane page) – CENTRED & WHITE ----- */
-.lane-page .hero-section {
-    text-align: center;
-    margin-bottom: 1.8rem;
-}
-.lane-page .page-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    background: none;
-    -webkit-background-clip: unset;
-    background-clip: unset;
-    -webkit-text-fill-color: unset;
-}
-.lane-page .page-subtitle {
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: #FFFFFF;
-    margin-top: 0.2rem;
-}
-
-/* ----- BOTTOM NAVIGATION (Mobile) – updated icons ----- */
+/* ----- BOTTOM NAVIGATION (Mobile) — recolored to the games.css accent palette ----- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -1227,9 +1265,9 @@ body {
     flex: 1;
 }
 .nav-item:active { transform: scale(0.9); }
-.nav-item.active { color: #00E5A0; }
+.nav-item.active { color: #3E7BFF; }
 
-/* Icon container – bigger, with background circle */
+/* Icon container – circular badge with inset "hollow" depth */
 .nav-item i {
     font-size: 1.8rem;
     display: flex;
@@ -1241,25 +1279,23 @@ body {
     background: #2a2a3a;
     color: #fff;
     transition: background 0.3s, transform 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
 }
 .nav-item.active i {
-    background: #00E5A0;
-    color: #0A0A0F;
     transform: scale(1.05);
 }
 
-/* Individual background colors for each nav item (inactive) */
-.nav-item:nth-child(1) i { background: #00E5A0; color: #0A0A0F; }        /* Home – mint green */
-.nav-item:nth-child(2) i { background: #FFD700; color: #0A0A0F; }        /* My Stats – gold */
-.nav-item:nth-child(3) i { background: #3E8BFF; color: #fff; }           /* Shop – blue */
-.nav-item:nth-child(4) i { background: #7C5CFF; color: #fff; }           /* Leaderboard – purple */
+/* Individual accent colors for each nav item, pulled from the games palette */
+.nav-item:nth-child(1) i { background: linear-gradient(160deg, #3E7BFF, #1A4FA0); color: #fff; }   /* Home – blue */
+.nav-item:nth-child(2) i { background: linear-gradient(160deg, #FFD700, #FF9A3E); color: #0A0A0F; } /* My Stats – gold */
+.nav-item:nth-child(3) i { background: linear-gradient(160deg, #8B5CF6, #4B2A9E); color: #fff; }     /* Shop – purple */
+.nav-item:nth-child(4) i { background: linear-gradient(160deg, #3FE07E, #0F9C4E); color: #0A0A0F; }  /* Leaderboard – green */
 
-/* Active state overrides the background to mint green with contrast */
-.nav-item.active:nth-child(1) i { background: #00E5A0; color: #0A0A0F; }
-.nav-item.active:nth-child(2) i { background: #00E5A0; color: #0A0A0F; }
-.nav-item.active:nth-child(3) i { background: #00E5A0; color: #0A0A0F; }
-.nav-item.active:nth-child(4) i { background: #00E5A0; color: #0A0A0F; }
+/* Active state keeps its own accent color but adds a highlight ring, rather
+   than flattening every icon to one color regardless of which tab it is. */
+.nav-item.active i {
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.4), 0 0 0 2px rgba(255,255,255,0.5), 0 4px 14px rgba(0,0,0,0.35);
+}
 
 .nav-label {
     font-size: 0.6rem;
@@ -1268,7 +1304,7 @@ body {
     margin-top: 0.1rem;
 }
 .nav-item.active .nav-label {
-    color: #00E5A0;
+    color: #3E7BFF;
 }
 .nav-dot {
     display: none;
@@ -1315,11 +1351,11 @@ body {
         font-family: 'Poppins', sans-serif;
     }
     .sidebar-item i { width: 24px; font-size: 1.25rem; }
-    .sidebar-item:hover { background: #1A1D2E; color: #00E5A0; }
+    .sidebar-item:hover { background: #1A1D2E; color: #3E7BFF; }
     .sidebar-item.active {
-        background: linear-gradient(135deg, #00E5A020, #FFD70020);
-        color: #00E5A0;
-        border-left: 3px solid #00E5A0;
+        background: linear-gradient(135deg, #3E7BFF20, #FFD70020);
+        color: #3E7BFF;
+        border-left: 3px solid #3E7BFF;
     }
     .bottom-nav { display: none; }
     .main-content { max-width: 800px; padding-bottom: 2rem; }
@@ -1378,7 +1414,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    border-left: 3px solid #00E5A0;
+    border-left: 3px solid #3E7BFF;
     pointer-events: auto;
     animation: slideUp 0.3s ease;
     max-width: calc(100% - 2rem);
@@ -1468,7 +1504,7 @@ body {
         font-size: 0.55rem;
     }
 
-    /* Lane page mobile */
+    /* Lane tab mobile */
     .lane-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.6rem;
@@ -1485,17 +1521,10 @@ body {
     .lane-desc {
         font-size: 0.6rem;
     }
-    .back-arrow-wrapper {
-        top: 0.5rem;
-        right: 0.5rem;
-    }
     .back-arrow-btn {
         width: 36px;
         height: 36px;
         font-size: 1rem;
-    }
-    .lane-page .main-content {
-        padding-top: 12px;
     }
 }
 
