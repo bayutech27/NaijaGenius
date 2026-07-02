@@ -617,69 +617,85 @@ function loadQuestion(index) {
 }
 
 // ========== TIMER ==========
+const TIMER_CIRCUMFERENCE = 2 * Math.PI * 18;
+
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = MAX_SCORE_PER_QUESTION;
   if (timerSeconds) timerSeconds.textContent = timeLeft;
 
-  const circumference = 2 * Math.PI * 18;
   if (timerPath) {
-    timerPath.style.strokeDasharray  = circumference;
+    timerPath.style.strokeDasharray  = TIMER_CIRCUMFERENCE;
     timerPath.style.strokeDashoffset = 0;
   }
 
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    if (timerSeconds) timerSeconds.textContent = Math.max(0, timeLeft);
+  timerInterval = setInterval(timerTick, 1000);
+}
 
-    if (timerPath) {
-      const offset = circumference * (1 - (Math.max(0, timeLeft) / MAX_SCORE_PER_QUESTION));
-      timerPath.style.strokeDashoffset = offset;
-    }
+// Freezes the countdown in place (used while the Call a Friend modal is open)
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
 
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      questionAnswered  = true;
-      lifelinesDisabled = true;
-      updateLifelineUI();
+// Resumes the countdown from exactly where it was paused — does not reset timeLeft
+function resumeTimer() {
+  if (questionAnswered) return;
+  if (timerInterval) return; // already running
+  timerInterval = setInterval(timerTick, 1000);
+}
 
-      // Lock all option buttons
-      ['A', 'B', 'C', 'D'].forEach(letter => {
-        const btn = optionBtns[letter];
-        if (btn) {
-          btn.disabled = true;
-          btn.classList.add('disabled');
-        }
-      });
+function timerTick() {
+  timeLeft--;
+  if (timerSeconds) timerSeconds.textContent = Math.max(0, timeLeft);
 
-      const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
+  if (timerPath) {
+    const offset = TIMER_CIRCUMFERENCE * (1 - (Math.max(0, timeLeft) / MAX_SCORE_PER_QUESTION));
+    timerPath.style.strokeDashoffset = offset;
+  }
 
-      // ── ONE CHANCE: immediate feedback & end round ──
-      if (questionType === 'one_chance') {
-        // Reveal correct answer in green
-        if (correctAns && optionBtns[correctAns]) {
-          applyCorrectStyle(optionBtns[correctAns]);
-        }
-        // Streak update (wrong)
-        const comment = handleStreakUpdate(false);
-        if (comment) showCommentModal(comment);
-        // End round immediately
-        endRound();
-        return;
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    questionAnswered  = true;
+    lifelinesDisabled = true;
+    updateLifelineUI();
+
+    // Lock all option buttons
+    ['A', 'B', 'C', 'D'].forEach(letter => {
+      const btn = optionBtns[letter];
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('disabled');
       }
+    });
 
-      // ── OTHER MODES (Jollof Mix, Pick Your Lane): delayed feedback ──
-      if (correctAns) {
-        pendingCorrectLetter = correctAns;
-        pendingSelectedLetter = null;
+    const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
+
+    // ── ONE CHANCE: immediate feedback & end round ──
+    if (questionType === 'one_chance') {
+      // Reveal correct answer in green
+      if (correctAns && optionBtns[correctAns]) {
+        applyCorrectStyle(optionBtns[correctAns]);
       }
       // Streak update (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
-      // Handle wrong answer (replay or delayed feedback)
-      handleWrongAnswer();
+      // End round immediately
+      endRound();
+      return;
     }
-  }, 1000);
+
+    // ── OTHER MODES (Jollof Mix, Pick Your Lane): delayed feedback ──
+    if (correctAns) {
+      pendingCorrectLetter = correctAns;
+      pendingSelectedLetter = null;
+    }
+    // Streak update (wrong)
+    const comment = handleStreakUpdate(false);
+    if (comment) showCommentModal(comment);
+    // Handle wrong answer (replay or delayed feedback)
+    handleWrongAnswer();
+  }
 }
 
 // ========== APPLY ANSWER HIGHLIGHT STYLES ==========
@@ -1152,11 +1168,14 @@ lifelineCallFriend?.addEventListener('click', async () => {
   }
 
   const correctLetter = currentQ.correctAnswer;
+  pauseTimer();
   showCallFriendModal(correctLetter);
 });
 
-// ========== CALL FRIEND MODAL ==========
+// ========== CALL FRIEND MODAL (3D, themed to match games.html/css) ==========
 function showCallFriendModal(correctLetter) {
+  ensureCommentModalAnimStyle();
+
   const existing = document.getElementById('callFriendModal');
   if (existing) existing.remove();
 
@@ -1164,49 +1183,85 @@ function showCallFriendModal(correctLetter) {
   overlay.id = 'callFriendModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.8); backdrop-filter:blur(6px);
+    background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    z-index:10003; padding:1rem;
+    z-index:10003; padding:1rem; perspective:1000px;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background:rgba(20,25,40,0.95);
-    border:1px solid rgba(62,214,183,0.4);
-    border-radius:2rem; padding:2rem 1.5rem;
-    max-width:400px; width:100%;
-    text-align:center; font-family:'Poppins',sans-serif;
-    position:relative;
+    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
+    backdrop-filter: blur(14px);
+    border-radius: 24px;
+    padding: 1.8rem 1.6rem;
+    max-width: 400px; width: 100%;
+    position: relative; text-align: center; color: #f0f3fa;
+    font-family: 'Poppins', sans-serif;
+    box-shadow:
+      0 24px 50px rgba(0,0,0,0.5),
+      0 6px 16px rgba(124,79,224,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    transform-style: preserve-3d;
+    animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   `;
 
+  const borderRing = document.createElement('div');
+  borderRing.style.cssText = `
+    position:absolute; inset:-2px; border-radius:24px; padding:2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events:none; opacity:0.85; z-index:0;
+  `;
+  card.appendChild(borderRing);
+
+  const inner = document.createElement('div');
+  inner.style.cssText = `position:relative; z-index:1;`;
+  card.appendChild(inner);
+
   const closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '✕';
+  closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
-    position:absolute; top:0.8rem; right:1.2rem;
-    background:none; border:none; font-size:1.6rem;
-    color:#a0b3d9; cursor:pointer; font-family:'Poppins',sans-serif;
+    position:absolute; top:0.6rem; right:1rem;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
+    width:34px; height:34px; border-radius:50%;
+    font-size:1.4rem; line-height:1;
+    color:#e4e8f5; cursor:pointer; font-family:'Poppins',sans-serif;
+    z-index:2;
   `;
   card.appendChild(closeBtn);
 
   const icon = document.createElement('div');
-  icon.style.cssText = `font-size:3rem; color:#3ED6B7; margin-bottom:0.5rem;`;
   icon.innerHTML = '<i class="fas fa-phone-volume"></i>';
-  card.appendChild(icon);
+  icon.style.cssText = `
+    font-size:2.4rem; color:#8B5CF6; margin-bottom:0.6rem;
+    filter: drop-shadow(0 4px 10px rgba(139,92,246,0.4));
+  `;
+  inner.appendChild(icon);
 
   const msg = document.createElement('p');
-  msg.style.cssText = `font-size:1.2rem; color:#f0f3fa; font-weight:500; margin:0.5rem 0 0.8rem;`;
+  msg.style.cssText = `font-size:1.05rem; color:#c9d3ee; font-weight:500; margin:0.4rem 0 0.7rem;`;
   msg.textContent = 'Your friend says:';
-  card.appendChild(msg);
+  inner.appendChild(msg);
 
   const answer = document.createElement('p');
-  answer.style.cssText = `font-size:2.5rem; font-weight:800; color:#FFD700; margin:0.2rem 0 0.8rem; letter-spacing:0.05em;`;
+  answer.style.cssText = `
+    font-family:'Orbitron',monospace; font-size:2.1rem; font-weight:800;
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin:0.2rem 0 0.9rem; letter-spacing:0.04em;
+  `;
   answer.textContent = `The correct answer is ${correctLetter}!`;
-  card.appendChild(answer);
+  inner.appendChild(answer);
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 
-  closeBtn.addEventListener('click', () => overlay.remove());
+  closeBtn.addEventListener('click', () => {
+    overlay.remove();
+    resumeTimer();
+  });
 }
 
 // ========== LOADER ==========
