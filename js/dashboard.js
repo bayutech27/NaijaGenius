@@ -2,7 +2,6 @@
 import { auth, db } from "/js/firebase.config.js";
 import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { showFunFactModal } from './fun-facts.js';
 import { renderShop, setupAdButton } from './shop.js';
 import { getCurrentChallenge } from './challenge.js';
 
@@ -252,11 +251,6 @@ onAuthStateChanged(auth, async (user) => {
         const challenge = await getCurrentChallenge(userData, user.uid, db);
         displayActiveChallenge(challenge, userData);
 
-        // ===== FUN FACT =====
-        setTimeout(() => {
-            showFunFactModal(displayName, true);
-        }, 1500);
-
         // ===== REAL‑TIME UPDATES =====
         onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -400,17 +394,48 @@ document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
 document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
     window.location.href = "games.html";
 });
-document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
-    window.location.href = "pick-your-lane.html";
-});
-document.getElementById("chooseLaneBtnPlay")?.addEventListener("click", () => {
-    window.location.href = "pick-your-lane.html";
-});
 document.getElementById("oneChanceBtn")?.addEventListener("click", () => {
     window.location.href = "games.html?type=one_chance";
 });
 document.getElementById("oneChanceBtnPlay")?.addEventListener("click", () => {
     window.location.href = "games.html?type=one_chance";
+});
+
+// ========== PICK YOUR LANE (merged tab — no longer a separate page) ==========
+// Opens the in-page laneSection tab instead of redirecting to pick-your-lane.html
+document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active-section");
+    });
+    document.getElementById("laneSection")?.classList.add("active-section");
+    document.querySelectorAll(".nav-item, .sidebar-item").forEach(item => {
+        item.classList.remove("active");
+    });
+});
+
+// Back button inside the lane tab returns to Home and restores the Home nav state
+document.getElementById("laneBackBtn")?.addEventListener("click", () => {
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active-section");
+    });
+    document.getElementById("homeSection")?.classList.add("active-section");
+    document.querySelectorAll(".nav-item, .sidebar-item").forEach(item => {
+        item.classList.remove("active");
+    });
+    document.querySelectorAll('[data-nav="home"]').forEach(item => {
+        item.classList.add("active");
+    });
+});
+
+// Category card clicks — same destination as before (games.html), no redirect page in between
+document.querySelectorAll('#laneSection .lane-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const category = card.dataset.category;
+        const exportName = card.dataset.export;
+        if (category && exportName) {
+            window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
+        }
+    });
 });
 
 // ========== NAVIGATION ==========
