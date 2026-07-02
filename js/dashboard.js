@@ -349,13 +349,17 @@ onAuthStateChanged(auth, async (user) => {
                     return;
                 }
                 try {
-                    await updateDoc(userRef, { displayName: newName });
+                    // Update both displayName and username fields
+                    await updateDoc(userRef, {
+                        displayName: newName,
+                        username: newName
+                    });
                     showToast('Name updated successfully!', 'success');
                     editNameInput.value = '';
                     // Update greeting immediately
                     const currentGreeting = getGreeting();
                     greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
-                    // Also update initials and My Stats level (if changed?)
+                    // Also update initials
                     const initials = newName.slice(0, 2).toUpperCase();
                     if (userInitialsSpan) userInitialsSpan.textContent = initials;
                     // Real-time update will also handle it.
