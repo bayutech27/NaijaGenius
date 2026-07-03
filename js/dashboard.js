@@ -3,7 +3,7 @@ import { auth, db } from "/js/firebase.config.js";
 import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from './shop.js';
-import { getCurrentChallenge } from './challenge.js';
+import { getTodaysChallenge, isChallengeCompletedToday } from './challenge.js';
 
 // ========== DOM ELEMENTS (Home page) ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
@@ -247,9 +247,10 @@ onAuthStateChanged(auth, async (user) => {
         renderShop(coins);
         setupAdButton(userRef, updateHeaderUI);
 
-        // ===== CHALLENGE =====
-        const challenge = await getCurrentChallenge(userData, user.uid, db);
-        displayActiveChallenge(challenge, userData);
+        // ===== CHALLENGE (new front‑end only) =====
+        const challenge = getTodaysChallenge();
+        const isCompleted = isChallengeCompletedToday();
+        displayActiveChallenge(challenge, isCompleted);
 
         // ===== REAL‑TIME UPDATES =====
         onSnapshot(userRef, (docSnap) => {
@@ -297,9 +298,8 @@ onAuthStateChanged(auth, async (user) => {
                     greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
                 }
 
-                getCurrentChallenge(updated, user.uid, db).then(ch => {
-                    displayActiveChallenge(ch, updated);
-                });
+                // Challenge display doesn't change in real‑time (localStorage only)
+                // We'll re‑display it; it might have been completed in another tab? Not needed.
             }
         });
 
@@ -384,7 +384,7 @@ function updateHeaderUI(coins, lives) {
 }
 
 // ========== DISPLAY ACTIVE CHALLENGE ==========
-function displayActiveChallenge(challenge, userData) {
+function displayActiveChallenge(challenge, isCompleted) {
     if (!challenge) {
         if (challengeTitle) challengeTitle.textContent = "No Active Challenge";
         if (challengeDesc) challengeDesc.textContent = "Complete a round to unlock your first challenge!";
@@ -425,7 +425,6 @@ function displayActiveChallenge(challenge, userData) {
         }
     }
 
-    const isCompleted = userData.challenge?.completed || false;
     if (isCompleted) {
         if (challengeProgressBar) challengeProgressBar.style.width = "100%";
         if (challengeProgressText) challengeProgressText.textContent = "Completed!";
