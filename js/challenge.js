@@ -1,5 +1,4 @@
-// challenge.js – 50 daily challenges for NaijaGenius
-import { doc, updateDoc, increment, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+// challenge.js – Fully front-end challenge system (Model 5)
 
 // ========== CHALLENGE DEFINITIONS ==========
 export const CHALLENGES = [
@@ -84,7 +83,6 @@ export const CHALLENGES = [
     difficulty: "easy",
     condition: (stats) => stats.correctCount >= 5
   },
-
   {
     id: 8,
     title: "Flawless Victory",
@@ -95,7 +93,6 @@ export const CHALLENGES = [
     difficulty: "easy",
     condition: (stats) => stats.correctCount >= 7 && stats.streakDirection === 'win'
   },
-  
   {
     id: 9,
     title: "Knowledge Seeker",
@@ -188,7 +185,6 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.correctCount === 10
   },
-  
   {
     id: 18,
     title: "The Comeback",
@@ -219,7 +215,6 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.lifelinesUsed === 0 && stats.correctCount >= 5
   },
-  
   {
     id: 21,
     title: "Close Call",
@@ -270,7 +265,6 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.lifelineUsed === 'all'
   },
-
   {
     id: 26,
     title: "The Survivor",
@@ -333,7 +327,6 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.correctCount === 10 && stats.lifelinesUsed === 0
   },
-  
   {
     id: 32,
     title: "The Comeback King",
@@ -354,7 +347,6 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.lifelineUsed === 'all' && stats.isCorrectAfterLifeline
   },
-  
   {
     id: 34,
     title: "The Mastermind",
@@ -415,7 +407,6 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.correctCount >= 8 && stats.lifelineUsed === 'all'
   },
-  
   {
     id: 40,
     title: "The Oracle",
@@ -438,76 +429,65 @@ export const CHALLENGES = [
   }
 ];
 
-// ========== CORE FUNCTIONS ==========
+// ========== CORE FRONT‑END FUNCTIONS ==========
 
 /**
- * Get the current active challenge for a user.
- * If the challenge was completed more than 24 hours ago, advance to the next one.
- * @param {Object} userData - The user document from Firestore.
- * @param {string} userUID - The user's UID.
- * @param {Object} db - Firestore db instance.
- * @returns {Promise<Object>} - The active challenge object.
+ * Get today's active challenge based on date seed.
+ * Same challenge for all users on the same day.
  */
-export async function getCurrentChallenge(userData, userUID, db) {
-  const challengeData = userData.challenge || { currentIndex: 0, completed: false, completedAt: null };
-  let { currentIndex, completed, completedAt } = challengeData;
-
-  // If completed and completedAt exists, check if 24h passed
-  if (completed && completedAt) {
-    const now = new Date();
-    const completedDate = completedAt.toDate ? completedAt.toDate() : new Date(completedAt);
-    const hoursDiff = (now - completedDate) / (1000 * 60 * 60);
-    if (hoursDiff >= 24) {
-      // Advance to next challenge
-      currentIndex = (currentIndex + 1) % CHALLENGES.length;
-      completed = false;
-      completedAt = null;
-      // Update Firestore
-      const userRef = doc(db, 'users', userUID);
-      await updateDoc(userRef, {
-        'challenge.currentIndex': currentIndex,
-        'challenge.completed': false,
-        'challenge.completedAt': null
-      });
-      // Update local data
-      userData.challenge = { currentIndex, completed: false, completedAt: null };
-    }
-  }
-
-  // Return the challenge object
-  return CHALLENGES[currentIndex] || null;
+export function getTodaysChallenge() {
+  const daySeed = Math.floor(Date.now() / 86400000); // days since epoch
+  const index = daySeed % CHALLENGES.length;
+  return CHALLENGES[index];
 }
 
 /**
- * Evaluate if the current challenge is completed based on round stats.
- * @param {Object} roundStats - Stats from the round (correctCount, wrongCount, currentStreak, etc.)
- * @param {Object} userData - The user document from Firestore.
- * @returns {Object|null} - { completed: boolean, rewardType, rewardValue } or null if already completed.
+ * Check if the current challenge has been completed today.
+ * Uses localStorage.
  */
-export function evaluateChallenge(roundStats, userData) {
-  const challengeData = userData.challenge || { currentIndex: 0, completed: false };
-  if (challengeData.completed) {
-    return null; // already done
+export function isChallengeCompletedToday() {
+  const today = Math.floor(Date.now() / 86400000);
+  const stored = localStorage.getItem('challengeData');
+  if (!stored) return false;
+  try {
+    const data = JSON.parse(stored);
+    return data.completedDay === today;
+  } catch {
+    return false;
   }
-  const challenge = CHALLENGES[challengeData.currentIndex];
+}
+
+/**
+ * Mark the challenge as completed and store the reward info.
+ */
+export function markChallengeCompletedLocal(rewardType, rewardValue) {
+  const today = Math.floor(Date.now() / 86400000);
+  localStorage.setItem('challengeData', JSON.stringify({
+    completedDay: today,
+    rewardType,
+    rewardValue
+  }));
+}
+
+/**
+ * Evaluate if today's challenge condition is met.
+ * @param {Object} stats – round stats from games.js
+ * @returns {Object|null} – { rewardType, rewardValue } if completed, else null.
+ */
+export function evaluateChallenge(stats) {
+  if (isChallengeCompletedToday()) return null;
+  const challenge = getTodaysChallenge();
   if (!challenge) return null;
-  const conditionMet = challenge.condition(roundStats);
+  const conditionMet = challenge.condition(stats);
   if (conditionMet) {
-    return {
-      completed: true,
-      rewardType: challenge.rewardType,
-      rewardValue: challenge.rewardValue
-    };
+    return { rewardType: challenge.rewardType, rewardValue: challenge.rewardValue };
   }
   return null;
 }
 
 /**
  * Apply the reward to the user in Firestore.
- * @param {string} userUID - The user's UID.
- * @param {string} rewardType - 'coins' or 'lifeline'.
- * @param {number|string} rewardValue - coins amount or lifeline type.
- * @param {Object} db - Firestore db instance.
+ * (Kept from original, still used by games.js)
  */
 export async function applyReward(userUID, rewardType, rewardValue, db) {
   const userRef = doc(db, 'users', userUID);
@@ -515,29 +495,14 @@ export async function applyReward(userUID, rewardType, rewardValue, db) {
   if (rewardType === 'coins') {
     update.coins = increment(rewardValue);
   } else if (rewardType === 'lifeline') {
-    // rewardValue is a string: 'fifty_fifty', 'ask_crowd', 'callFriend'
     update[`lifeline.${rewardValue}`] = increment(1);
   }
   await updateDoc(userRef, update);
 }
 
 /**
- * Mark the current challenge as completed in Firestore.
- * @param {string} userUID - The user's UID.
- * @param {Object} db - Firestore db instance.
- */
-export async function markChallengeCompleted(userUID, db) {
-  const userRef = doc(db, 'users', userUID);
-  await updateDoc(userRef, {
-    'challenge.completed': true,
-    'challenge.completedAt': serverTimestamp()
-  });
-}
-
-/**
  * Show a congratulatory modal with flowers animation.
- * @param {string} rewardType - 'coins' or 'lifeline'.
- * @param {number|string} rewardValue - coins or lifeline type.
+ * (Unchanged from original)
  */
 export function showCongratulationsModal(rewardType, rewardValue) {
   // Remove any existing modal
