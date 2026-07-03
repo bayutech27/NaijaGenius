@@ -341,7 +341,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
+    gap: 2.5rem;              /* increased gap to make it more visible */
     margin-bottom: 2.058rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
@@ -435,15 +435,15 @@ body {
     display: block;
 }
 
-/* Level container (right) – align items left, but we will adjust inner items */
+/* Level container (right) – align items left */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;   /* changed from center */
+    align-items: flex-start;
     justify-content: center;
     min-width: 0;
-    text-align: left;          /* changed from center */
+    text-align: left;
     gap: 0.25rem;
 }
 
@@ -492,7 +492,7 @@ body {
     color: #FFFFFF;
     line-height: 1.2;
     margin: 0.1rem 0 0.1rem;
-    margin-left: calc(78px + 0.6rem); /* shield width + gap to align with label text */
+    margin-left: calc(78px + 0.6rem); /* shield width + gap */
 }
 .level-star { font-size: 0.9rem; }
 
@@ -508,7 +508,7 @@ body {
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
     overflow: hidden;
-    margin-left: calc(78px + 0.6rem); /* same left margin to align */
+    margin-left: calc(78px + 0.6rem);
 }
 
 .xp-bar {
@@ -520,13 +520,17 @@ body {
     width: 0%;
 }
 
+/* ---- MAKE XP TEXT MORE VIVID AND VISIBLE ---- */
 .xp-text {
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #E4E8F5;
+    font-weight: 700;           /* increased from 600 */
+    color: #FFFFFF;            /* brighter */
+    text-shadow: 0 0 8px rgba(62, 123, 255, 0.4); /* subtle glow */
     white-space: nowrap;
     min-width: 3.8rem;
     text-align: center;
+    padding-top: 2px;          /* ensure no clipping at top */
+    line-height: 1.2;          /* prevent overlap */
 }
 
 /* ----- STATS ROW ----- */
@@ -1626,7 +1630,7 @@ body {
 
     .level-display {
         flex-direction: row;
-        gap: 1rem;
+        gap: 1.5rem;           /* slightly less on mobile */
         padding: 0.8rem 1rem;
         margin-bottom: 0.784rem;
         border-radius: 17.64px;
@@ -1638,7 +1642,7 @@ body {
         font-size: 1.2rem;
     }
     .avatar-edit-btn {
-        width: 20px;   /* reduced proportionally */
+        width: 20px;
         height: 20px;
         font-size: 0.55rem;
     }
@@ -1652,7 +1656,7 @@ body {
     }
     .level-name {
         font-size: 1.2rem;
-        margin-left: calc(60px + 0.6rem); /* adjust for smaller shield */
+        margin-left: calc(60px + 0.6rem);
     }
     .xp-progress {
         width: 85%;
@@ -1663,6 +1667,8 @@ body {
     .xp-text {
         font-size: 0.65rem;
         min-width: 3rem;
+        font-weight: 700;
+        text-shadow: 0 0 6px rgba(62,123,255,0.3);
     }
 
     .stats-row {
@@ -1891,7 +1897,7 @@ body {
         font-size: 1.029rem;
     }
     .level-display {
-        gap: 0.6rem;
+        gap: 1rem;
         padding: 0.5rem 0.6rem;
         min-height: 80px;
     }
@@ -1926,6 +1932,8 @@ body {
     .xp-text {
         font-size: 0.55rem;
         min-width: 2.5rem;
+        font-weight: 700;
+        text-shadow: 0 0 4px rgba(62,123,255,0.2);
     }
     .challenges-3d-container {
         padding: 0.5rem 0.5rem 0.3rem;
