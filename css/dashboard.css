@@ -341,7 +341,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2.5rem;              /* increased gap to make it more visible */
+    gap: 2.5rem;
     margin-bottom: 2.058rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
@@ -403,7 +403,7 @@ body {
     justify-content: center;
 }
 
-/* ---- AVATAR EDIT BUTTON – reduced by 40% (was 42px, now 26px) ---- */
+/* ---- AVATAR EDIT BUTTON – reduced by 40% ---- */
 .avatar-edit-btn {
     position: absolute;
     bottom: 0px;
@@ -485,14 +485,13 @@ body {
     border-radius: 20px;
 }
 
-/* ---- LEVEL NAME and PROGRESS BAR – align with the label text ---- */
 .level-name {
     font-size: 1.5rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
     margin: 0.1rem 0 0.1rem;
-    margin-left: calc(78px + 0.6rem); /* shield width + gap */
+    margin-left: calc(78px + 0.6rem);
 }
 .level-star { font-size: 0.9rem; }
 
@@ -520,17 +519,16 @@ body {
     width: 0%;
 }
 
-/* ---- MAKE XP TEXT MORE VIVID AND VISIBLE ---- */
 .xp-text {
     font-size: 0.75rem;
-    font-weight: 700;           /* increased from 600 */
-    color: #FFFFFF;            /* brighter */
-    text-shadow: 0 0 8px rgba(62, 123, 255, 0.4); /* subtle glow */
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(62, 123, 255, 0.4);
     white-space: nowrap;
     min-width: 3.8rem;
     text-align: center;
-    padding-top: 2px;          /* ensure no clipping at top */
-    line-height: 1.2;          /* prevent overlap */
+    padding-top: 2px;
+    line-height: 1.2;
 }
 
 /* ----- STATS ROW ----- */
@@ -1281,44 +1279,59 @@ body {
     border-color: #FFD700;
 }
 
-/* ----- SETTINGS SECTION ----- */
+/* ============================================================
+   SETTINGS SECTION – overflow fixes for mobile (320px–768px)
+   ============================================================ */
 .settings-container {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1rem;               /* reduced from 1.2rem */
     margin-top: 1rem;
+    max-width: 100%;
+    overflow-x: hidden;      /* ensure no horizontal scroll */
 }
+
 .settings-item {
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border-radius: 16px;
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 0.8rem;   /* reduced padding */
     border: 1px solid rgba(255, 215, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: 0.5rem;             /* reduced gap */
+    flex-wrap: wrap;         /* allow wrapping on small screens */
+    max-width: 100%;
 }
+
 .settings-item label {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;      /* slightly smaller */
     color: #FFFFFF;
-    min-width: 80px;
+    min-width: 60px;         /* reduced from 80px */
+    flex-shrink: 0;
 }
+
 .settings-control {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    flex: 1;
+    gap: 0.5rem;
+    flex: 1 1 auto;          /* allow shrinking */
     justify-content: flex-end;
+    min-width: 0;            /* prevent overflow */
+    max-width: 100%;
 }
+
 .settings-control input[type="range"] {
     -webkit-appearance: none;
-    width: 120px;
+    width: 100%;             /* take full available space */
+    max-width: 120px;        /* but cap it */
     height: 4px;
     background: rgba(255,255,255,0.2);
     border-radius: 2px;
     outline: none;
     transition: background 0.2s;
+    flex-shrink: 1;          /* allow shrinking */
 }
 .settings-control input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -1337,17 +1350,22 @@ body {
     cursor: pointer;
     border: none;
 }
+
 #volumeValue {
     font-weight: 600;
     color: #FFD700;
-    min-width: 40px;
+    min-width: 32px;         /* reduced from 40px */
     text-align: center;
+    flex-shrink: 0;
+    font-size: 0.8rem;
 }
 
+/* Toggle switch – already 48px wide, okay */
 .toggle-switch {
     position: relative;
     width: 48px;
     height: 26px;
+    flex-shrink: 0;
 }
 .toggle-switch input {
     opacity: 0;
@@ -1383,19 +1401,23 @@ body {
     transform: translateX(22px);
 }
 
+/* Edit name control – fix input width */
 .settings-name-control {
-    gap: 0.5rem;
+    gap: 0.4rem;
+    flex-wrap: wrap;         /* allow wrap if needed */
+    justify-content: flex-end;
 }
 .settings-name-control input {
     background: rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 20px;
-    padding: 0.3rem 0.8rem;
+    padding: 0.25rem 0.6rem;
     color: #FFFFFF;
     font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    flex: 1;
-    min-width: 100px;
+    font-size: 0.8rem;       /* slightly smaller */
+    flex: 1 1 auto;          /* grow/shrink */
+    min-width: 70px;         /* reduced from 100px */
+    max-width: 100%;
     outline: none;
 }
 .settings-name-control input::placeholder {
@@ -1408,15 +1430,44 @@ body {
     background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
     border: none;
     border-radius: 20px;
-    padding: 0.3rem 1.2rem;
+    padding: 0.25rem 0.8rem;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;      /* slightly smaller */
     color: #FFFFFF;
     cursor: pointer;
     transition: opacity 0.2s;
+    flex-shrink: 0;
 }
 .settings-name-control button:hover {
     opacity: 0.8;
+}
+
+/* small screen tweaks */
+@media (max-width: 480px) {
+    .settings-item {
+        padding: 0.5rem 0.6rem;
+        gap: 0.3rem;
+    }
+    .settings-item label {
+        font-size: 0.75rem;
+        min-width: 50px;
+    }
+    .settings-control input[type="range"] {
+        max-width: 80px;
+    }
+    #volumeValue {
+        min-width: 28px;
+        font-size: 0.7rem;
+    }
+    .settings-name-control input {
+        min-width: 60px;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+    .settings-name-control button {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.6rem;
+    }
 }
 
 /* ----- BOTTOM NAV ----- */
@@ -1594,7 +1645,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS ----- */
+/* ----- MOBILE ADJUSTMENTS (for other parts, not settings – already handled above) ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -1630,7 +1681,7 @@ body {
 
     .level-display {
         flex-direction: row;
-        gap: 1.5rem;           /* slightly less on mobile */
+        gap: 1.5rem;
         padding: 0.8rem 1rem;
         margin-bottom: 0.784rem;
         border-radius: 17.64px;
@@ -1862,20 +1913,7 @@ body {
         font-size: 1rem;
     }
     .settings-item {
-        gap: 0.6rem;
-        padding: 0.8rem 0.9rem;
-    }
-    .settings-item label {
-        font-size: 0.9rem;
-        min-width: 75px;
-    }
-    .settings-name-control input {
-        font-size: 0.85rem;
-        min-width: 75px;
-    }
-    .settings-name-control button {
-        font-size: 0.8rem;
-        padding: 0.35rem 1rem;
+        /* already handled above; keep responsive */
     }
 }
 
