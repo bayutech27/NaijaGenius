@@ -406,6 +406,9 @@ onAuthStateChanged(auth, async (user) => {
     renderShop(coins);
     setupAdButton(userRef, updateHeaderUI);
 
+    // ===== SET UP AD COOLDOWN BUTTON =====
+    setupAdCooldownButton(userRef);
+
     // ===== ACTIVE CHALLENGE SPACE – left empty for AdMob banner =====
     if (activeChallengesContainer) {
       activeChallengesContainer.innerHTML = ""; // empty container for ad
@@ -541,6 +544,121 @@ onAuthStateChanged(auth, async (user) => {
 function updateHeaderUI(coins, lives) {
   if (headerCoinsValue) headerCoinsValue.textContent = coins;
   if (headerLivesValue) headerLivesValue.textContent = lives;
+}
+
+// ========== AD COOLDOWN LOGIC ==========
+const WATCH_AD_BTN = document.getElementById("watchAdBtn");
+const AD_COOLDOWN_KEY = "adCooldownUntil";
+const AD_COOLDOWN_MINUTES = 30;
+let cooldownInterval = null;
+
+function isAdOnCooldown() {
+  const until = localStorage.getItem(AD_COOLDOWN_KEY);
+  if (!until) return false;
+  const untilTime = parseInt(until, 10);
+  return Date.now() < untilTime;
+}
+
+function getAdCooldownRemaining() {
+  const until = localStorage.getItem(AD_COOLDOWN_KEY);
+  if (!until) return 0;
+  const untilTime = parseInt(until, 10);
+  const remaining = untilTime - Date.now();
+  return remaining > 0 ? remaining : 0;
+}
+
+function startAdCooldown() {
+  const until = Date.now() + AD_COOLDOWN_MINUTES * 60 * 1000;
+  localStorage.setItem(AD_COOLDOWN_KEY, until.toString());
+}
+
+function updateAdButtonState() {
+  if (!WATCH_AD_BTN) return;
+  if (isAdOnCooldown()) {
+    const remaining = getAdCooldownRemaining();
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    WATCH_AD_BTN.disabled = true;
+    WATCH_AD_BTN.innerHTML = `<i class="fas fa-clock"></i> ${minutes}m ${seconds}s until available`;
+    WATCH_AD_BTN.style.opacity = "0.6";
+  } else {
+    WATCH_AD_BTN.disabled = false;
+    WATCH_AD_BTN.innerHTML = `<i class="fas fa-video"></i> Watch Ad for +200 Coins`;
+    WATCH_AD_BTN.style.opacity = "1";
+  }
+}
+
+function startCooldownTimer() {
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  cooldownInterval = setInterval(() => {
+    updateAdButtonState();
+    // If cooldown ended, clear interval
+    if (!isAdOnCooldown()) {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+    }
+  }, 1000);
+}
+
+function setupAdCooldownButton(userRef) {
+  if (!WATCH_AD_BTN) return;
+
+  // Initial state
+  updateAdButtonState();
+  if (isAdOnCooldown()) {
+    startCooldownTimer();
+  }
+
+  // Remove any previous listeners (if any) by cloning and replacing? 
+  // We'll add a new listener with a flag to avoid duplicates.
+  // We'll remove existing listener by replacing the button with a clone.
+  // This ensures no conflict with the setupAdButton from shop.js
+  const newBtn = WATCH_AD_BTN.cloneNode(true);
+  WATCH_AD_BTN.parentNode.replaceChild(newBtn, WATCH_AD_BTN);
+  // Update reference
+  const btn = document.getElementById("watchAdBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isAdOnCooldown()) {
+      showToast("Please wait for the cooldown to finish.", "warning");
+      return;
+    }
+
+    // Simulate ad trigger
+    showToast("Playing ad...", "info");
+    // Simulate ad completion after 3 seconds
+    setTimeout(() => {
+      // Reward user with 200 coins
+      const userRefLocal = doc(db, "users", currentUserUid);
+      getDoc(userRefLocal)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const currentCoins = data.coins || 0;
+            const newCoins = currentCoins + 200;
+            return updateDoc(userRefLocal, { coins: newCoins }).then(() => {
+              updateHeaderUI(newCoins, data.lives ?? 2);
+              if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
+              showToast("You earned 200 coins! 🎉", "success");
+              // Start cooldown
+              startAdCooldown();
+              updateAdButtonState();
+              startCooldownTimer();
+            });
+          } else {
+            showToast("User data not found.", "error");
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to reward coins:", err);
+          showToast("Failed to reward coins. Please try again.", "error");
+        });
+    }, 3000); // simulate 3‑second ad
+  });
 }
 
 // ========== MODE BUTTON NAVIGATION ==========
