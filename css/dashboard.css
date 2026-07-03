@@ -340,10 +340,10 @@ body {
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
     border-radius: 21.56px;
-    padding: 1.2rem 1.5rem;   /* increased padding for height */
+    padding: 1.2rem 1.5rem;
     border: none;
     position: relative;
-    min-height: 120px;        /* ensure consistent height */
+    min-height: 120px;
 }
 .level-display::before {
     content: '';
@@ -370,7 +370,7 @@ body {
 }
 
 .user-avatar {
-    width: 90px;              /* increased from ~72px */
+    width: 90px;
     height: 90px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
@@ -396,37 +396,44 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+/* ---- ENLARGED AVATAR EDIT BUTTON (pen) ---- */
 .avatar-edit-btn {
     position: absolute;
     bottom: -2px;
     right: -2px;
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 34px;              /* increased from 28px */
+    height: 34px;             /* increased from 28px */
+    min-height: 34px;
     border-radius: 50%;
     background: #3E7BFF;
-    border: 2px solid #0A0A0F;
+    border: 2.5px solid #0A0A0F;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.9rem;        /* increased from 0.7rem */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+.avatar-edit-btn:hover {
+    transform: scale(1.1);
+    background: #2a5fd0;
 }
 
-/* Level container (right) – new layout */
+/* Level container (right) */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;      /* center horizontally */
+    align-items: center;
     justify-content: center;
     min-width: 0;
     text-align: center;
     gap: 0.25rem;
 }
 
-/* Top row: shield badge on left, label on right */
 .level-top-row {
     display: flex;
     align-items: center;
@@ -434,17 +441,18 @@ body {
     margin-bottom: 0.1rem;
 }
 
+/* ---- ENLARGED SHIELD BADGE ---- */
 .shield-badge {
     flex-shrink: 0;
-    width: 48px;              /* original larger size */
-    height: 54px;
+    width: 60px;              /* increased from 48px */
+    height: 68px;             /* increased from 54px */
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #FFD700;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.25);
+    border: 2.5px solid #FFD700;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 18px rgba(255,215,0,0.3);
 }
 .shield-badge .level-badge-img {
     width: 70%;
@@ -465,7 +473,7 @@ body {
 }
 
 .level-name {
-    font-size: 1.5rem;        /* increased */
+    font-size: 1.5rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
@@ -478,11 +486,11 @@ body {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    width: 75%;               /* short – does not span full container */
+    width: 75%;
     max-width: 260px;
     background: rgba(0,0,0,0.3);
     border-radius: 20px;
-    height: 10px;             /* slightly taller */
+    height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
     overflow: hidden;
@@ -1617,13 +1625,13 @@ body {
         font-size: 1rem;
     }
     .avatar-edit-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 0.5rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
     }
     .shield-badge {
-        width: 40px;
-        height: 46px;
+        width: 48px;
+        height: 54px;
     }
     .level-label {
         font-size: 0.7rem;
@@ -1878,13 +1886,13 @@ body {
         font-size: 0.8rem;
     }
     .avatar-edit-btn {
-        width: 18px;
-        height: 18px;
-        font-size: 0.4rem;
+        width: 22px;
+        height: 22px;
+        font-size: 0.6rem;
     }
     .shield-badge {
-        width: 32px;
-        height: 36px;
+        width: 38px;
+        height: 44px;
     }
     .level-label {
         font-size: 0.6rem;
