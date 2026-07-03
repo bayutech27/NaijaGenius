@@ -13,7 +13,7 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
-import { evaluateChallenge, showCongratulationsModal } from './challenge.js';
+import { evaluateChallenge, markChallengeCompletedLocal, applyReward, showCongratulationsModal } from './challenge.js';
 
 console.log('🎮 games.js loaded');
 
@@ -1432,35 +1432,16 @@ async function endRound() {
 
       console.log('🏆 CHALLENGE DEBUG: roundStats =', roundStats);
 
-      // Re-fetch user data to get the latest challenge state
-      const freshUserSnap = await getDoc(userRef);
-      const freshUserData = freshUserSnap.exists() ? freshUserSnap.data() : currentUserData;
-
-      // Log the current challenge from Firestore
-      const challengeData = freshUserData.challenge || { currentIndex: 0, completed: false };
-      console.log('🏆 CHALLENGE DEBUG: challengeData from Firestore =', challengeData);
-
-      const challengeResult = evaluateChallenge(roundStats, freshUserData);
+      const challengeResult = evaluateChallenge(roundStats);
       console.log('🏆 CHALLENGE DEBUG: evaluateChallenge result =', challengeResult);
 
-      if (challengeResult && challengeResult.completed) {
+      if (challengeResult) {
         try {
-          // Single atomic write: the reward and the completion flag land together
-          // or not at all. Previously these were two separate updateDoc calls
-          // (applyReward, then markChallengeCompleted) — if the second one failed
-          // after the first succeeded, a user would keep coins/lifelines while the
-          // challenge stayed marked incomplete, re-triggerable on a future round.
-          const challengeUpdate = {
-            'challenge.completed': true,
-            'challenge.completedAt': serverTimestamp()
-          };
-          if (challengeResult.rewardType === 'coins') {
-            challengeUpdate.coins = increment(challengeResult.rewardValue);
-          } else if (challengeResult.rewardType === 'lifeline') {
-            challengeUpdate[`lifeline.${challengeResult.rewardValue}`] = increment(1);
-          }
-          await updateDoc(userRef, challengeUpdate);
-          console.log('🏆 CHALLENGE DEBUG: Challenge completed and reward applied atomically.');
+          // Apply reward (Firestore)
+          await applyReward(currentUserUID, challengeResult.rewardType, challengeResult.rewardValue, db);
+          // Mark as completed locally
+          markChallengeCompletedLocal(challengeResult.rewardType, challengeResult.rewardValue);
+          console.log('🏆 CHALLENGE DEBUG: Challenge completed and reward applied (Firestore + localStorage).');
           // Show congratulations modal (after a short delay)
           setTimeout(() => {
             showCongratulationsModal(challengeResult.rewardType, challengeResult.rewardValue);
@@ -1470,7 +1451,7 @@ async function endRound() {
           showToast('Challenge reward could not be saved. Please contact support if this persists.', 'error', 8000);
         }
       } else {
-        console.log('🏆 CHALLENGE DEBUG: Challenge not completed or already completed.');
+        console.log('🏆 CHALLENGE DEBUG: Challenge not completed or already completed today.');
       }
 
     } catch (err) {
