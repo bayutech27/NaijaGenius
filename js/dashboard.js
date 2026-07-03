@@ -40,6 +40,19 @@ const avatarFileInput = document.getElementById("avatarFileInput");
 const userAvatarImg = document.getElementById("userAvatarImg");
 const userInitialsSpan = document.getElementById("userInitials");
 
+// ========== HEADER TOGGLE ==========
+const appHeader = document.querySelector(".app-header");
+
+function toggleHeaderVisibility(sectionId) {
+  if (!appHeader) return;
+  // Show header only when the home section is active
+  if (sectionId === "home" || sectionId === "homeSection") {
+    appHeader.classList.remove("hidden");
+  } else {
+    appHeader.classList.add("hidden");
+  }
+}
+
 // ========== LEVEL DEFINITIONS ==========
 const LEVELS = [
   { min: 0, max: 300, name: "Ajebutter", badge: "ajebutter.png" },
@@ -553,6 +566,7 @@ document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
   document.querySelectorAll(".nav-item, .sidebar-item").forEach((item) => {
     item.classList.remove("active");
   });
+  toggleHeaderVisibility("laneSection");
 });
 
 document.getElementById("laneBackBtn")?.addEventListener("click", () => {
@@ -566,6 +580,7 @@ document.getElementById("laneBackBtn")?.addEventListener("click", () => {
   document.querySelectorAll('[data-nav="home"]').forEach((item) => {
     item.classList.add("active");
   });
+  toggleHeaderVisibility("home");
 });
 
 document.querySelectorAll("#laneSection .lane-card").forEach((card) => {
@@ -590,6 +605,7 @@ function openSettings() {
   document.querySelectorAll(".nav-item, .sidebar-item").forEach((item) => {
     item.classList.remove("active");
   });
+  toggleHeaderVisibility("settingsSection");
 }
 
 function closeSettings() {
@@ -603,6 +619,7 @@ function closeSettings() {
   document.querySelectorAll('[data-nav="home"]').forEach((item) => {
     item.classList.add("active");
   });
+  toggleHeaderVisibility("home");
 }
 
 if (settingsBtn) {
@@ -628,8 +645,12 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
         item.classList.remove("active");
       });
       btn.classList.add("active");
+      toggleHeaderVisibility(target);
     }
   });
 });
+
+// Ensure header is visible on initial load (home is active by default)
+toggleHeaderVisibility("home");
 
 console.log("Dashboard initialized successfully.");
