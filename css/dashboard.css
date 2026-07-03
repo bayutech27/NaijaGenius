@@ -182,7 +182,7 @@ body {
 }
 .icon-btn:hover { color: #3E7BFF; }
 
-/* ----- MAIN LAYOUT ----- */
+/* ----- MAIN LAYOUT – smooth scrolling improvements ----- */
 .main-content {
     padding-top: 88px;
     padding-bottom: 96px;
@@ -192,6 +192,15 @@ body {
     padding-left: 1rem;
     padding-right: 1rem;
     overflow-x: hidden;
+    overflow-y: auto;               /* enable vertical scrolling */
+    -webkit-overflow-scrolling: touch; /* smooth momentum scrolling on iOS */
+    height: calc(100vh - 72px);     /* fill remaining viewport height */
+    scroll-behavior: smooth;        /* smooth scroll behavior */
+}
+
+/* Ensure the body still allows the fixed header and nav */
+body {
+    overflow-y: hidden;             /* prevent body scrolling, let main-content handle it */
 }
 
 /* ----- PAGE SECTIONS ----- */
@@ -360,7 +369,7 @@ body {
     opacity: 0.7;
 }
 
-/* Avatar container (left) – increased size by 20% */
+/* Avatar container (left) – further increased size */
 .avatar-container {
     display: flex;
     flex-direction: column;
@@ -370,8 +379,8 @@ body {
 }
 
 .user-avatar {
-    width: 108px;             /* 90 * 1.2 = 108 */
-    height: 108px;
+    width: 130px;             /* increased from 108px */
+    height: 130px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
     display: flex;
@@ -379,7 +388,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.5rem;        /* adjusted */
+    font-size: 1.8rem;        /* adjusted */
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -400,24 +409,24 @@ body {
 /* ---- PERFECT CIRCLE AVATAR EDIT BUTTON (pen) ---- */
 .avatar-edit-btn {
     position: absolute;
-    bottom: 0px;              /* adjusted to sit on the border */
+    bottom: 0px;
     right: 0px;
-    width: 36px;              /* kept proportional */
-    height: 36px;
-    min-height: 36px;
+    width: 42px;              /* scaled up */
+    height: 42px;
+    min-height: 42px;
     border-radius: 50%;       /* ensure perfect circle */
     background: #3E7BFF;
     border: 2.5px solid #0A0A0F;
     color: #fff;
-    font-size: 1rem;          /* slightly larger icon */
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     transition: transform 0.2s, background 0.2s;
-    padding: 0;               /* remove any extra padding */
-    line-height: 1;           /* ensure icon is centered */
+    padding: 0;
+    line-height: 1;
     text-align: center;
 }
 .avatar-edit-btn:hover {
@@ -425,8 +434,8 @@ body {
     background: #2a5fd0;
 }
 .avatar-edit-btn i {
-    margin: 0;                /* remove any default margin */
-    display: block;           /* block to avoid inline quirks */
+    margin: 0;
+    display: block;
 }
 
 /* Level container (right) */
@@ -448,11 +457,11 @@ body {
     margin-bottom: 0.1rem;
 }
 
-/* ---- ENLARGED SHIELD BADGE ---- */
+/* ---- SHIELD BADGE – increased by 30% ---- */
 .shield-badge {
     flex-shrink: 0;
-    width: 60px;
-    height: 68px;
+    width: 78px;              /* 60 * 1.3 */
+    height: 88px;             /* 68 * 1.3 */
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -488,14 +497,14 @@ body {
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- SHORT, ANIMATED PROGRESS BAR ----- */
+/* ----- SHORT, ANIMATED PROGRESS BAR – with two colors: blue for filled, white for empty ----- */
 .xp-progress {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     width: 75%;
     max-width: 260px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.25);  /* white with opacity for empty part */
     border-radius: 20px;
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
@@ -507,9 +516,7 @@ body {
     height: 100%;
     border-radius: 20px;
     transition: width 0.5s ease, background 0.3s;
-    background: linear-gradient(90deg, #3E7BFF, #FFD700);
-    background-size: 200% 100%;
-    background-position: 0% 0%;
+    background: #3E7BFF;                     /* solid blue for filled progress */
     box-shadow: 0 0 8px rgba(62, 123, 255, 0.3);
     width: 0%;
 }
@@ -1531,7 +1538,7 @@ body {
     .main-content { max-width: 800px; padding-bottom: 2rem; }
     .stats-row { gap: 1rem; }
     .level-display { padding: 1rem 1.5rem; }
-    .user-avatar { width: 108px; height: 108px; }
+    .user-avatar { width: 130px; height: 130px; }
     .level-name { font-size: 1.6rem; }
     .mode-grid { gap: 1.5rem; }
     .mode-btn { min-height: 250px; }
@@ -1589,6 +1596,7 @@ body {
     .main-content {
         padding-top: 72px;
         padding-bottom: 74px;
+        height: calc(100vh - 72px);
     }
 
     .greeting-wrapper {
@@ -1627,18 +1635,18 @@ body {
         min-height: 100px;
     }
     .user-avatar {
-        width: 80px;           /* proportional scaling */
-        height: 80px;
-        font-size: 1.1rem;
+        width: 90px;           /* proportional scaling */
+        height: 90px;
+        font-size: 1.2rem;
     }
     .avatar-edit-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
     }
     .shield-badge {
-        width: 48px;
-        height: 54px;
+        width: 60px;
+        height: 68px;
     }
     .level-label {
         font-size: 0.7rem;
@@ -1888,18 +1896,18 @@ body {
         min-height: 80px;
     }
     .user-avatar {
-        width: 64px;
-        height: 64px;
-        font-size: 0.9rem;
+        width: 72px;
+        height: 72px;
+        font-size: 1rem;
     }
     .avatar-edit-btn {
-        width: 24px;
-        height: 24px;
-        font-size: 0.65rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
     }
     .shield-badge {
-        width: 38px;
-        height: 44px;
+        width: 48px;
+        height: 54px;
     }
     .level-label {
         font-size: 0.6rem;
