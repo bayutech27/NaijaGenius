@@ -13,7 +13,6 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
-import { evaluateChallenge, markChallengeCompletedLocal, applyReward, showCongratulationsModal } from './challenge.js';
 
 console.log('🎮 games.js loaded');
 
@@ -65,11 +64,9 @@ let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
 let displayedCoins = 0;
 
-// Challenge tracking
-let lifelineUsed = null;             // 'fifty_fifty', 'ask_crowd', 'callFriend', 'both', 'all'
+// Lifeline usage tracking (kept for future use, but no challenge depends on it now)
+let lifelineUsed = null;
 let isCorrectAfterLifeline = false;
-let peakWinStreak = 0;        // highest consecutive-correct streak reached ANYWHERE in the round
-let peakComebackMagnitude = 0; // largest loss-streak overcome by a win, ANYWHERE in the round
 
 // Variables for delayed feedback (used only in non‑One‑Chance modes)
 let pendingSelectedLetter = null;
@@ -422,8 +419,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     roundCoins = 0;
     lifelineUsed = null;
     isCorrectAfterLifeline = false;
-    peakWinStreak = 0;
-    peakComebackMagnitude = 0;
     showCountdown(() => loadQuestion(0));
 
   } catch (err) {
@@ -479,8 +474,6 @@ async function loadMixedQuestions() {
   roundCoins = 0;
   lifelineUsed = null;
   isCorrectAfterLifeline = false;
-  peakWinStreak = 0;
-  peakComebackMagnitude = 0;
   showCountdown(() => loadQuestion(0));
 }
 
@@ -562,12 +555,6 @@ function loadQuestion(index) {
   lifelinesDisabled = false;
   oneChanceMissed = false;
   nextBtn.disabled  = true;
-
-  // NOTE: lifelineUsed / isCorrectAfterLifeline are intentionally NOT reset here.
-  // They are round-scoped (reset once per round in loadQuestionsFromJS/loadMixedQuestions/
-  // playAgainBtn), not per-question — several challenges ("Mixed Bag", "Lifeline Trio",
-  // "Lifeline Legend") explicitly describe lifeline usage "in one round" / "in a single round".
-  // Resetting this every question silently made those challenges unwinnable.
 
   nextBtn.innerHTML = (index === TOTAL_QUESTIONS - 1)
     ? '<i class="fas fa-flag-checkered"></i> Finish'
@@ -732,9 +719,6 @@ function handleStreakUpdate(isCorrect) {
       const previousLossCount = Math.abs(currentStreak);
       currentStreak   = 1;
       streakDirection = 'win';
-      if (previousLossCount > peakComebackMagnitude) {
-        peakComebackMagnitude = previousLossCount;
-      }
       if (previousLossCount >= 3) {
         commentText = onCorrectAfterStreak();
       }
@@ -748,9 +732,6 @@ function handleStreakUpdate(isCorrect) {
     } else {
       currentStreak   = 1;
       streakDirection = 'win';
-    }
-    if (currentStreak > peakWinStreak) {
-      peakWinStreak = currentStreak;
     }
   } else {
     if (streakDirection === 'win') {
@@ -965,23 +946,55 @@ function attachOptionListener() {
     // ── 4. Handle correct answer (immediate feedback) ──
     if (isCorrect) {
       applyCorrectStyle(btn);
-      const coinsEarned = (timeLeft <= 7) ? 10 : 15;
-      roundCoins += coinsEarned;
-      roundScore += pointsEarned;
-      correctCount += 1;
-      console.log(`✅ Correct! +${pointsEarned} pts, +${coinsEarned} coins`);
 
-      // Live-update the coins badge immediately (Firestore write happens in background at endRound)
-      displayedCoins += coinsEarned;
+      // ===== NEW STREAK-BASED COIN REWARD =====
+      // After incrementing streak via handleStreakUpdate, we compute reward based on streak.
+      // We need to call handleStreakUpdate first to update currentStreak, then determine reward.
+      // However handleStreakUpdate also triggers comment modals, which we want to keep.
+      // So we call it before computing reward, then use the updated currentStreak.
+      // But we need to capture the reward value after streak is updated.
+      // We'll compute reward based on currentStreak after handleStreakUpdate.
+      // We'll store a variable to add coins later.
+      
+      // First, handle streak update (which updates currentStreak and may show comment)
+      const comment = handleStreakUpdate(true);
+      if (comment) showCommentModal(comment);
+
+      // Now compute coin reward based on the updated streak
+      let streakReward = 0;
+      const streak = currentStreak;
+      if (streak >= 6) {
+        streakReward = 30;
+      } else if (streak >= 5) {
+        streakReward = 20;
+      } else if (streak >= 3) {
+        streakReward = 10;
+      } else if (streak >= 2) {
+        streakReward = 5;
+      }
+      // For streak 1 or less, no coin reward.
+      
+      // Add the reward to roundCoins and update displayed coins
+      roundCoins += streakReward;
+      displayedCoins += streakReward;
       if (gameCoinsValue) gameCoinsValue.textContent = displayedCoins.toLocaleString();
 
-      // If a lifeline was used and the answer is correct, mark it
+      // Log the reward
+      if (streakReward > 0) {
+        console.log(`💰 Streak ${streak} → +${streakReward} coins`);
+      } else {
+        console.log(`💡 Streak ${streak} → no coin reward (need 2+ streak)`);
+      }
+
+      // Round score (points) still based on timeLeft (existing logic)
+      roundScore += pointsEarned;
+      correctCount += 1;
+      console.log(`✅ Correct! +${pointsEarned} pts, +${streakReward} coins (streak ${streak})`);
+
+      // If a lifeline was used and the answer is correct, mark it (no challenge now, but keep)
       if (lifelineUsed) {
         isCorrectAfterLifeline = true;
       }
-
-      const comment = handleStreakUpdate(true);
-      if (comment) showCommentModal(comment);
 
       questionAnswered = true;
       lifelinesDisabled = true;
@@ -1054,12 +1067,11 @@ lifelineFifty?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Track lifeline usage for challenge
+  // Track lifeline usage (no challenge, but keep for future)
   if (lifelineUsed === null) lifelineUsed = 'fifty_fifty';
   else if (lifelineUsed === 'ask_crowd') lifelineUsed = 'both';
   else if (lifelineUsed === 'callFriend') lifelineUsed = 'both';
   else if (lifelineUsed === 'both') lifelineUsed = 'all';
-  // else remains 'all' or whatever
 
   if (lifelineCounts.fifty_fifty <= 0) return;
   lifelineCounts.fifty_fifty--;
@@ -1330,7 +1342,7 @@ async function endRound() {
 
   showRoundEndModal(false);
 
-  // --- Background Firestore saves + challenge check ---
+  // --- Background Firestore saves ---
   (async () => {
     try {
       let previousBest = 0;
@@ -1394,64 +1406,6 @@ async function endRound() {
           }
           setTimeout(() => showFireworks(), 300);
         }
-      }
-
-      // ========== CHALLENGE EVALUATION ==========
-      // currentStreak/streakDirection here use PEAK values reached during the round,
-      // not the live value at round-end — the live value only reflects how the LAST
-      // question went, which silently broke every streak-based challenge (you could
-      // hit a 5-streak on questions 1-5, miss question 9, and the challenge would
-      // never fire because streakDirection had flipped to 'loss' by round end).
-      const roundStats = {
-        correctCount,
-        wrongCount: Math.max(0, (currentQuestionIndex + 1) - correctCount),
-        currentStreak: peakWinStreak,
-        streakDirection: peakWinStreak > 0 ? 'win' : streakDirection,
-        previousStreak: peakComebackMagnitude > 0 ? -peakComebackMagnitude : 0,
-        lifelinesUsed: lifelineUsed !== null ? (lifelineUsed === 'both' || lifelineUsed === 'all' ? 2 : 1) : 0,
-        lifelineUsed: lifelineUsed,
-        isCorrectAfterLifeline,
-        lastAnswerTimeLeft: timeLeft,
-        totalQuestions: TOTAL_QUESTIONS,
-        finalTimer: timeLeft,
-        // ---- NOT REAL — hardcoded placeholders, never instrumented ----
-        // These make challenge IDs 8, 10, 20, 24, 30, 37, 40, 47 either
-        // permanently impossible (fastAnswersCount/slowAnswersCount/
-        // firstThreeCorrect/firstFiveCorrect always false) or trivially
-        // always-true (fastestAnswer/averageTime/totalTime always beat
-        // any threshold since they're stuck at 0). Fixing this requires
-        // per-question timestamp tracking, which this pass does not add.
-        fastestAnswer: 0,
-        totalTime: 0,
-        firstThreeCorrect: false,
-        firstFiveCorrect: false,
-        fastAnswersCount: 0,
-        slowAnswersCount: 0,
-        averageTime: 0,
-      };
-
-      console.log('🏆 CHALLENGE DEBUG: roundStats =', roundStats);
-
-      const challengeResult = evaluateChallenge(roundStats);
-      console.log('🏆 CHALLENGE DEBUG: evaluateChallenge result =', challengeResult);
-
-      if (challengeResult) {
-        try {
-          // Apply reward (Firestore)
-          await applyReward(currentUserUID, challengeResult.rewardType, challengeResult.rewardValue, db);
-          // Mark as completed locally
-          markChallengeCompletedLocal(challengeResult.rewardType, challengeResult.rewardValue);
-          console.log('🏆 CHALLENGE DEBUG: Challenge completed and reward applied (Firestore + localStorage).');
-          // Show congratulations modal (after a short delay)
-          setTimeout(() => {
-            showCongratulationsModal(challengeResult.rewardType, challengeResult.rewardValue);
-          }, 600);
-        } catch (err) {
-          console.error('Failed to apply challenge reward:', err);
-          showToast('Challenge reward could not be saved. Please contact support if this persists.', 'error', 8000);
-        }
-      } else {
-        console.log('🏆 CHALLENGE DEBUG: Challenge not completed or already completed today.');
       }
 
     } catch (err) {
@@ -1855,8 +1809,6 @@ function showRoundEndModal(newBest = false) {
     roundCoins           = 0;
     lifelineUsed         = null;
     isCorrectAfterLifeline = false;
-    peakWinStreak         = 0;
-    peakComebackMagnitude = 0;
 
     const urlParams       = new URLSearchParams(window.location.search);
     const exportNameParam = urlParams.get('export');
