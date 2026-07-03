@@ -223,7 +223,12 @@ body {
 }
 
 /* ============================================================
-   HOME PAGE – increased heights by 40% and adjusted spacing
+   HOME PAGE – increased heights by 40% (all containers & items)
+   with additional adjustments per user request:
+   - reduced gap between avatar and level info to 80% of 6.72rem
+   - reduced padding in .level-display
+   - reduced progress bar length
+   - increased margin-top of .mode-section to 2rem
    ============================================================ */
 
 /* ----- GREETING ----- */
@@ -231,26 +236,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.2rem;
+    gap: 1.05rem;
+    margin-bottom: 1.68rem;
 }
 .greeting-copy { flex: 1; min-width: 0; }
 .greeting-text {
-    font-size: 1.1rem;   /* increased from 0.9rem */
+    font-size: 1.54rem;
     font-weight: 500;
     color: #D7DCEC;
     line-height: 1.2;
 }
 .greeting-text span#greetingName {
     display: inline;
-    font-size: 2.2rem;   /* increased from 1.8rem */
+    font-size: 3.08rem;
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.02em;
     margin-left: 0.2rem;
 }
 .greeting-sub {
-    font-size: 0.95rem;  /* increased from 0.8rem */
+    font-size: 1.33rem;
     font-weight: 400;
     color: #8C97B8;
     margin-top: 0.2rem;
@@ -258,8 +263,8 @@ body {
 
 .hero-logo-wrap {
     flex-shrink: 0;
-    width: 130px;        /* increased from 110px */
-    height: 130px;
+    width: 182px;
+    height: 182px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -283,20 +288,20 @@ body {
     position: absolute;
     top: -4px;
     left: 4px;
-    font-size: 1.8rem;   /* increased */
+    font-size: 2.52rem;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 .hero-bulb {
     position: absolute;
     top: -10px;
     right: 0;
-    font-size: 2.4rem;   /* increased */
+    font-size: 3.36rem;
     filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
 }
 .hero-logo-text {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: 1.6rem;   /* increased from 1.35rem */
+    font-size: 2.24rem;
     line-height: 1.05;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     letter-spacing: -0.02em;
@@ -320,7 +325,7 @@ body {
 }
 .sparkle {
     position: absolute;
-    font-size: 1.4rem;   /* increased */
+    font-size: 1.96rem;
     animation: sparkleFloat 3s ease-in-out infinite;
 }
 .sparkle-1 { top: -10%; left: -10%; animation-delay: 0s; }
@@ -336,16 +341,16 @@ body {
     100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
 }
 
-/* ----- LEVEL DISPLAY (avatar + level side‑by‑by) — gap increased by 100% (4.8rem) ----- */
+/* ----- LEVEL DISPLAY – updated per user request ----- */
 .level-display {
     display: flex;
     align-items: center;
-    gap: 4.8rem;          /* was 2.4rem → +100% */
-    margin-bottom: 2.1rem; /* increased from 1.5rem */
+    gap: 5.376rem;          /* 80% of 6.72rem */
+    margin-bottom: 2.94rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
-    border-radius: 22px;
-    padding: 1.2rem 1.4rem; /* increased from 0.9rem 1rem */
+    border-radius: 30.8px;
+    padding: 1.2rem 1.4rem;  /* reduced from 1.68rem 1.96rem */
     border: none;
     position: relative;
 }
@@ -353,7 +358,7 @@ body {
     content: '';
     position: absolute;
     inset: -2px;
-    border-radius: 22px;
+    border-radius: 30.8px;
     padding: 2px;
     background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -369,8 +374,8 @@ body {
     flex-shrink: 0;
 }
 .user-avatar {
-    width: 74px;
-    height: 74px;
+    width: 103.6px;
+    height: 103.6px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
     display: flex;
@@ -378,7 +383,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.54rem;
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -399,14 +404,14 @@ body {
     position: absolute;
     bottom: -2px;
     right: -2px;
-    width: 24px;
-    height: 24px;
-    min-height: 24px;
+    width: 33.6px;
+    height: 33.6px;
+    min-height: 33.6px;
     border-radius: 50%;
     background: #3E7BFF;
     border: 2px solid #0A0A0F;
     color: #fff;
-    font-size: 0.6rem;
+    font-size: 0.84rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -417,15 +422,15 @@ body {
 .level-info-container {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1.12rem;
     flex: 1;
     min-width: 0;
 }
 
 .shield-badge {
     flex-shrink: 0;
-    width: 50px;
-    height: 56px;
+    width: 70px;
+    height: 78.4px;
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -445,12 +450,12 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;          /* increased from 0.5rem */
+    gap: 0.84rem;
     min-width: 0;
 }
 .level-label {
     align-self: flex-start;
-    font-size: 0.7rem;     /* increased from 0.55rem */
+    font-size: 0.98rem;
     font-weight: 600;
     text-transform: uppercase;
     color: #C9B6FF;
@@ -459,37 +464,38 @@ body {
     border: 1px solid rgba(124, 79, 224, 0.4);
     padding: 0.1rem 0.6rem;
     border-radius: 20px;
-    margin-bottom: 0.05rem;  /* reduced to move it upward */
+    margin-bottom: 0.05rem;
 }
 .level-name {
-    font-size: 1.3rem;     /* increased from 1.1rem */
+    font-size: 1.82rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.15;
 }
 .level-star { font-size: 0.9rem; }
 
-/* XP progress – pushed down by increasing its margin-top */
+/* XP progress – reduced length (width 80%) */
 .xp-progress {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    width: 100%;
+    gap: 0.7rem;
+    width: 80%;              /* reduced from 100% */
+    max-width: 400px;        /* optional cap */
     background: rgba(0,0,0,0.3);
-    border-radius: 6px;
-    height: 7px;          /* increased from 6px */
+    border-radius: 8.4px;
+    height: 9.8px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-    margin-top: 0.2rem;    /* added to push progress bar lower */
+    margin-top: 0.2rem;
 }
 .xp-bar {
-    height: 7px;          /* increased from 6px */
+    height: 9.8px;
     background: linear-gradient(90deg, #7C4FE0, #3E7BFF);
-    border-radius: 6px;
+    border-radius: 8.4px;
     transition: width 0.3s ease;
     box-shadow: 0 0 8px rgba(124, 79, 224, 0.5);
 }
 .xp-text {
-    font-size: 0.8rem;     /* increased from 0.7rem */
+    font-size: 1.12rem;
     font-weight: 600;
     color: #E4E8F5;
     white-space: nowrap;
@@ -500,22 +506,19 @@ body {
     display: flex;
     align-items: stretch;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border-radius: 18px;
-    padding: 0.8rem 1.4rem; /* increased from 0.6rem 1rem */
-    margin-bottom: 1.7rem;  /* increased from 1.2rem */
+    border-radius: 25.2px;
+    padding: 1.12rem 1.96rem;
+    margin-bottom: 2.38rem;
     width: 100%;
 }
-/* ---- Removed stats divider ---- */
-.stats-divider {
-    display: none;
-}
+.stats-divider { display: none; }
 .stat-card {
     background: transparent;
     border-radius: 0;
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 0.7rem;          /* increased from 0.5rem */
+    gap: 0.98rem;
     opacity: 0;
     animation: fadeUp 0.4s ease-out forwards;
     width: auto;
@@ -523,11 +526,11 @@ body {
     min-width: 0;
 }
 .stat-icon {
-    font-size: 1.1rem;     /* increased from 0.9rem */
+    font-size: 1.54rem;
     color: #fff;
     flex-shrink: 0;
-    width: 34px;          /* increased from 30px */
-    height: 34px;
+    width: 47.6px;
+    height: 47.6px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -545,47 +548,43 @@ body {
     flex: 1;
 }
 .stat-label {
-    font-size: 0.75rem;    /* increased from 0.65rem */
+    font-size: 1.05rem;
     font-weight: 600;
     color: #C9D3EE;
     order: -1;
 }
 .stat-value {
-    font-size: 1.3rem;     /* increased from 1.1rem */
+    font-size: 1.82rem;
     font-weight: 700;
     color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 .stat-caption {
-    font-size: 0.65rem;    /* increased from 0.55rem */
+    font-size: 0.91rem;
     font-weight: 400;
     color: #9AA5C7;
 }
 
 /* ----- ACTIVE CHALLENGE (now empty for AdMob) ----- */
 .challenge-section {
-    margin: 0 0 1.7rem 0;  /* increased margin */
-    min-height: 60px;      /* reserve space for ad */
+    margin: 0 0 2.38rem 0;
+    min-height: 84px;
 }
-.challenge-section > .section-title {
-    display: none;         /* hide the title */
-}
-.challenge-card-large {
-    display: none;         /* fully removed */
-}
+.challenge-section > .section-title { display: none; }
+.challenge-card-large { display: none; }
 
-/* ----- CHOOSE A MODE ----- */
+/* ----- CHOOSE A MODE – moved down 2rem ----- */
 .mode-section {
-    margin-top: 0.5rem;
+    margin-top: 2rem;          /* increased from 0.7rem */
 }
 .mode-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1.1rem;
-    font-size: 0.75rem;
+    gap: 0.7rem;
+    margin-bottom: 1.54rem;
+    font-size: 1.05rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -593,11 +592,11 @@ body {
 }
 .mode-title i.fa-crown {
     color: #FFD700;
-    font-size: 0.85rem;
+    font-size: 1.19rem;
 }
 .title-line {
     flex: 1;
-    max-width: 60px;
+    max-width: 84px;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201, 182, 255, 0.5), transparent);
 }
@@ -605,25 +604,25 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: stretch;
-    gap: 0.7rem;
+    gap: 0.98rem;
     width: 100%;
     perspective: 900px;
 }
 .mode-btn {
     border: none;
-    border-radius: 20px;
-    padding: 1.12rem 0.42rem; /* increased from 0.8rem 0.3rem */
+    border-radius: 28px;
+    padding: 1.568rem 0.588rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 0.2rem;
+    gap: 0.28rem;
     width: 100%;
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.2s ease;
     text-decoration: none;
     color: #FFFFFF;
-    min-height: 224px;      /* increased from 160px */
+    min-height: 313.6px;
     position: relative;
     overflow: hidden;
 }
@@ -659,7 +658,7 @@ body {
     border-radius: 0;
 }
 .mode-icon {
-    font-size: 3.5rem;      /* increased from 2.6rem */
+    font-size: 4.9rem;
     color: rgba(255,255,255,0.92);
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
 }
@@ -682,33 +681,24 @@ body {
 }
 .mode-name {
     font-weight: 800;
-    font-size: 1.1rem;      /* increased from 0.9rem */
+    font-size: 1.54rem;
     color: #FFFFFF;
     letter-spacing: -0.01em;
     line-height: 1.15;
     text-align: center;
     text-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
-/* Shift "One Chance" text slightly left on screens > 320px */
-@media (min-width: 321px) {
-    .mode-btn-green .mode-name {
-        margin-left: -0.2rem;
-    }
-}
 .mode-questions {
     width: 100%;
     text-align: center;
-    font-size: 0.75rem;     /* increased from 0.7rem */
+    font-size: 1.05rem;
     color: #FFFFFF;
     font-weight: 700;
     background: transparent;
     padding: 0.2rem 0.3rem 0;
 }
-.mode-arrow {
-    display: none;
-}
+.mode-arrow { display: none; }
 
-/* Disabled mode buttons (when lives = 0) */
 .mode-btn:disabled {
     cursor: not-allowed;
     filter: grayscale(0.5);
@@ -716,7 +706,7 @@ body {
     pointer-events: none;
 }
 
-/* Adjusted perspective for smaller screens to keep text readable */
+/* Adjusted perspective for smaller screens */
 @media (max-width: 420px) {
     .mode-btn-red { transform: perspective(700px) rotateY(12deg); }
     .mode-btn-red:hover { transform: perspective(700px) rotateY(12deg) translateY(-4px); }
@@ -1353,33 +1343,15 @@ body {
     .level-display { padding: 1rem 1.5rem; }
     .user-avatar { width: 90px; height: 90px; }
     .level-name { font-size: 1.6rem; }
-    .mode-grid {
-        gap: 1.5rem;
-    }
-    .mode-btn {
-        min-height: 200px;
-    }
-    .mode-name {
-        font-size: 1.2rem;
-    }
-    .mode-questions {
-        font-size: 0.8rem;
-    }
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    .lane-grid {
-        gap: 1rem;
-    }
-    .lane-card {
-        padding: 1.2rem 0.6rem;
-    }
-    .lane-name {
-        font-size: 1rem;
-    }
-    .lane-desc {
-        font-size: 0.75rem;
-    }
+    .mode-grid { gap: 1.5rem; }
+    .mode-btn { min-height: 200px; }
+    .mode-name { font-size: 1.2rem; }
+    .mode-questions { font-size: 0.8rem; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .lane-grid { gap: 1rem; }
+    .lane-card { padding: 1.2rem 0.6rem; }
+    .lane-name { font-size: 1rem; }
+    .lane-desc { font-size: 0.75rem; }
 }
 
 /* ----- TOAST ----- */
@@ -1415,7 +1387,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS – already increased heights; keep them but ensure consistency ----- */
+/* ----- MOBILE ADJUSTMENTS – home items scaled by 40% and updated accordingly ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -1424,142 +1396,143 @@ body {
 
     /* ---- GREETING ---- */
     .greeting-wrapper {
-        margin-bottom: 0.8rem;
-        gap: 0.5rem;
+        margin-bottom: 1.12rem;
+        gap: 0.7rem;
     }
     .greeting-text {
-        font-size: 0.9rem;
+        font-size: 1.26rem;
     }
     .greeting-text span#greetingName {
-        font-size: 1.8rem;
+        font-size: 2.52rem;
         margin-left: 0.15rem;
     }
     .greeting-sub {
-        font-size: 0.8rem;
+        font-size: 1.12rem;
         margin-top: 0.1rem;
     }
     .hero-logo-wrap {
-        width: 95px;
-        height: 95px;
+        width: 133px;
+        height: 133px;
     }
     .hero-logo-text {
-        font-size: 1.25rem;
+        font-size: 1.75rem;
     }
-    .hero-flag { font-size: 1.5rem; }
-    .hero-bulb { font-size: 1.8rem; }
-    .sparkle { font-size: 1.1rem; }
+    .hero-flag { font-size: 2.1rem; }
+    .hero-bulb { font-size: 2.52rem; }
+    .sparkle { font-size: 1.54rem; }
 
     /* ---- LEVEL DISPLAY ---- */
     .level-display {
-        gap: 1.5rem;        /* reduced on mobile to avoid overflow */
-        padding: 0.8rem 1rem;
-        margin-bottom: 0.8rem;
-        border-radius: 18px;
+        gap: 2.1rem;               /* reduced for mobile */
+        padding: 1rem 1.1rem;       /* reduced padding */
+        margin-bottom: 1.12rem;
+        border-radius: 25.2px;
     }
     .user-avatar {
-        width: 68px;
-        height: 68px;
-        font-size: 1rem;
+        width: 95.2px;
+        height: 95.2px;
+        font-size: 1.4rem;
         border-width: 2px;
     }
     .avatar-edit-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 0.55rem;
+        width: 30.8px;
+        height: 30.8px;
+        font-size: 0.77rem;
     }
     .shield-badge {
-        width: 48px;
-        height: 52px;
+        width: 67.2px;
+        height: 72.8px;
     }
     .shield-badge .level-badge-img {
         width: 65%;
         height: 65%;
     }
     .level-info {
-        gap: 0.3rem;
+        gap: 0.42rem;
     }
     .level-label {
-        font-size: 0.6rem;
+        font-size: 0.84rem;
         padding: 0.15rem 0.6rem;
         margin-bottom: 0.1rem;
     }
     .level-name {
-        font-size: 1.1rem;
+        font-size: 1.54rem;
     }
     .level-star { font-size: 0.85rem; }
     .xp-progress {
-        height: 6px;
-        gap: 0.4rem;
+        height: 8.4px;
+        gap: 0.56rem;
+        width: 80%;              /* keep reduced width on mobile */
     }
     .xp-bar {
-        height: 6px;
+        height: 8.4px;
     }
     .xp-text {
-        font-size: 0.7rem;
+        font-size: 0.98rem;
     }
 
     /* ---- STATS ROW ---- */
     .stats-row {
-        padding: 0.6rem 0.9rem;
-        margin-bottom: 0.7rem;
-        border-radius: 16px;
+        padding: 0.84rem 1.26rem;
+        margin-bottom: 0.98rem;
+        border-radius: 22.4px;
     }
     .stat-card {
-        gap: 0.5rem;
+        gap: 0.7rem;
     }
     .stat-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
+        width: 44.8px;
+        height: 44.8px;
+        font-size: 1.19rem;
     }
     .stat-value {
-        font-size: 1.1rem;
+        font-size: 1.54rem;
     }
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.98rem;
     }
     .stat-caption {
-        font-size: 0.6rem;
+        font-size: 0.84rem;
     }
 
     /* ---- ACTIVE CHALLENGE (empty) ---- */
     .challenge-section {
-        margin-bottom: 0.7rem;
-        min-height: 40px;
+        margin-bottom: 0.98rem;
+        min-height: 56px;
     }
 
     /* ---- MODE SECTION ---- */
     .mode-section {
-        margin-top: 0.3rem;
+        margin-top: 1.5rem;          /* reduced from 2rem on mobile but still moved down */
     }
     .mode-title {
-        margin-bottom: 0.6rem;
-        font-size: 0.7rem;
-        gap: 0.4rem;
+        margin-bottom: 0.84rem;
+        font-size: 0.98rem;
+        gap: 0.56rem;
     }
     .mode-title i.fa-crown {
-        font-size: 0.8rem;
+        font-size: 1.12rem;
     }
     .title-line {
-        max-width: 40px;
+        max-width: 56px;
     }
     .mode-grid {
-        gap: 0.5rem;
+        gap: 0.7rem;
     }
     .mode-btn {
-        padding: 0.6rem 0.25rem;
-        min-height: 135px;
-        border-radius: 16px;
-        gap: 0.2rem;
+        padding: 0.84rem 0.35rem;
+        min-height: 189px;
+        border-radius: 22.4px;
+        gap: 0.28rem;
     }
     .mode-icon {
-        font-size: 2.3rem;
+        font-size: 3.22rem;
     }
     .mode-name {
-        font-size: 0.9rem;
+        font-size: 1.26rem;
     }
     .mode-questions {
-        font-size: 0.6rem;
+        font-size: 0.84rem;
         padding: 0.15rem 0.25rem;
     }
     .mode-btn-red { transform: perspective(700px) rotateY(14deg); }
@@ -1570,7 +1543,7 @@ body {
         margin-left: -0.18rem;
     }
 
-    /* ---- Other tabs ---- */
+    /* ---- Other tabs (unchanged) ---- */
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 0.7rem;
@@ -1679,63 +1652,63 @@ body {
 
 @media (max-width: 380px) {
     .greeting-text {
-        font-size: 0.75rem;
-    }
-    .greeting-text span#greetingName {
-        font-size: 1.4rem;
-    }
-    .greeting-sub {
-        font-size: 0.65rem;
-    }
-    .hero-logo-wrap {
-        width: 80px;
-        height: 80px;
-    }
-    .hero-logo-text {
         font-size: 1.05rem;
     }
+    .greeting-text span#greetingName {
+        font-size: 1.96rem;
+    }
+    .greeting-sub {
+        font-size: 0.91rem;
+    }
+    .hero-logo-wrap {
+        width: 112px;
+        height: 112px;
+    }
+    .hero-logo-text {
+        font-size: 1.47rem;
+    }
     .level-display {
-        gap: 1.1rem;
-        padding: 0.55rem 0.7rem;
+        gap: 1.54rem;
+        padding: 0.77rem 0.9rem;
     }
     .user-avatar {
-        width: 56px;
-        height: 56px;
-        font-size: 0.85rem;
+        width: 78.4px;
+        height: 78.4px;
+        font-size: 1.19rem;
     }
     .shield-badge {
-        width: 40px;
-        height: 44px;
+        width: 56px;
+        height: 61.6px;
     }
     .level-name {
-        font-size: 0.9rem;
+        font-size: 1.26rem;
     }
     .xp-text {
-        font-size: 0.6rem;
+        font-size: 0.84rem;
     }
     .stat-value {
-        font-size: 0.9rem;
+        font-size: 1.26rem;
     }
     .stat-icon {
-        width: 26px;
-        height: 26px;
-        font-size: 0.7rem;
+        width: 36.4px;
+        height: 36.4px;
+        font-size: 0.98rem;
     }
     .challenge-section {
-        min-height: 30px;
+        min-height: 42px;
     }
     .mode-btn {
-        min-height: 115px;
-        padding: 0.45rem 0.15rem;
+        min-height: 161px;
+        padding: 0.63rem 0.21rem;
     }
     .mode-icon {
-        font-size: 1.9rem;
+        font-size: 2.66rem;
     }
     .mode-name {
-        font-size: 0.75rem;
+        font-size: 1.05rem;
     }
     .mode-questions {
-        font-size: 0.55rem;
+        font-size: 0.77rem;
     }
     .mode-btn-red { transform: perspective(500px) rotateY(8deg); }
     .mode-btn-green { transform: perspective(500px) rotateY(-8deg); }
