@@ -3,7 +3,6 @@ import { auth, db } from "/js/firebase.config.js";
 import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from './shop.js';
-import { getTodaysChallenge, isChallengeCompletedToday } from './challenge.js';
 
 // ========== DOM ELEMENTS (Home page) ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
@@ -25,14 +24,6 @@ const bestScoreStats = document.getElementById("bestScoreStats");
 const livesStats = document.getElementById("livesStats");
 const coinsStats = document.getElementById("coinsStats");
 const levelStats = document.getElementById("levelStats");
-
-// ----- Challenge card elements -----
-const challengeTitle = document.getElementById("challengeTitle");
-const challengeDesc = document.getElementById("challengeDesc");
-const challengeProgressBar = document.getElementById("challengeProgressBar");
-const challengeProgressText = document.getElementById("challengeProgressText");
-const challengeRewardAmount = document.querySelector(".challenge-reward-amount");
-const challengeRewardIcon = document.querySelector(".challenge-reward i");
 
 // ----- Avatar elements -----
 const userAvatarBtn = document.getElementById("userAvatarBtn");
@@ -247,10 +238,10 @@ onAuthStateChanged(auth, async (user) => {
         renderShop(coins);
         setupAdButton(userRef, updateHeaderUI);
 
-        // ===== CHALLENGE (Model 2) =====
-        const challenge = getTodaysChallenge();
-        const isCompleted = isChallengeCompletedToday();
-        displayActiveChallenge(challenge, isCompleted);
+        // ===== ACTIVE CHALLENGE SPACE – left empty for AdMob banner =====
+        if (activeChallengesContainer) {
+            activeChallengesContainer.innerHTML = ''; // empty container for ad
+        }
 
         // ===== REAL‑TIME UPDATES =====
         onSnapshot(userRef, (docSnap) => {
@@ -297,8 +288,6 @@ onAuthStateChanged(auth, async (user) => {
                     const currentGreeting = getGreeting();
                     greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
                 }
-
-                // Challenge display is unaffected by Firestore changes – stays local.
             }
         });
 
@@ -382,56 +371,6 @@ function updateHeaderUI(coins, lives) {
     if (headerLivesValue) headerLivesValue.textContent = lives;
 }
 
-// ========== DISPLAY ACTIVE CHALLENGE ==========
-function displayActiveChallenge(challenge, isCompleted) {
-    if (!challenge) {
-        if (challengeTitle) challengeTitle.textContent = "No Active Challenge";
-        if (challengeDesc) challengeDesc.textContent = "Complete a round to unlock your first challenge!";
-        if (challengeProgressBar) challengeProgressBar.style.width = "0%";
-        if (challengeProgressText) challengeProgressText.textContent = "0 / 0 Questions";
-        return;
-    }
-
-    if (challengeTitle) challengeTitle.textContent = challenge.title || "Daily Challenge";
-    if (challengeDesc) {
-        challengeDesc.textContent = challenge.description || "Answer questions and earn rewards!";
-    }
-
-    if (challengeRewardIcon) {
-        if (challenge.rewardType === 'coins') {
-            challengeRewardIcon.className = 'fas fa-coins';
-            challengeRewardIcon.style.color = '#FFD700';
-        } else {
-            const icons = {
-                fifty_fifty: 'fa-percent',
-                ask_crowd: 'fa-users',
-                callFriend: 'fa-phone'
-            };
-            challengeRewardIcon.className = `fas ${icons[challenge.rewardValue] || 'fa-gift'}`;
-            challengeRewardIcon.style.color = '#9B6BFF';
-        }
-    }
-    if (challengeRewardAmount) {
-        if (challenge.rewardType === 'coins') {
-            challengeRewardAmount.textContent = challenge.rewardValue;
-        } else {
-            const labels = {
-                fifty_fifty: '50:50',
-                ask_crowd: 'Crowd',
-                callFriend: 'Call'
-            };
-            challengeRewardAmount.textContent = `+1 ${labels[challenge.rewardValue] || 'Lifeline'}`;
-        }
-    }
-
-    if (isCompleted) {
-        if (challengeProgressBar) challengeProgressBar.style.width = "100%";
-        if (challengeProgressText) challengeProgressText.textContent = "Completed!";
-    } else {
-        if (challengeProgressText) challengeProgressText.textContent = "Incomplete";
-    }
-}
-
 // ========== MODE BUTTON NAVIGATION ==========
 document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
     window.location.href = "games.html";
@@ -446,8 +385,7 @@ document.getElementById("oneChanceBtnPlay")?.addEventListener("click", () => {
     window.location.href = "games.html?type=one_chance";
 });
 
-// ========== PICK YOUR LANE (merged tab — no longer a separate page) ==========
-// Opens the in-page laneSection tab instead of redirecting to pick-your-lane.html
+// ========== PICK YOUR LANE (merged tab) ==========
 document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
     document.querySelectorAll(".page-section").forEach(section => {
         section.classList.remove("active-section");
@@ -458,7 +396,6 @@ document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
     });
 });
 
-// Back button inside the lane tab returns to Home and restores the Home nav state
 document.getElementById("laneBackBtn")?.addEventListener("click", () => {
     document.querySelectorAll(".page-section").forEach(section => {
         section.classList.remove("active-section");
@@ -472,7 +409,6 @@ document.getElementById("laneBackBtn")?.addEventListener("click", () => {
     });
 });
 
-// Category card clicks — same destination as before (games.html), no redirect page in between
 document.querySelectorAll('#laneSection .lane-card').forEach(card => {
     card.addEventListener('click', () => {
         const category = card.dataset.category;
