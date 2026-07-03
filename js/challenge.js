@@ -1,4 +1,5 @@
-// challenge.js – Fully front-end challenge system (Model 5)
+// challenge.js – Daily Seed-Based Challenges (Model 2)
+// Fully front-end; completion stored in localStorage.
 
 // ========== CHALLENGE DEFINITIONS ==========
 export const CHALLENGES = [
@@ -432,17 +433,17 @@ export const CHALLENGES = [
 // ========== CORE FRONT‑END FUNCTIONS ==========
 
 /**
- * Get today's active challenge based on date seed.
+ * Get today's active challenge based on a date seed.
  * Same challenge for all users on the same day.
  */
 export function getTodaysChallenge() {
-  const daySeed = Math.floor(Date.now() / 86400000); // days since epoch
+  const daySeed = Math.floor(Date.now() / 86400000); // days since Unix epoch
   const index = daySeed % CHALLENGES.length;
   return CHALLENGES[index];
 }
 
 /**
- * Check if the current challenge has been completed today.
+ * Check if today's challenge has already been completed.
  * Uses localStorage.
  */
 export function isChallengeCompletedToday() {
@@ -458,7 +459,7 @@ export function isChallengeCompletedToday() {
 }
 
 /**
- * Mark the challenge as completed and store the reward info.
+ * Mark today's challenge as completed and store reward info.
  */
 export function markChallengeCompletedLocal(rewardType, rewardValue) {
   const today = Math.floor(Date.now() / 86400000);
@@ -470,7 +471,7 @@ export function markChallengeCompletedLocal(rewardType, rewardValue) {
 }
 
 /**
- * Evaluate if today's challenge condition is met.
+ * Evaluate if the current day's challenge condition is met.
  * @param {Object} stats – round stats from games.js
  * @returns {Object|null} – { rewardType, rewardValue } if completed, else null.
  */
@@ -487,7 +488,7 @@ export function evaluateChallenge(stats) {
 
 /**
  * Apply the reward to the user in Firestore.
- * (Kept from original, still used by games.js)
+ * (Kept from original – still used by games.js)
  */
 export async function applyReward(userUID, rewardType, rewardValue, db) {
   const userRef = doc(db, 'users', userUID);
