@@ -247,7 +247,7 @@ onAuthStateChanged(auth, async (user) => {
         renderShop(coins);
         setupAdButton(userRef, updateHeaderUI);
 
-        // ===== CHALLENGE (new front‑end only) =====
+        // ===== CHALLENGE (Model 2) =====
         const challenge = getTodaysChallenge();
         const isCompleted = isChallengeCompletedToday();
         displayActiveChallenge(challenge, isCompleted);
@@ -298,8 +298,7 @@ onAuthStateChanged(auth, async (user) => {
                     greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
                 }
 
-                // Challenge display doesn't change in real‑time (localStorage only)
-                // We'll re‑display it; it might have been completed in another tab? Not needed.
+                // Challenge display is unaffected by Firestore changes – stays local.
             }
         });
 
