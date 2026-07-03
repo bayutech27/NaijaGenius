@@ -159,22 +159,51 @@ async function handleAvatarUpload(file, userUID) {
 // ========== LEADERBOARD ==========
 const leaderboardFilter = document.getElementById("leaderboardFilter");
 const fullLeaderboard = document.getElementById("fullLeaderboard");
+let currentUserUid = null;
+
+// Create a rank display element if it doesn't exist
+function ensureRankDisplay() {
+  let rankDisplay = document.getElementById("userRankDisplay");
+  if (!rankDisplay) {
+    const sectionHeader = document.querySelector("#leaderboardSection .section-header");
+    if (sectionHeader) {
+      rankDisplay = document.createElement("span");
+      rankDisplay.id = "userRankDisplay";
+      rankDisplay.style.cssText =
+        "font-size:0.8rem;font-weight:600;color:#FFD700;margin-left:0.5rem;white-space:nowrap;";
+      // Insert after the filter select (which is a child of section-header)
+      const filter = sectionHeader.querySelector(".filter-select");
+      if (filter) {
+        filter.parentNode.insertBefore(rankDisplay, filter.nextSibling);
+      } else {
+        sectionHeader.appendChild(rankDisplay);
+      }
+    }
+  }
+  return rankDisplay;
+}
 
 async function loadLeaderboard(filter = "all") {
   if (!fullLeaderboard) return;
   fullLeaderboard.innerHTML =
     '<div class="loading-skeleton">Loading leaderboard…</div>';
 
+  const rankDisplay = ensureRankDisplay();
+  if (rankDisplay) rankDisplay.textContent = "";
+
   try {
     const usersSnapshot = await getDocs(collection(db, "users"));
-    const users = [];
+    const allUsers = [];
     usersSnapshot.forEach((doc) => {
       const data = doc.data();
+      // Skip anonymous: require a displayName or username
+      const name = data.displayName || data.username;
+      if (!name || name.trim() === "" || name === "Anonymous") return;
+
       let correct = 0;
       if (filter === "all") {
         correct = data.totalCorrectAnswers || 0;
       } else if (filter === "monthly") {
-        // If monthlyCorrectAnswers exists, use it; otherwise fallback to total
         correct =
           data.monthlyCorrectAnswers !== undefined
             ? data.monthlyCorrectAnswers
@@ -185,9 +214,9 @@ async function loadLeaderboard(filter = "all") {
             ? data.weeklyCorrectAnswers
             : data.totalCorrectAnswers || 0;
       }
-      users.push({
+      allUsers.push({
         uid: doc.id,
-        displayName: data.displayName || data.username || "Anonymous",
+        displayName: name,
         avatar: data.avatar || null,
         correct: correct,
         level: getLevel(correct).name,
@@ -195,16 +224,19 @@ async function loadLeaderboard(filter = "all") {
     });
 
     // Sort by correct descending
-    users.sort((a, b) => b.correct - a.correct);
+    allUsers.sort((a, b) => b.correct - a.correct);
 
-    if (users.length === 0) {
+    // Take top 50
+    const top50 = allUsers.slice(0, 50);
+
+    if (top50.length === 0) {
       fullLeaderboard.innerHTML =
-        '<div class="loading-skeleton">No users found.</div>';
+        '<div class="loading-skeleton">No players found.</div>';
       return;
     }
 
     let html = "";
-    users.forEach((user, index) => {
+    top50.forEach((user, index) => {
       const rank = index + 1;
       let rankClass = "rank-badge";
       if (rank === 1) rankClass += " rank-1";
@@ -233,6 +265,19 @@ async function loadLeaderboard(filter = "all") {
     });
 
     fullLeaderboard.innerHTML = html;
+
+    // ---- Compute current user's rank ----
+    if (currentUserUid) {
+      const userIndex = allUsers.findIndex((u) => u.uid === currentUserUid);
+      if (userIndex !== -1) {
+        const rank = userIndex + 1;
+        if (rankDisplay) {
+          rankDisplay.textContent = `🏆 Your Rank: #${rank}`;
+        }
+      } else {
+        if (rankDisplay) rankDisplay.textContent = "🏆 Unranked";
+      }
+    }
   } catch (error) {
     console.error("Failed to load leaderboard:", error);
     fullLeaderboard.innerHTML =
@@ -259,6 +304,8 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "/login.html";
     return;
   }
+
+  currentUserUid = user.uid;
 
   try {
     const userRef = doc(db, "users", user.uid);
@@ -466,6 +513,8 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     // ===== LOAD LEADERBOARD =====
+    // Ensure rank display element exists
+    ensureRankDisplay();
     loadLeaderboard("all");
 
   } catch (error) {
