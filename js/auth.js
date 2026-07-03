@@ -182,6 +182,7 @@ async function createUserProfile(user, userData) {
         level: "",
         badges: [],
         adCooldownUntil: null,
+        lastAdRewardTime: null,
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
         isAdmin: false
