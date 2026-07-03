@@ -74,9 +74,10 @@
                 </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY ---- -->
+            <!-- ---- LEVEL DISPLAY (redesigned: avatar and level in separate containers) ---- -->
             <div class="level-display fade-in-up">
-                <div class="avatar-level-wrap">
+                <!-- Left: Avatar container -->
+                <div class="avatar-container">
                     <div class="user-avatar" id="userAvatarBtn">
                         <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -86,18 +87,19 @@
                     <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
                 </div>
 
-                <div class="level-info-container">
-                    <div class="level-badge-container shield-badge">
-                        <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
-                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
-                    </div>
-                    <div class="level-info">
+                <!-- Right: Level container (all items centred) -->
+                <div class="level-container">
+                    <div class="level-badge-and-label">
                         <span class="level-label" id="levelLabel">Current Level</span>
-                        <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
-                        <div class="xp-progress">
-                            <div class="xp-bar" id="xpBar" style="width: 67%;"></div>
-                            <span class="xp-text" id="xpText">0/0</span>
+                        <div class="shield-badge">
+                            <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
                         </div>
+                    </div>
+                    <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
+                    <div class="xp-progress">
+                        <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
+                        <span class="xp-text" id="xpText">0/0</span>
                     </div>
                 </div>
             </div>
@@ -162,8 +164,6 @@
                 </div>
             </div>
 
-            <!-- ===== GAP BETWEEN CHALLENGES AND MODE (handled by CSS margin) ===== -->
-
             <!-- ---- CHOOSE A MODE ---- -->
             <div class="mode-section">
                 <h2 class="section-title mode-title">
@@ -206,9 +206,9 @@
                 </div>
             </div>
 
-            <!-- ===== ADMOB CONTAINER (moved to the bottom) ===== -->
+            <!-- ===== ADMOB CONTAINER (bottom of home) ===== -->
             <div class="ad-container" id="adContainer">
-                <!-- AdMob banner will be placed here by the JavaScript -->
+                <!-- AdMob banner will be placed here -->
             </div>
 
         </section>
