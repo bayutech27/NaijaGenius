@@ -326,16 +326,19 @@ body {
     100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
 }
 
-/* ----- LEVEL DISPLAY ----- */
+/* ============================================================
+   LEVEL DISPLAY – redesigned: avatar and level in separate containers
+   ============================================================ */
 .level-display {
     display: flex;
     align-items: center;
-    gap: 3.7632rem;
+    justify-content: space-between;
+    gap: 2rem;                /* considerable gap between avatar and level */
     margin-bottom: 2.058rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
     border-radius: 21.56px;
-    padding: 0.84rem 0.98rem;
+    padding: 0.84rem 1.2rem;
     border: none;
     position: relative;
 }
@@ -354,10 +357,15 @@ body {
     opacity: 0.7;
 }
 
-.avatar-level-wrap {
+/* Avatar container (left) */
+.avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: relative;
     flex-shrink: 0;
 }
+
 .user-avatar {
     width: 72.52px;
     height: 72.52px;
@@ -403,42 +411,25 @@ body {
     cursor: pointer;
 }
 
-.level-info-container {
-    display: flex;
-    align-items: center;
-    gap: 0.784rem;
-    flex: 1;
-    min-width: 0;
-}
-
-.shield-badge {
-    flex-shrink: 0;
-    width: 49px;
-    height: 54.88px;
-    background: #1A1D2E;
-    clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border: 2px solid #FFD700;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.25);
-}
-.shield-badge .level-badge-img {
-    width: 70%;
-    height: 70%;
-    object-fit: contain;
-}
-
-.level-info {
+/* Level container (right) – all items centred */
+.level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.588rem;
+    align-items: center;      /* center everything horizontally */
+    justify-content: center;
     min-width: 0;
+    text-align: center;
 }
+
+.level-badge-and-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
 .level-label {
-    align-self: flex-start;
     font-size: 0.686rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -448,40 +439,68 @@ body {
     border: 1px solid rgba(124, 79, 224, 0.4);
     padding: 0.1rem 0.6rem;
     border-radius: 20px;
-    margin-bottom: 0.05rem;
 }
+
+.shield-badge {
+    width: 32px;
+    height: 36px;
+    background: #1A1D2E;
+    clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #FFD700;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.2);
+}
+.shield-badge .level-badge-img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
 .level-name {
     font-size: 1.274rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.15;
+    margin: 0.1rem 0 0.2rem;
 }
 .level-star { font-size: 0.9rem; }
 
+/* ----- SHORT, ANIMATED PROGRESS BAR ----- */
 .xp-progress {
     display: flex;
     align-items: center;
-    gap: 0.49rem;
-    width: 80%;
-    max-width: 400px;
+    gap: 0.5rem;
+    width: 80%;               /* short – does not span full container */
+    max-width: 280px;         /* max width for larger screens */
     background: rgba(0,0,0,0.3);
-    border-radius: 5.88px;
-    height: 6.86px;
+    border-radius: 20px;      /* rounded ends */
+    height: 8px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-    margin-top: 0.2rem;
+    margin-top: 0.15rem;
+    overflow: hidden;         /* keep bar inside rounded corners */
 }
+
 .xp-bar {
-    height: 6.86px;
-    background: linear-gradient(90deg, #7C4FE0, #3E7BFF);
-    border-radius: 5.88px;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 8px rgba(124, 79, 224, 0.5);
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.5s ease, background 0.3s;
+    /* dynamic gradient: from blue to gold based on width */
+    background: linear-gradient(90deg, #3E7BFF, #FFD700);
+    background-size: 200% 100%;
+    background-position: 0% 0%;
+    box-shadow: 0 0 8px rgba(62, 123, 255, 0.3);
+    width: 0%;
 }
+
 .xp-text {
-    font-size: 0.784rem;
+    font-size: 0.686rem;
     font-weight: 600;
     color: #E4E8F5;
     white-space: nowrap;
+    min-width: 3.5rem;
+    text-align: center;
 }
 
 /* ----- STATS ROW ----- */
@@ -549,7 +568,7 @@ body {
     color: #9AA5C7;
 }
 
-/* ===== CHALLENGES FOR YOU (3D container) ===== */
+/* ===== CHALLENGES FOR YOU ===== */
 .challenges-3d-container {
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
@@ -557,7 +576,7 @@ body {
     padding: 0.8rem 1rem 0.5rem;
     border: none;
     position: relative;
-    margin-bottom: 2rem;   /* gap between challenges and mode */
+    margin-bottom: 2rem;
     box-shadow:
         inset 0 4px 12px rgba(0, 0, 0, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.25);
@@ -688,9 +707,9 @@ body {
     color: #3E7BFF;
 }
 
-/* ----- CHOOSE A MODE (redesigned for beauty and 3D) ----- */
+/* ----- CHOOSE A MODE (redesigned) ----- */
 .mode-section {
-    margin-top: 0;       /* gap is provided by the challenges container margin */
+    margin-top: 0;
 }
 
 .mode-title {
@@ -745,7 +764,6 @@ body {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Each card gets a subtle glowing border */
 .mode-btn::after {
     content: '';
     position: absolute;
@@ -761,7 +779,6 @@ body {
     opacity: 0.6;
 }
 
-/* Left card (Jollof) – 3D tilt */
 .mode-btn-red {
     background: linear-gradient(160deg, #FF5757 0%, #C21E1E 100%);
     transform-origin: right center;
@@ -773,7 +790,6 @@ body {
     box-shadow: -12px 12px 28px rgba(0,0,0,0.6);
 }
 
-/* Center card – flat, but with a prominent glow */
 .mode-btn-blue {
     background: linear-gradient(160deg, #3E8BFF 0%, #1440C2 100%);
     transform: none;
@@ -784,7 +800,6 @@ body {
     box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 40px rgba(62, 139, 255, 0.25);
 }
 
-/* Right card (One Chance) – 3D tilt opposite */
 .mode-btn-green {
     background: linear-gradient(160deg, #3FE07E 0%, #0F9C4E 100%);
     transform-origin: left center;
@@ -806,7 +821,6 @@ body {
     border-radius: 0;
     position: relative;
 }
-/* Icon glow effect */
 .mode-icon-wrap::before {
     content: '';
     position: absolute;
@@ -863,9 +877,7 @@ body {
     padding: 0.2rem 0.3rem 0;
     text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
-.mode-arrow {
-    display: none; /* hidden, we rely on the card hover effect */
-}
+.mode-arrow { display: none; }
 
 .mode-btn:disabled {
     cursor: not-allowed;
@@ -873,7 +885,6 @@ body {
     transform: none !important;
 }
 
-/* Reduce tilt on smaller screens */
 @media (max-width: 420px) {
     .mode-btn-red { transform: perspective(700px) rotateY(6deg); }
     .mode-btn-red:hover { transform: perspective(700px) rotateY(6deg) translateY(-4px); }
@@ -1513,7 +1524,7 @@ body {
     .lane-desc { font-size: 0.75rem; }
 }
 
-/* ----- AD CONTAINER (empty, kept for AdMob) ----- */
+/* ----- AD CONTAINER ----- */
 .ad-container {
     margin: 1.5rem 0 0 0;
     min-height: 58.8px;
@@ -1553,7 +1564,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS (scaled down by 30%, then mode cards +25%) ----- */
+/* ----- MOBILE ADJUSTMENTS ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -1586,53 +1597,43 @@ body {
     .hero-bulb { font-size: 1.764rem; }
     .sparkle { font-size: 1.078rem; }
 
+    /* Level display mobile */
     .level-display {
-        gap: 1.47rem;
-        padding: 0.7rem 0.77rem;
+        flex-direction: row;      /* keep side‑by‑side on mobile */
+        gap: 1.2rem;
+        padding: 0.6rem 0.8rem;
         margin-bottom: 0.784rem;
         border-radius: 17.64px;
     }
     .user-avatar {
-        width: 66.64px;
-        height: 66.64px;
-        font-size: 0.98rem;
-        border-width: 2px;
+        width: 58px;
+        height: 58px;
+        font-size: 0.85rem;
     }
     .avatar-edit-btn {
-        width: 21.56px;
-        height: 21.56px;
-        font-size: 0.539rem;
-    }
-    .shield-badge {
-        width: 47.04px;
-        height: 50.96px;
-    }
-    .shield-badge .level-badge-img {
-        width: 65%;
-        height: 65%;
-    }
-    .level-info {
-        gap: 0.294rem;
-    }
-    .level-label {
-        font-size: 0.588rem;
-        padding: 0.15rem 0.6rem;
-        margin-bottom: 0.1rem;
+        width: 18px;
+        height: 18px;
+        font-size: 0.45rem;
     }
     .level-name {
-        font-size: 1.078rem;
+        font-size: 1.0rem;
     }
-    .level-star { font-size: 0.85rem; }
+    .level-label {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.4rem;
+    }
+    .shield-badge {
+        width: 26px;
+        height: 30px;
+    }
     .xp-progress {
-        height: 5.88px;
-        gap: 0.392rem;
-        width: 80%;
-    }
-    .xp-bar {
-        height: 5.88px;
+        width: 90%;               /* slightly wider on mobile but still short */
+        max-width: 200px;
+        height: 6px;
     }
     .xp-text {
-        font-size: 0.686rem;
+        font-size: 0.6rem;
+        min-width: 2.8rem;
     }
 
     .stats-row {
@@ -1658,11 +1659,10 @@ body {
         font-size: 0.588rem;
     }
 
-    /* Challenges mobile */
     .challenges-3d-container {
         padding: 0.6rem 0.7rem 0.4rem;
         border-radius: 17.64px;
-        margin-bottom: 1.2rem;   /* reduced gap on mobile */
+        margin-bottom: 1.2rem;
     }
     .challenges-title {
         font-size: 0.85rem;
@@ -1690,7 +1690,6 @@ body {
         font-size: 0.8rem;
     }
 
-    /* Mode section mobile */
     .mode-section {
         margin-top: 0;
     }
@@ -1713,7 +1712,7 @@ body {
         min-height: 165.4px;
         border-radius: 15.68px;
         gap: 0.196rem;
-        transform: none !important; /* override 3D on small screens for readability */
+        transform: none !important;
     }
     .mode-btn-red { transform: perspective(700px) rotateY(6deg); }
     .mode-btn-red:hover { transform: perspective(700px) rotateY(6deg) translateY(-4px); }
@@ -1734,7 +1733,6 @@ body {
         margin-left: -0.18rem;
     }
 
-    /* Ad container mobile */
     .ad-container {
         margin-top: 1.2rem;
         min-height: 39.2px;
@@ -1865,31 +1863,38 @@ body {
         font-size: 1.029rem;
     }
     .level-display {
-        gap: 1.078rem;
-        padding: 0.539rem 0.63rem;
+        gap: 0.8rem;
+        padding: 0.4rem 0.5rem;
     }
     .user-avatar {
-        width: 54.88px;
-        height: 54.88px;
-        font-size: 0.833rem;
+        width: 44px;
+        height: 44px;
+        font-size: 0.7rem;
     }
-    .shield-badge {
-        width: 39.2px;
-        height: 43.12px;
+    .avatar-edit-btn {
+        width: 16px;
+        height: 16px;
+        font-size: 0.4rem;
     }
     .level-name {
-        font-size: 0.882rem;
+        font-size: 0.85rem;
+    }
+    .shield-badge {
+        width: 22px;
+        height: 26px;
+    }
+    .xp-progress {
+        width: 100%;
+        max-width: 140px;
+        height: 5px;
     }
     .xp-text {
-        font-size: 0.588rem;
+        font-size: 0.5rem;
+        min-width: 2.2rem;
     }
-    .stat-value {
-        font-size: 0.882rem;
-    }
-    .stat-icon {
-        width: 25.48px;
-        height: 25.48px;
-        font-size: 0.686rem;
+    .level-label {
+        font-size: 0.5rem;
+        padding: 0.05rem 0.3rem;
     }
     .challenges-3d-container {
         padding: 0.5rem 0.5rem 0.3rem;
