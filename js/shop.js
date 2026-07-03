@@ -1,6 +1,6 @@
 // shop.js – Shop logic for NaijaGenius
 import { auth, db } from '/js/firebase.config.js';
-import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 // ========== SHOP ITEMS ==========
 const SHOP_ITEMS = [
@@ -142,23 +142,103 @@ function showNotEnoughCoinsModal() {
     });
 }
 
-// ========== AD BUTTON ==========
+// ========== AD BUTTON WITH COOLDOWN ==========
+let adCooldownInterval = null;
+
 export function setupAdButton(userRef, updateHeaderUI) {
     const adBtn = document.getElementById('watchAdBtn');
     if (!adBtn) return;
 
-    adBtn.addEventListener('click', () => {
-        // Placeholder for AdMob rewarded video
-        if (confirm('Simulate watching ad? (In production, this would trigger a rewarded video ad.)')) {
-            updateDoc(userRef, { lives: increment(1) })
-                .then(() => {
-                    showToast('🎉 +1 Life earned!', 'success');
-                })
-                .catch(err => {
-                    console.error('Ad reward failed:', err);
-                    showToast('Failed to grant life. Try again.', 'error');
-                });
+    // Helper: update button state based on cooldown
+    async function updateAdButtonState() {
+        if (!userRef) return;
+        try {
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) return;
+            const data = userSnap.data();
+            const cooldownUntil = data.adCooldownUntil?.toDate?.() || null;
+            const now = new Date();
+
+            if (cooldownUntil && cooldownUntil > now) {
+                // Cooldown active – calculate remaining time
+                const remainingMs = cooldownUntil - now;
+                const minutes = Math.floor(remainingMs / 60000);
+                const seconds = Math.floor((remainingMs % 60000) / 1000);
+                adBtn.disabled = true;
+                adBtn.innerHTML = `<i class="fas fa-clock"></i> ${minutes}m ${seconds}s until available`;
+                adBtn.style.opacity = '0.6';
+                // Start interval if not already running
+                if (!adCooldownInterval) {
+                    adCooldownInterval = setInterval(() => updateAdButtonState(), 1000);
+                }
+            } else {
+                // Cooldown expired or not set – enable button
+                adBtn.disabled = false;
+                adBtn.innerHTML = `<i class="fas fa-video"></i> Watch Ad for <i class="fas fa-coins" style="color:#FFD700;"></i> +200 Coins`;
+                adBtn.style.opacity = '1';
+                // Clear interval if running
+                if (adCooldownInterval) {
+                    clearInterval(adCooldownInterval);
+                    adCooldownInterval = null;
+                }
+            }
+        } catch (err) {
+            console.error('Error updating ad button state:', err);
         }
+    }
+
+    // Initial state update
+    updateAdButtonState();
+
+    // Click handler
+    adBtn.addEventListener('click', async () => {
+        // Double-check cooldown before proceeding
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            showToast('User data not found.', 'error');
+            return;
+        }
+        const data = userSnap.data();
+        const cooldownUntil = data.adCooldownUntil?.toDate?.() || null;
+        if (cooldownUntil && cooldownUntil > new Date()) {
+            showToast('Please wait for the cooldown to finish.', 'warning');
+            updateAdButtonState(); // force refresh
+            return;
+        }
+
+        // Simulate ad trigger (in production, replace with actual AdMob rewarded video)
+        showToast('Playing ad...', 'info');
+
+        // Simulate ad completion after 3 seconds
+        setTimeout(async () => {
+            try {
+                // Set cooldown timestamps
+                const now = new Date();
+                const cooldownEnd = new Date(now.getTime() + 30 * 60 * 1000); // +30 minutes
+
+                await updateDoc(userRef, {
+                    coins: increment(200),
+                    adCooldownUntil: cooldownEnd,
+                    lastAdRewardTime: serverTimestamp()
+                });
+
+                // Update header coins
+                const newSnap = await getDoc(userRef);
+                const newCoins = newSnap.data().coins || 0;
+                updateHeaderUI(newCoins, newSnap.data().lives ?? 2);
+
+                // Re-render shop to update coin display
+                renderShop(newCoins);
+
+                showToast('🎉 You earned 200 coins!', 'success');
+
+                // Refresh button state (cooldown now active)
+                updateAdButtonState();
+            } catch (err) {
+                console.error('Ad reward failed:', err);
+                showToast('Failed to grant coins. Please try again.', 'error');
+            }
+        }, 3000); // simulate 3‑second ad
     });
 }
 
