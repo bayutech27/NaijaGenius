@@ -74,9 +74,9 @@
                 </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY (redesigned: avatar and level in separate containers) ---- -->
+            <!-- ---- LEVEL DISPLAY (redesigned: badge left, label top, name middle, progress bottom) ---- -->
             <div class="level-display fade-in-up">
-                <!-- Left: Avatar container -->
+                <!-- Left: Avatar container (height increased) -->
                 <div class="avatar-container">
                     <div class="user-avatar" id="userAvatarBtn">
                         <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
@@ -87,14 +87,14 @@
                     <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
                 </div>
 
-                <!-- Right: Level container (all items centred) -->
+                <!-- Right: Level container (badge left, label top, name middle, progress bottom) -->
                 <div class="level-container">
-                    <div class="level-badge-and-label">
-                        <span class="level-label" id="levelLabel">Current Level</span>
+                    <div class="level-top-row">
                         <div class="shield-badge">
                             <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
                                  onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
                         </div>
+                        <span class="level-label" id="levelLabel">Current Level</span>
                     </div>
                     <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
                     <div class="xp-progress">
