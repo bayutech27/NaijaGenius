@@ -1,5 +1,5 @@
 /* ============================================================
-   NAIJAGENIUS DASHBOARD — reduced heights by 30%
+   NAIJAGENIUS DASHBOARD – themed to match games.html/css
    ============================================================ */
 
 /* ----- RESET & BASE ----- */
@@ -73,7 +73,8 @@ body {
 .leaderboard-item,
 .lane-card,
 .ad-life-container,
-.settings-item {
+.settings-item,
+.challenges-3d-container {
     box-shadow:
         inset 0 4px 12px rgba(0, 0, 0, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.25);
@@ -213,7 +214,8 @@ body {
 }
 
 /* ============================================================
-   HOME PAGE – all heights reduced by 30% from the previous version
+   HOME PAGE – all heights reduced by 30% (from previous)
+   then mode cards increased by 25%
    ============================================================ */
 
 /* ----- GREETING ----- */
@@ -221,26 +223,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.735rem;          /* 1.05 * 0.7 */
-    margin-bottom: 1.176rem; /* 1.68 * 0.7 */
+    gap: 0.735rem;
+    margin-bottom: 1.176rem;
 }
 .greeting-copy { flex: 1; min-width: 0; }
 .greeting-text {
-    font-size: 1.078rem;    /* 1.54 * 0.7 */
+    font-size: 1.078rem;
     font-weight: 500;
     color: #D7DCEC;
     line-height: 1.2;
 }
 .greeting-text span#greetingName {
     display: inline;
-    font-size: 2.156rem;    /* 3.08 * 0.7 */
+    font-size: 2.156rem;
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.02em;
     margin-left: 0.2rem;
 }
 .greeting-sub {
-    font-size: 0.931rem;    /* 1.33 * 0.7 */
+    font-size: 0.931rem;
     font-weight: 400;
     color: #8C97B8;
     margin-top: 0.2rem;
@@ -248,7 +250,7 @@ body {
 
 .hero-logo-wrap {
     flex-shrink: 0;
-    width: 127.4px;         /* 182 * 0.7 */
+    width: 127.4px;
     height: 127.4px;
     display: flex;
     align-items: center;
@@ -273,20 +275,20 @@ body {
     position: absolute;
     top: -4px;
     left: 4px;
-    font-size: 1.764rem;    /* 2.52 * 0.7 */
+    font-size: 1.764rem;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 .hero-bulb {
     position: absolute;
     top: -10px;
     right: 0;
-    font-size: 2.352rem;    /* 3.36 * 0.7 */
+    font-size: 2.352rem;
     filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
 }
 .hero-logo-text {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: 1.568rem;    /* 2.24 * 0.7 */
+    font-size: 1.568rem;
     line-height: 1.05;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     letter-spacing: -0.02em;
@@ -308,7 +310,7 @@ body {
 }
 .sparkle {
     position: absolute;
-    font-size: 1.372rem;    /* 1.96 * 0.7 */
+    font-size: 1.372rem;
     animation: sparkleFloat 3s ease-in-out infinite;
 }
 .sparkle-1 { top: -10%; left: -10%; animation-delay: 0s; }
@@ -328,12 +330,12 @@ body {
 .level-display {
     display: flex;
     align-items: center;
-    gap: 3.7632rem;         /* 5.376 * 0.7 */
-    margin-bottom: 2.058rem; /* 2.94 * 0.7 */
+    gap: 3.7632rem;
+    margin-bottom: 2.058rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
-    border-radius: 21.56px;  /* 30.8 * 0.7 */
-    padding: 0.84rem 0.98rem; /* 1.2*0.7, 1.4*0.7 */
+    border-radius: 21.56px;
+    padding: 0.84rem 0.98rem;
     border: none;
     position: relative;
 }
@@ -357,7 +359,7 @@ body {
     flex-shrink: 0;
 }
 .user-avatar {
-    width: 72.52px;         /* 103.6 * 0.7 */
+    width: 72.52px;
     height: 72.52px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
@@ -366,7 +368,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.078rem;    /* 1.54 * 0.7 */
+    font-size: 1.078rem;
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -387,14 +389,14 @@ body {
     position: absolute;
     bottom: -2px;
     right: -2px;
-    width: 23.52px;         /* 33.6 * 0.7 */
+    width: 23.52px;
     height: 23.52px;
     min-height: 23.52px;
     border-radius: 50%;
     background: #3E7BFF;
     border: 2px solid #0A0A0F;
     color: #fff;
-    font-size: 0.588rem;    /* 0.84 * 0.7 */
+    font-size: 0.588rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -404,15 +406,15 @@ body {
 .level-info-container {
     display: flex;
     align-items: center;
-    gap: 0.784rem;          /* 1.12 * 0.7 */
+    gap: 0.784rem;
     flex: 1;
     min-width: 0;
 }
 
 .shield-badge {
     flex-shrink: 0;
-    width: 49px;            /* 70 * 0.7 */
-    height: 54.88px;        /* 78.4 * 0.7 */
+    width: 49px;
+    height: 54.88px;
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -432,12 +434,12 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.588rem;          /* 0.84 * 0.7 */
+    gap: 0.588rem;
     min-width: 0;
 }
 .level-label {
     align-self: flex-start;
-    font-size: 0.686rem;    /* 0.98 * 0.7 */
+    font-size: 0.686rem;
     font-weight: 600;
     text-transform: uppercase;
     color: #C9B6FF;
@@ -449,7 +451,7 @@ body {
     margin-bottom: 0.05rem;
 }
 .level-name {
-    font-size: 1.274rem;    /* 1.82 * 0.7 */
+    font-size: 1.274rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.15;
@@ -459,12 +461,12 @@ body {
 .xp-progress {
     display: flex;
     align-items: center;
-    gap: 0.49rem;           /* 0.7 * 0.7 */
+    gap: 0.49rem;
     width: 80%;
     max-width: 400px;
     background: rgba(0,0,0,0.3);
-    border-radius: 5.88px;   /* 8.4 * 0.7 */
-    height: 6.86px;          /* 9.8 * 0.7 */
+    border-radius: 5.88px;
+    height: 6.86px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
 }
@@ -476,7 +478,7 @@ body {
     box-shadow: 0 0 8px rgba(124, 79, 224, 0.5);
 }
 .xp-text {
-    font-size: 0.784rem;    /* 1.12 * 0.7 */
+    font-size: 0.784rem;
     font-weight: 600;
     color: #E4E8F5;
     white-space: nowrap;
@@ -487,9 +489,9 @@ body {
     display: flex;
     align-items: stretch;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border-radius: 17.64px;  /* 25.2 * 0.7 */
-    padding: 0.784rem 1.372rem; /* 1.12*0.7, 1.96*0.7 */
-    margin-bottom: 1.666rem; /* 2.38 * 0.7 */
+    border-radius: 17.64px;
+    padding: 0.784rem 1.372rem;
+    margin-bottom: 1.666rem;
     width: 100%;
 }
 .stats-divider { display: none; }
@@ -499,7 +501,7 @@ body {
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 0.686rem;          /* 0.98 * 0.7 */
+    gap: 0.686rem;
     opacity: 0;
     animation: fadeUp 0.4s ease-out forwards;
     width: auto;
@@ -507,10 +509,10 @@ body {
     min-width: 0;
 }
 .stat-icon {
-    font-size: 1.078rem;    /* 1.54 * 0.7 */
+    font-size: 1.078rem;
     color: #fff;
     flex-shrink: 0;
-    width: 33.32px;         /* 47.6 * 0.7 */
+    width: 33.32px;
     height: 33.32px;
     border-radius: 50%;
     display: flex;
@@ -529,43 +531,175 @@ body {
     flex: 1;
 }
 .stat-label {
-    font-size: 0.735rem;    /* 1.05 * 0.7 */
+    font-size: 0.735rem;
     font-weight: 600;
     color: #C9D3EE;
     order: -1;
 }
 .stat-value {
-    font-size: 1.274rem;    /* 1.82 * 0.7 */
+    font-size: 1.274rem;
     font-weight: 700;
     color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 .stat-caption {
-    font-size: 0.637rem;    /* 0.91 * 0.7 */
+    font-size: 0.637rem;
     font-weight: 400;
     color: #9AA5C7;
 }
 
-/* ----- ACTIVE CHALLENGE (empty for AdMob) ----- */
-.challenge-section {
-    margin: 0 0 1.666rem 0; /* 2.38 * 0.7 */
-    min-height: 58.8px;     /* 84 * 0.7 */
+/* ----- AD CONTAINER (empty, kept for AdMob) ----- */
+.ad-container {
+    margin: 0 0 1.666rem 0;
+    min-height: 58.8px;
 }
-.challenge-section > .section-title { display: none; }
-.challenge-card-large { display: none; }
+.ad-container > .section-title { display: none; }
 
-/* ----- CHOOSE A MODE ----- */
+/* ===== CHALLENGES FOR YOU (3D container) ===== */
+.challenges-3d-container {
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
+    backdrop-filter: blur(8px);
+    border-radius: 21.56px;
+    padding: 1.2rem 1.2rem 0.8rem;
+    border: none;
+    position: relative;
+    margin-bottom: 1.666rem;
+    box-shadow:
+        inset 0 4px 12px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.25);
+    perspective: 900px;
+    transform: rotateX(0.5deg) rotateY(0.5deg);
+    transition: transform 0.25s ease;
+}
+.challenges-3d-container:hover {
+    transform: rotateX(0) rotateY(0) scale(1.01);
+}
+.challenges-3d-container::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 21.56px;
+    padding: 2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.challenges-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #C9B6FF;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+}
+.challenges-title i {
+    color: #FFD700;
+    font-size: 1.2rem;
+}
+
+.challenges-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.challenge-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    padding: 0.7rem 1rem;
+    transition: transform 0.2s, background 0.2s;
+    cursor: default;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.challenge-item:hover {
+    transform: translateX(6px) scale(1.02);
+    background: rgba(255, 215, 0, 0.08);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.challenge-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    color: #FFFFFF;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.challenge-item:nth-child(2) .challenge-icon {
+    background: linear-gradient(135deg, #FFD700, #FF9A3E);
+    color: #0A0A0F;
+}
+.challenge-item:nth-child(3) .challenge-icon {
+    background: linear-gradient(135deg, #3FE07E, #0F9C4E);
+    color: #0A0A0F;
+}
+.challenge-item:nth-child(4) .challenge-icon {
+    background: linear-gradient(135deg, #FF6B6B, #C21E1E);
+}
+
+.challenge-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.challenge-condition {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #FFFFFF;
+    line-height: 1.2;
+}
+.challenge-reward {
+    font-size: 0.8rem;
+    color: #FFD700;
+    font-weight: 500;
+}
+.challenge-reward i {
+    margin-right: 0.2rem;
+}
+
+.challenge-arrow {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1rem;
+    transition: transform 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+.challenge-item:hover .challenge-arrow {
+    transform: translateX(4px);
+    color: #3E7BFF;
+}
+
+/* ----- CHOOSE A MODE (height increased by 25% over reduced base) ----- */
 .mode-section {
-    margin-top: 1.4rem;     /* 2 * 0.7 */
+    margin-top: 1.4rem;
 }
 .mode-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.49rem;           /* 0.7 * 0.7 */
-    margin-bottom: 1.078rem; /* 1.54 * 0.7 */
-    font-size: 0.735rem;    /* 1.05 * 0.7 */
+    gap: 0.49rem;
+    margin-bottom: 1.078rem;
+    font-size: 0.735rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -573,11 +707,11 @@ body {
 }
 .mode-title i.fa-crown {
     color: #FFD700;
-    font-size: 0.833rem;    /* 1.19 * 0.7 */
+    font-size: 0.833rem;
 }
 .title-line {
     flex: 1;
-    max-width: 58.8px;      /* 84 * 0.7 */
+    max-width: 58.8px;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201, 182, 255, 0.5), transparent);
 }
@@ -585,25 +719,25 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: stretch;
-    gap: 0.686rem;          /* 0.98 * 0.7 */
+    gap: 0.686rem;
     width: 100%;
     perspective: 900px;
 }
 .mode-btn {
     border: none;
-    border-radius: 19.6px;   /* 28 * 0.7 */
-    padding: 1.0976rem 0.4116rem; /* 1.568*0.7, 0.588*0.7 */
+    border-radius: 19.6px;
+    padding: 1.0976rem 0.4116rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 0.196rem;           /* 0.28 * 0.7 */
+    gap: 0.196rem;
     width: 100%;
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.2s ease;
     text-decoration: none;
     color: #FFFFFF;
-    min-height: 219.52px;    /* 313.6 * 0.7 */
+    min-height: 274.4px;
     position: relative;
     overflow: hidden;
 }
@@ -639,7 +773,7 @@ body {
     border-radius: 0;
 }
 .mode-icon {
-    font-size: 3.43rem;      /* 4.9 * 0.7 */
+    font-size: 3.43rem;
     color: rgba(255,255,255,0.92);
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
 }
@@ -662,7 +796,7 @@ body {
 }
 .mode-name {
     font-weight: 800;
-    font-size: 1.078rem;    /* 1.54 * 0.7 */
+    font-size: 1.078rem;
     color: #FFFFFF;
     letter-spacing: -0.01em;
     line-height: 1.15;
@@ -672,7 +806,7 @@ body {
 .mode-questions {
     width: 100%;
     text-align: center;
-    font-size: 0.735rem;    /* 1.05 * 0.7 */
+    font-size: 0.735rem;
     color: #FFFFFF;
     font-weight: 700;
     background: transparent;
@@ -1316,7 +1450,7 @@ body {
     .user-avatar { width: 90px; height: 90px; }
     .level-name { font-size: 1.6rem; }
     .mode-grid { gap: 1.5rem; }
-    .mode-btn { min-height: 200px; }
+    .mode-btn { min-height: 250px; }
     .mode-name { font-size: 1.2rem; }
     .mode-questions { font-size: 0.8rem; }
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1359,7 +1493,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS (scaled down by 30%) ----- */
+/* ----- MOBILE ADJUSTMENTS (scaled down by 30%, then mode cards +25%) ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -1367,139 +1501,166 @@ body {
     }
 
     .greeting-wrapper {
-        margin-bottom: 0.784rem;   /* 1.12 * 0.7 */
+        margin-bottom: 0.784rem;
         gap: 0.49rem;
     }
     .greeting-text {
-        font-size: 0.882rem;       /* 1.26 * 0.7 */
+        font-size: 0.882rem;
     }
     .greeting-text span#greetingName {
-        font-size: 1.764rem;       /* 2.52 * 0.7 */
+        font-size: 1.764rem;
         margin-left: 0.15rem;
     }
     .greeting-sub {
-        font-size: 0.784rem;       /* 1.12 * 0.7 */
+        font-size: 0.784rem;
         margin-top: 0.1rem;
     }
     .hero-logo-wrap {
-        width: 93.1px;             /* 133 * 0.7 */
+        width: 93.1px;
         height: 93.1px;
     }
     .hero-logo-text {
-        font-size: 1.225rem;       /* 1.75 * 0.7 */
+        font-size: 1.225rem;
     }
-    .hero-flag { font-size: 1.47rem; }   /* 2.1 * 0.7 */
-    .hero-bulb { font-size: 1.764rem; }  /* 2.52 * 0.7 */
-    .sparkle { font-size: 1.078rem; }    /* 1.54 * 0.7 */
+    .hero-flag { font-size: 1.47rem; }
+    .hero-bulb { font-size: 1.764rem; }
+    .sparkle { font-size: 1.078rem; }
 
     .level-display {
-        gap: 1.47rem;              /* 2.1 * 0.7 */
-        padding: 0.7rem 0.77rem;   /* 1*0.7, 1.1*0.7 */
+        gap: 1.47rem;
+        padding: 0.7rem 0.77rem;
         margin-bottom: 0.784rem;
-        border-radius: 17.64px;    /* 25.2 * 0.7 */
+        border-radius: 17.64px;
     }
     .user-avatar {
-        width: 66.64px;            /* 95.2 * 0.7 */
+        width: 66.64px;
         height: 66.64px;
-        font-size: 0.98rem;        /* 1.4 * 0.7 */
+        font-size: 0.98rem;
         border-width: 2px;
     }
     .avatar-edit-btn {
-        width: 21.56px;            /* 30.8 * 0.7 */
+        width: 21.56px;
         height: 21.56px;
-        font-size: 0.539rem;       /* 0.77 * 0.7 */
+        font-size: 0.539rem;
     }
     .shield-badge {
-        width: 47.04px;            /* 67.2 * 0.7 */
-        height: 50.96px;           /* 72.8 * 0.7 */
+        width: 47.04px;
+        height: 50.96px;
     }
     .shield-badge .level-badge-img {
         width: 65%;
         height: 65%;
     }
     .level-info {
-        gap: 0.294rem;             /* 0.42 * 0.7 */
+        gap: 0.294rem;
     }
     .level-label {
-        font-size: 0.588rem;       /* 0.84 * 0.7 */
+        font-size: 0.588rem;
         padding: 0.15rem 0.6rem;
         margin-bottom: 0.1rem;
     }
     .level-name {
-        font-size: 1.078rem;       /* 1.54 * 0.7 */
+        font-size: 1.078rem;
     }
     .level-star { font-size: 0.85rem; }
     .xp-progress {
-        height: 5.88px;            /* 8.4 * 0.7 */
-        gap: 0.392rem;             /* 0.56 * 0.7 */
+        height: 5.88px;
+        gap: 0.392rem;
         width: 80%;
     }
     .xp-bar {
         height: 5.88px;
     }
     .xp-text {
-        font-size: 0.686rem;       /* 0.98 * 0.7 */
+        font-size: 0.686rem;
     }
 
     .stats-row {
-        padding: 0.588rem 0.882rem; /* 0.84*0.7, 1.26*0.7 */
-        margin-bottom: 0.686rem;    /* 0.98 * 0.7 */
-        border-radius: 15.68px;     /* 22.4 * 0.7 */
+        padding: 0.588rem 0.882rem;
+        margin-bottom: 0.686rem;
+        border-radius: 15.68px;
     }
     .stat-card {
-        gap: 0.49rem;              /* 0.7 * 0.7 */
+        gap: 0.49rem;
     }
     .stat-icon {
-        width: 31.36px;            /* 44.8 * 0.7 */
+        width: 31.36px;
         height: 31.36px;
-        font-size: 0.833rem;       /* 1.19 * 0.7 */
+        font-size: 0.833rem;
     }
     .stat-value {
-        font-size: 1.078rem;       /* 1.54 * 0.7 */
+        font-size: 1.078rem;
     }
     .stat-label {
-        font-size: 0.686rem;       /* 0.98 * 0.7 */
+        font-size: 0.686rem;
     }
     .stat-caption {
-        font-size: 0.588rem;       /* 0.84 * 0.7 */
+        font-size: 0.588rem;
     }
 
-    .challenge-section {
-        margin-bottom: 0.686rem;    /* 0.98 * 0.7 */
-        min-height: 39.2px;         /* 56 * 0.7 */
+    .ad-container {
+        margin-bottom: 0.686rem;
+        min-height: 39.2px;
+    }
+
+    /* Challenges mobile */
+    .challenges-3d-container {
+        padding: 0.9rem 0.9rem 0.6rem;
+        border-radius: 17.64px;
+        margin-bottom: 0.686rem;
+    }
+    .challenges-title {
+        font-size: 0.85rem;
+        gap: 0.4rem;
+        margin-bottom: 0.6rem;
+    }
+    .challenge-item {
+        padding: 0.5rem 0.7rem;
+        gap: 0.6rem;
+    }
+    .challenge-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+    .challenge-condition {
+        font-size: 0.8rem;
+    }
+    .challenge-reward {
+        font-size: 0.7rem;
     }
 
     .mode-section {
-        margin-top: 1.05rem;        /* 1.5 * 0.7 */
+        margin-top: 1.05rem;
     }
     .mode-title {
-        margin-bottom: 0.588rem;    /* 0.84 * 0.7 */
-        font-size: 0.686rem;        /* 0.98 * 0.7 */
-        gap: 0.392rem;              /* 0.56 * 0.7 */
+        margin-bottom: 0.588rem;
+        font-size: 0.686rem;
+        gap: 0.392rem;
     }
     .mode-title i.fa-crown {
-        font-size: 0.784rem;        /* 1.12 * 0.7 */
+        font-size: 0.784rem;
     }
     .title-line {
-        max-width: 39.2px;          /* 56 * 0.7 */
+        max-width: 39.2px;
     }
     .mode-grid {
-        gap: 0.49rem;               /* 0.7 * 0.7 */
+        gap: 0.49rem;
     }
     .mode-btn {
-        padding: 0.588rem 0.245rem;  /* 0.84*0.7, 0.35*0.7 */
-        min-height: 132.3px;        /* 189 * 0.7 */
-        border-radius: 15.68px;     /* 22.4 * 0.7 */
-        gap: 0.196rem;              /* 0.28 * 0.7 */
+        padding: 0.588rem 0.245rem;
+        min-height: 165.4px;
+        border-radius: 15.68px;
+        gap: 0.196rem;
     }
     .mode-icon {
-        font-size: 2.254rem;        /* 3.22 * 0.7 */
+        font-size: 2.254rem;
     }
     .mode-name {
-        font-size: 0.882rem;        /* 1.26 * 0.7 */
+        font-size: 0.882rem;
     }
     .mode-questions {
-        font-size: 0.588rem;        /* 0.84 * 0.7 */
+        font-size: 0.588rem;
         padding: 0.15rem 0.25rem;
     }
     .mode-btn-red { transform: perspective(700px) rotateY(14deg); }
@@ -1510,7 +1671,7 @@ body {
         margin-left: -0.18rem;
     }
 
-    /* other tabs unchanged but their sizes were not scaled in previous versions; we'll keep them */
+    /* other tabs unchanged */
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 0.7rem;
@@ -1619,63 +1780,77 @@ body {
 
 @media (max-width: 380px) {
     .greeting-text {
-        font-size: 0.735rem;       /* 1.05 * 0.7 */
+        font-size: 0.735rem;
     }
     .greeting-text span#greetingName {
-        font-size: 1.372rem;       /* 1.96 * 0.7 */
+        font-size: 1.372rem;
     }
     .greeting-sub {
-        font-size: 0.637rem;       /* 0.91 * 0.7 */
+        font-size: 0.637rem;
     }
     .hero-logo-wrap {
-        width: 78.4px;             /* 112 * 0.7 */
+        width: 78.4px;
         height: 78.4px;
     }
     .hero-logo-text {
-        font-size: 1.029rem;       /* 1.47 * 0.7 */
+        font-size: 1.029rem;
     }
     .level-display {
-        gap: 1.078rem;             /* 1.54 * 0.7 */
-        padding: 0.539rem 0.63rem; /* 0.77*0.7, 0.9*0.7 */
+        gap: 1.078rem;
+        padding: 0.539rem 0.63rem;
     }
     .user-avatar {
-        width: 54.88px;            /* 78.4 * 0.7 */
+        width: 54.88px;
         height: 54.88px;
-        font-size: 0.833rem;       /* 1.19 * 0.7 */
+        font-size: 0.833rem;
     }
     .shield-badge {
-        width: 39.2px;             /* 56 * 0.7 */
-        height: 43.12px;           /* 61.6 * 0.7 */
+        width: 39.2px;
+        height: 43.12px;
     }
     .level-name {
-        font-size: 0.882rem;       /* 1.26 * 0.7 */
+        font-size: 0.882rem;
     }
     .xp-text {
-        font-size: 0.588rem;       /* 0.84 * 0.7 */
+        font-size: 0.588rem;
     }
     .stat-value {
-        font-size: 0.882rem;       /* 1.26 * 0.7 */
+        font-size: 0.882rem;
     }
     .stat-icon {
-        width: 25.48px;            /* 36.4 * 0.7 */
+        width: 25.48px;
         height: 25.48px;
-        font-size: 0.686rem;       /* 0.98 * 0.7 */
+        font-size: 0.686rem;
     }
-    .challenge-section {
-        min-height: 29.4px;        /* 42 * 0.7 */
+    .ad-container {
+        min-height: 29.4px;
+    }
+    .challenges-3d-container {
+        padding: 0.7rem 0.7rem 0.5rem;
+    }
+    .challenge-item {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    .challenge-info {
+        width: 100%;
+        flex: none;
+    }
+    .challenge-arrow {
+        margin-left: auto;
     }
     .mode-btn {
-        min-height: 112.7px;       /* 161 * 0.7 */
-        padding: 0.441rem 0.147rem; /* 0.63*0.7, 0.21*0.7 */
+        min-height: 140.9px;
+        padding: 0.441rem 0.147rem;
     }
     .mode-icon {
-        font-size: 1.862rem;       /* 2.66 * 0.7 */
+        font-size: 1.862rem;
     }
     .mode-name {
-        font-size: 0.735rem;       /* 1.05 * 0.7 */
+        font-size: 0.735rem;
     }
     .mode-questions {
-        font-size: 0.539rem;       /* 0.77 * 0.7 */
+        font-size: 0.539rem;
     }
     .mode-btn-red { transform: perspective(500px) rotateY(8deg); }
     .mode-btn-green { transform: perspective(500px) rotateY(-8deg); }
