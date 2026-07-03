@@ -360,7 +360,7 @@ body {
     opacity: 0.7;
 }
 
-/* Avatar container (left) – increased size */
+/* Avatar container (left) – increased size by 20% */
 .avatar-container {
     display: flex;
     flex-direction: column;
@@ -370,8 +370,8 @@ body {
 }
 
 .user-avatar {
-    width: 90px;
-    height: 90px;
+    width: 108px;             /* 90 * 1.2 = 108 */
+    height: 108px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
     display: flex;
@@ -379,7 +379,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 1.5rem;        /* adjusted */
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -397,29 +397,36 @@ body {
     justify-content: center;
 }
 
-/* ---- ENLARGED AVATAR EDIT BUTTON (pen) ---- */
+/* ---- PERFECT CIRCLE AVATAR EDIT BUTTON (pen) ---- */
 .avatar-edit-btn {
     position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 34px;              /* increased from 28px */
-    height: 34px;             /* increased from 28px */
-    min-height: 34px;
-    border-radius: 50%;
+    bottom: 0px;              /* adjusted to sit on the border */
+    right: 0px;
+    width: 36px;              /* kept proportional */
+    height: 36px;
+    min-height: 36px;
+    border-radius: 50%;       /* ensure perfect circle */
     background: #3E7BFF;
     border: 2.5px solid #0A0A0F;
     color: #fff;
-    font-size: 0.9rem;        /* increased from 0.7rem */
+    font-size: 1rem;          /* slightly larger icon */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     transition: transform 0.2s, background 0.2s;
+    padding: 0;               /* remove any extra padding */
+    line-height: 1;           /* ensure icon is centered */
+    text-align: center;
 }
 .avatar-edit-btn:hover {
     transform: scale(1.1);
     background: #2a5fd0;
+}
+.avatar-edit-btn i {
+    margin: 0;                /* remove any default margin */
+    display: block;           /* block to avoid inline quirks */
 }
 
 /* Level container (right) */
@@ -444,8 +451,8 @@ body {
 /* ---- ENLARGED SHIELD BADGE ---- */
 .shield-badge {
     flex-shrink: 0;
-    width: 60px;              /* increased from 48px */
-    height: 68px;             /* increased from 54px */
+    width: 60px;
+    height: 68px;
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -1524,7 +1531,7 @@ body {
     .main-content { max-width: 800px; padding-bottom: 2rem; }
     .stats-row { gap: 1rem; }
     .level-display { padding: 1rem 1.5rem; }
-    .user-avatar { width: 90px; height: 90px; }
+    .user-avatar { width: 108px; height: 108px; }
     .level-name { font-size: 1.6rem; }
     .mode-grid { gap: 1.5rem; }
     .mode-btn { min-height: 250px; }
@@ -1620,14 +1627,14 @@ body {
         min-height: 100px;
     }
     .user-avatar {
-        width: 70px;
-        height: 70px;
-        font-size: 1rem;
+        width: 80px;           /* proportional scaling */
+        height: 80px;
+        font-size: 1.1rem;
     }
     .avatar-edit-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
     }
     .shield-badge {
         width: 48px;
@@ -1881,14 +1888,14 @@ body {
         min-height: 80px;
     }
     .user-avatar {
-        width: 56px;
-        height: 56px;
-        font-size: 0.8rem;
+        width: 64px;
+        height: 64px;
+        font-size: 0.9rem;
     }
     .avatar-edit-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 0.6rem;
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
     }
     .shield-badge {
         width: 38px;
