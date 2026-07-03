@@ -15,6 +15,11 @@ html, body {
     overflow-x: hidden;
     max-width: 100%;
     -webkit-overflow-scrolling: touch;
+    /* Hide scrollbars for cleaner look */
+    scrollbar-width: none; /* Firefox */
+}
+body::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 body {
@@ -120,11 +125,9 @@ body {
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
+/* ---- Removed header divider ---- */
 .header-divider {
-    width: 1px;
-    height: 22px;
-    background: rgba(255, 255, 255, 0.15);
-    flex-shrink: 0;
+    display: none;
 }
 
 /* Stats badges – with labels */
@@ -498,11 +501,9 @@ body {
     margin-bottom: 1.2rem;
     width: 100%;
 }
+/* ---- Removed stats divider ---- */
 .stats-divider {
-    width: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 0.2rem 0.8rem;
-    flex-shrink: 0;
+    display: none;
 }
 .stat-card {
     background: transparent;
@@ -760,10 +761,10 @@ body {
 .mode-btn-red {
     background: linear-gradient(160deg, #FF5757 0%, #C21E1E 100%);
     transform-origin: right center;
-    transform: perspective(900px) rotateY(30deg);
+    transform: perspective(900px) rotateY(20deg); /* reduced from 30deg */
 }
 .mode-btn-red:hover {
-    transform: perspective(900px) rotateY(30deg) translateY(-6px);
+    transform: perspective(900px) rotateY(20deg) translateY(-6px);
 }
 .mode-btn-blue {
     background: linear-gradient(160deg, #3E8BFF 0%, #1440C2 100%);
@@ -774,10 +775,10 @@ body {
 .mode-btn-green {
     background: linear-gradient(160deg, #3FE07E 0%, #0F9C4E 100%);
     transform-origin: left center;
-    transform: perspective(900px) rotateY(-30deg);
+    transform: perspective(900px) rotateY(-20deg); /* reduced from -30deg */
 }
 .mode-btn-green:hover {
-    transform: perspective(900px) rotateY(-30deg) translateY(-6px);
+    transform: perspective(900px) rotateY(-20deg) translateY(-6px);
 }
 .mode-icon-wrap {
     display: flex;
@@ -819,6 +820,12 @@ body {
     text-align: center;
     text-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
+/* Shift "One Chance" text slightly left on screens > 320px */
+@media (min-width: 321px) {
+    .mode-btn-green .mode-name {
+        margin-left: -0.2rem;
+    }
+}
 .mode-questions {
     width: 100%;
     text-align: center;
@@ -840,11 +847,12 @@ body {
     pointer-events: none;
 }
 
+/* Adjusted perspective for smaller screens to keep text readable */
 @media (max-width: 420px) {
-    .mode-btn-red { transform: perspective(700px) rotateY(18deg); }
-    .mode-btn-red:hover { transform: perspective(700px) rotateY(18deg) translateY(-4px); }
-    .mode-btn-green { transform: perspective(700px) rotateY(-18deg); }
-    .mode-btn-green:hover { transform: perspective(700px) rotateY(-18deg) translateY(-4px); }
+    .mode-btn-red { transform: perspective(700px) rotateY(12deg); }
+    .mode-btn-red:hover { transform: perspective(700px) rotateY(12deg) translateY(-4px); }
+    .mode-btn-green { transform: perspective(700px) rotateY(-12deg); }
+    .mode-btn-green:hover { transform: perspective(700px) rotateY(-12deg) translateY(-4px); }
 }
 
 /* ----- SECTION HEADER (shared: Shop / Leaderboard) ----- */
