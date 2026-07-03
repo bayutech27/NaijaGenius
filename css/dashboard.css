@@ -214,7 +214,7 @@ body {
 }
 
 /* ============================================================
-   HOME PAGE – all heights reduced by 30% (from previous)
+   HOME PAGE – all heights reduced by 30%
    then mode cards increased by 25%
    ============================================================ */
 
@@ -549,22 +549,15 @@ body {
     color: #9AA5C7;
 }
 
-/* ----- AD CONTAINER (empty, kept for AdMob) ----- */
-.ad-container {
-    margin: 0 0 1.666rem 0;
-    min-height: 58.8px;
-}
-.ad-container > .section-title { display: none; }
-
-/* ===== CHALLENGES FOR YOU (3D container) – reduced height and padding ===== */
+/* ===== CHALLENGES FOR YOU (3D container) ===== */
 .challenges-3d-container {
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
     border-radius: 21.56px;
-    padding: 0.8rem 1rem 0.5rem;  /* reduced top/bottom */
+    padding: 0.8rem 1rem 0.5rem;
     border: none;
     position: relative;
-    margin-bottom: 1.666rem;
+    margin-bottom: 2rem;   /* gap between challenges and mode */
     box-shadow:
         inset 0 4px 12px rgba(0, 0, 0, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.25);
@@ -600,7 +593,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    margin-bottom: 0.6rem;   /* reduced */
+    margin-bottom: 0.6rem;
 }
 .challenges-title i {
     color: #FFD700;
@@ -610,7 +603,7 @@ body {
 .challenges-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;            /* reduced gap */
+    gap: 0.45rem;
 }
 
 .challenge-item {
@@ -619,12 +612,12 @@ body {
     gap: 0.6rem;
     background: rgba(0, 0, 0, 0.25);
     border-radius: 14px;
-    padding: 0.4rem 0.7rem;   /* reduced padding */
+    padding: 0.4rem 0.7rem;
     transition: transform 0.2s, background 0.2s;
     cursor: default;
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
-    min-height: 44px;        /* ensure touch target */
+    min-height: 44px;
 }
 .challenge-item:hover {
     transform: translateX(6px) scale(1.02);
@@ -633,7 +626,7 @@ body {
 }
 
 .challenge-icon {
-    width: 34px;             /* slightly smaller */
+    width: 34px;
     height: 34px;
     border-radius: 50%;
     background: linear-gradient(135deg, #3E7BFF, #1A4FA0);
@@ -641,7 +634,7 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 1rem;         /* smaller icon */
+    font-size: 1rem;
     color: #FFFFFF;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
@@ -660,21 +653,21 @@ body {
 .challenge-info {
     flex: 1;
     display: flex;
-    flex-direction: row;       /* changed to row to keep text and reward on one line */
+    flex-direction: row;
     align-items: center;
     gap: 0.5rem;
     min-width: 0;
-    flex-wrap: wrap;           /* allow wrap on very small screens */
+    flex-wrap: wrap;
 }
 .challenge-condition {
     font-weight: 600;
-    font-size: 0.85rem;       /* slightly smaller */
+    font-size: 0.85rem;
     color: #FFFFFF;
     line-height: 1.2;
     white-space: nowrap;
 }
 .challenge-reward {
-    font-size: 0.75rem;       /* smaller */
+    font-size: 0.75rem;
     color: #FFD700;
     font-weight: 500;
     white-space: nowrap;
@@ -695,10 +688,11 @@ body {
     color: #3E7BFF;
 }
 
-/* ----- CHOOSE A MODE (height increased by 25% over reduced base) ----- */
+/* ----- CHOOSE A MODE (redesigned for beauty and 3D) ----- */
 .mode-section {
-    margin-top: 1.4rem;
+    margin-top: 0;       /* gap is provided by the challenges container margin */
 }
+
 .mode-title {
     display: flex;
     align-items: center;
@@ -721,6 +715,7 @@ body {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201, 182, 255, 0.5), transparent);
 }
+
 .mode-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -729,6 +724,7 @@ body {
     width: 100%;
     perspective: 900px;
 }
+
 .mode-btn {
     border: none;
     border-radius: 19.6px;
@@ -740,35 +736,66 @@ body {
     gap: 0.196rem;
     width: 100%;
     cursor: pointer;
-    transition: transform 0.25s ease, box-shadow 0.2s ease;
+    transition: transform 0.25s ease, box-shadow 0.2s ease, filter 0.2s;
     text-decoration: none;
     color: #FFFFFF;
     min-height: 274.4px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+
+/* Each card gets a subtle glowing border */
+.mode-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 19.6px;
+    padding: 2px;
+    background: linear-gradient(150deg, rgba(255,255,255,0.2), transparent 60%, rgba(255,255,255,0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Left card (Jollof) – 3D tilt */
 .mode-btn-red {
     background: linear-gradient(160deg, #FF5757 0%, #C21E1E 100%);
     transform-origin: right center;
-    transform: perspective(900px) rotateY(20deg);
+    transform: perspective(900px) rotateY(12deg);
+    box-shadow: -8px 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .mode-btn-red:hover {
-    transform: perspective(900px) rotateY(20deg) translateY(-6px);
+    transform: perspective(900px) rotateY(12deg) translateY(-4px) scale(1.02);
+    box-shadow: -12px 12px 28px rgba(0,0,0,0.6);
 }
+
+/* Center card – flat, but with a prominent glow */
 .mode-btn-blue {
     background: linear-gradient(160deg, #3E8BFF 0%, #1440C2 100%);
+    transform: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 30px rgba(62, 139, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .mode-btn-blue:hover {
-    transform: translateY(-6px);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 40px rgba(62, 139, 255, 0.25);
 }
+
+/* Right card (One Chance) – 3D tilt opposite */
 .mode-btn-green {
     background: linear-gradient(160deg, #3FE07E 0%, #0F9C4E 100%);
     transform-origin: left center;
-    transform: perspective(900px) rotateY(-20deg);
+    transform: perspective(900px) rotateY(-12deg);
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .mode-btn-green:hover {
-    transform: perspective(900px) rotateY(-20deg) translateY(-6px);
+    transform: perspective(900px) rotateY(-12deg) translateY(-4px) scale(1.02);
+    box-shadow: 12px 12px 28px rgba(0,0,0,0.6);
 }
+
 .mode-icon-wrap {
     display: flex;
     align-items: center;
@@ -777,12 +804,29 @@ body {
     flex: 1;
     background: transparent;
     border-radius: 0;
+    position: relative;
 }
+/* Icon glow effect */
+.mode-icon-wrap::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
 .mode-icon {
     font-size: 3.43rem;
-    color: rgba(255,255,255,0.92);
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+    color: rgba(255,255,255,0.95);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
 }
+.mode-btn:hover .mode-icon {
+    transform: scale(1.05) rotate(2deg);
+}
+
 .animate-icon {
     animation: iconFloat 2.4s ease-in-out infinite;
 }
@@ -817,21 +861,24 @@ body {
     font-weight: 700;
     background: transparent;
     padding: 0.2rem 0.3rem 0;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
-.mode-arrow { display: none; }
+.mode-arrow {
+    display: none; /* hidden, we rely on the card hover effect */
+}
 
 .mode-btn:disabled {
     cursor: not-allowed;
-    filter: grayscale(0.5);
-    opacity: 0.6;
-    pointer-events: none;
+    filter: grayscale(0.5) opacity(0.6);
+    transform: none !important;
 }
 
+/* Reduce tilt on smaller screens */
 @media (max-width: 420px) {
-    .mode-btn-red { transform: perspective(700px) rotateY(12deg); }
-    .mode-btn-red:hover { transform: perspective(700px) rotateY(12deg) translateY(-4px); }
-    .mode-btn-green { transform: perspective(700px) rotateY(-12deg); }
-    .mode-btn-green:hover { transform: perspective(700px) rotateY(-12deg) translateY(-4px); }
+    .mode-btn-red { transform: perspective(700px) rotateY(6deg); }
+    .mode-btn-red:hover { transform: perspective(700px) rotateY(6deg) translateY(-4px); }
+    .mode-btn-green { transform: perspective(700px) rotateY(-6deg); }
+    .mode-btn-green:hover { transform: perspective(700px) rotateY(-6deg) translateY(-4px); }
 }
 
 /* ----- SECTION HEADER (Shop / Leaderboard) ----- */
@@ -1466,6 +1513,13 @@ body {
     .lane-desc { font-size: 0.75rem; }
 }
 
+/* ----- AD CONTAINER (empty, kept for AdMob) ----- */
+.ad-container {
+    margin: 1.5rem 0 0 0;
+    min-height: 58.8px;
+}
+.ad-container > .section-title { display: none; }
+
 /* ----- TOAST ----- */
 .toast-container {
     position: fixed;
@@ -1604,16 +1658,11 @@ body {
         font-size: 0.588rem;
     }
 
-    .ad-container {
-        margin-bottom: 0.686rem;
-        min-height: 39.2px;
-    }
-
-    /* Challenges mobile – further reduced */
+    /* Challenges mobile */
     .challenges-3d-container {
         padding: 0.6rem 0.7rem 0.4rem;
         border-radius: 17.64px;
-        margin-bottom: 0.686rem;
+        margin-bottom: 1.2rem;   /* reduced gap on mobile */
     }
     .challenges-title {
         font-size: 0.85rem;
@@ -1641,8 +1690,9 @@ body {
         font-size: 0.8rem;
     }
 
+    /* Mode section mobile */
     .mode-section {
-        margin-top: 1.05rem;
+        margin-top: 0;
     }
     .mode-title {
         margin-bottom: 0.588rem;
@@ -1663,7 +1713,13 @@ body {
         min-height: 165.4px;
         border-radius: 15.68px;
         gap: 0.196rem;
+        transform: none !important; /* override 3D on small screens for readability */
     }
+    .mode-btn-red { transform: perspective(700px) rotateY(6deg); }
+    .mode-btn-red:hover { transform: perspective(700px) rotateY(6deg) translateY(-4px); }
+    .mode-btn-green { transform: perspective(700px) rotateY(-6deg); }
+    .mode-btn-green:hover { transform: perspective(700px) rotateY(-6deg) translateY(-4px); }
+    .mode-btn-blue { transform: none; }
     .mode-icon {
         font-size: 2.254rem;
     }
@@ -1674,12 +1730,14 @@ body {
         font-size: 0.588rem;
         padding: 0.15rem 0.25rem;
     }
-    .mode-btn-red { transform: perspective(700px) rotateY(14deg); }
-    .mode-btn-red:hover { transform: perspective(700px) rotateY(14deg) translateY(-4px); }
-    .mode-btn-green { transform: perspective(700px) rotateY(-14deg); }
-    .mode-btn-green:hover { transform: perspective(700px) rotateY(-14deg) translateY(-4px); }
     .mode-btn-green .mode-name {
         margin-left: -0.18rem;
+    }
+
+    /* Ad container mobile */
+    .ad-container {
+        margin-top: 1.2rem;
+        min-height: 39.2px;
     }
 
     /* other tabs unchanged */
@@ -1833,9 +1891,6 @@ body {
         height: 25.48px;
         font-size: 0.686rem;
     }
-    .ad-container {
-        min-height: 29.4px;
-    }
     .challenges-3d-container {
         padding: 0.5rem 0.5rem 0.3rem;
     }
@@ -1861,7 +1916,12 @@ body {
     .mode-btn {
         min-height: 140.9px;
         padding: 0.441rem 0.147rem;
+        transform: none !important;
     }
+    .mode-btn-red { transform: perspective(500px) rotateY(4deg); }
+    .mode-btn-red:hover { transform: perspective(500px) rotateY(4deg) translateY(-3px); }
+    .mode-btn-green { transform: perspective(500px) rotateY(-4deg); }
+    .mode-btn-green:hover { transform: perspective(500px) rotateY(-4deg) translateY(-3px); }
     .mode-icon {
         font-size: 1.862rem;
     }
@@ -1871,8 +1931,10 @@ body {
     .mode-questions {
         font-size: 0.539rem;
     }
-    .mode-btn-red { transform: perspective(500px) rotateY(8deg); }
-    .mode-btn-green { transform: perspective(500px) rotateY(-8deg); }
+    .ad-container {
+        margin-top: 0.8rem;
+        min-height: 29.4px;
+    }
     .stat-badge-group { gap: 0.35rem; }
     .stat-label-text { display: none; }
     .nav-item i {
