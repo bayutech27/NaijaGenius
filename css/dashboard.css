@@ -192,15 +192,14 @@ body {
     padding-left: 1rem;
     padding-right: 1rem;
     overflow-x: hidden;
-    overflow-y: auto;               /* enable vertical scrolling */
-    -webkit-overflow-scrolling: touch; /* smooth momentum scrolling on iOS */
-    height: calc(100vh - 72px);     /* fill remaining viewport height */
-    scroll-behavior: smooth;        /* smooth scroll behavior */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100vh - 72px);
+    scroll-behavior: smooth;
 }
 
-/* Ensure the body still allows the fixed header and nav */
 body {
-    overflow-y: hidden;             /* prevent body scrolling, let main-content handle it */
+    overflow-y: hidden;
 }
 
 /* ----- PAGE SECTIONS ----- */
@@ -336,9 +335,7 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – redesigned:
-   badge left, label top, name middle, progress bottom.
-   Height increased by 25% (larger avatar, bigger padding, bigger text)
+   LEVEL DISPLAY – redesigned
    ============================================================ */
 .level-display {
     display: flex;
@@ -369,7 +366,7 @@ body {
     opacity: 0.7;
 }
 
-/* Avatar container (left) – further increased size */
+/* Avatar container (left) */
 .avatar-container {
     display: flex;
     flex-direction: column;
@@ -379,7 +376,7 @@ body {
 }
 
 .user-avatar {
-    width: 130px;             /* increased from 108px */
+    width: 130px;
     height: 130px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
@@ -388,7 +385,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.8rem;        /* adjusted */
+    font-size: 1.8rem;
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -406,19 +403,19 @@ body {
     justify-content: center;
 }
 
-/* ---- PERFECT CIRCLE AVATAR EDIT BUTTON (pen) ---- */
+/* ---- AVATAR EDIT BUTTON – reduced by 40% (was 42px, now 26px) ---- */
 .avatar-edit-btn {
     position: absolute;
     bottom: 0px;
     right: 0px;
-    width: 42px;              /* scaled up */
-    height: 42px;
-    min-height: 42px;
-    border-radius: 50%;       /* ensure perfect circle */
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
+    border-radius: 50%;
     background: #3E7BFF;
     border: 2.5px solid #0A0A0F;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -438,15 +435,15 @@ body {
     display: block;
 }
 
-/* Level container (right) */
+/* Level container (right) – align items left, but we will adjust inner items */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;   /* changed from center */
     justify-content: center;
     min-width: 0;
-    text-align: center;
+    text-align: left;          /* changed from center */
     gap: 0.25rem;
 }
 
@@ -460,8 +457,8 @@ body {
 /* ---- SHIELD BADGE – increased by 30% ---- */
 .shield-badge {
     flex-shrink: 0;
-    width: 78px;              /* 60 * 1.3 */
-    height: 88px;             /* 68 * 1.3 */
+    width: 78px;
+    height: 88px;
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -488,35 +485,37 @@ body {
     border-radius: 20px;
 }
 
+/* ---- LEVEL NAME and PROGRESS BAR – align with the label text ---- */
 .level-name {
     font-size: 1.5rem;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
     margin: 0.1rem 0 0.1rem;
+    margin-left: calc(78px + 0.6rem); /* shield width + gap to align with label text */
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- SHORT, ANIMATED PROGRESS BAR – with two colors: blue for filled, white for empty ----- */
 .xp-progress {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     width: 75%;
     max-width: 260px;
-    background: rgba(255, 255, 255, 0.25);  /* white with opacity for empty part */
+    background: rgba(255, 255, 255, 0.25);
     border-radius: 20px;
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
     overflow: hidden;
+    margin-left: calc(78px + 0.6rem); /* same left margin to align */
 }
 
 .xp-bar {
     height: 100%;
     border-radius: 20px;
     transition: width 0.5s ease, background 0.3s;
-    background: #3E7BFF;                     /* solid blue for filled progress */
+    background: #3E7BFF;
     box-shadow: 0 0 8px rgba(62, 123, 255, 0.3);
     width: 0%;
 }
@@ -1625,7 +1624,6 @@ body {
     .hero-bulb { font-size: 1.764rem; }
     .sparkle { font-size: 1.078rem; }
 
-    /* Level display mobile – keep layout, slightly smaller */
     .level-display {
         flex-direction: row;
         gap: 1rem;
@@ -1635,14 +1633,14 @@ body {
         min-height: 100px;
     }
     .user-avatar {
-        width: 90px;           /* proportional scaling */
+        width: 90px;
         height: 90px;
         font-size: 1.2rem;
     }
     .avatar-edit-btn {
-        width: 34px;
-        height: 34px;
-        font-size: 0.9rem;
+        width: 20px;   /* reduced proportionally */
+        height: 20px;
+        font-size: 0.55rem;
     }
     .shield-badge {
         width: 60px;
@@ -1654,11 +1652,13 @@ body {
     }
     .level-name {
         font-size: 1.2rem;
+        margin-left: calc(60px + 0.6rem); /* adjust for smaller shield */
     }
     .xp-progress {
         width: 85%;
         max-width: 200px;
         height: 8px;
+        margin-left: calc(60px + 0.6rem);
     }
     .xp-text {
         font-size: 0.65rem;
@@ -1901,9 +1901,9 @@ body {
         font-size: 1rem;
     }
     .avatar-edit-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
+        width: 16px;
+        height: 16px;
+        font-size: 0.45rem;
     }
     .shield-badge {
         width: 48px;
@@ -1915,11 +1915,13 @@ body {
     }
     .level-name {
         font-size: 1rem;
+        margin-left: calc(48px + 0.6rem);
     }
     .xp-progress {
         width: 100%;
         max-width: 140px;
         height: 6px;
+        margin-left: calc(48px + 0.6rem);
     }
     .xp-text {
         font-size: 0.55rem;
