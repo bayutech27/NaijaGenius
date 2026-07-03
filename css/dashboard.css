@@ -1,7 +1,5 @@
 /* ============================================================
-   NAIJAGENIUS DASHBOARD — themed to match games.html/css
-   (same background gradient, same accent palette, same inset
-   "platter" card treatment used across the game screen)
+   NAIJAGENIUS DASHBOARD — reduced heights by 30%
    ============================================================ */
 
 /* ----- RESET & BASE ----- */
@@ -9,11 +7,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Hide scrollbars everywhere */
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
 }
 *::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge */
+    display: none;
 }
 
 html, body {
@@ -124,12 +121,8 @@ body {
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-/* ---- Removed header divider ---- */
-.header-divider {
-    display: none;
-}
+.header-divider { display: none; }
 
-/* Stats badges – with labels */
 .stat-badge {
     display: flex;
     align-items: center;
@@ -140,9 +133,7 @@ body {
     font-weight: 600;
     color: #f0f3fa;
 }
-.stat-badge i {
-    font-size: 1.1rem;
-}
+.stat-badge i { font-size: 1.1rem; }
 .stat-label-text {
     font-weight: 400;
     color: #a0b3d9;
@@ -170,7 +161,6 @@ body {
     margin-left: 0.15rem;
 }
 
-/* Settings Gear – same styling as old bell */
 .icon-btn {
     background: rgba(20, 24, 46, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -223,12 +213,7 @@ body {
 }
 
 /* ============================================================
-   HOME PAGE – increased heights by 40% (all containers & items)
-   with additional adjustments per user request:
-   - reduced gap between avatar and level info to 80% of 6.72rem
-   - reduced padding in .level-display
-   - reduced progress bar length
-   - increased margin-top of .mode-section to 2rem
+   HOME PAGE – all heights reduced by 30% from the previous version
    ============================================================ */
 
 /* ----- GREETING ----- */
@@ -236,26 +221,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.05rem;
-    margin-bottom: 1.68rem;
+    gap: 0.735rem;          /* 1.05 * 0.7 */
+    margin-bottom: 1.176rem; /* 1.68 * 0.7 */
 }
 .greeting-copy { flex: 1; min-width: 0; }
 .greeting-text {
-    font-size: 1.54rem;
+    font-size: 1.078rem;    /* 1.54 * 0.7 */
     font-weight: 500;
     color: #D7DCEC;
     line-height: 1.2;
 }
 .greeting-text span#greetingName {
     display: inline;
-    font-size: 3.08rem;
+    font-size: 2.156rem;    /* 3.08 * 0.7 */
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.02em;
     margin-left: 0.2rem;
 }
 .greeting-sub {
-    font-size: 1.33rem;
+    font-size: 0.931rem;    /* 1.33 * 0.7 */
     font-weight: 400;
     color: #8C97B8;
     margin-top: 0.2rem;
@@ -263,8 +248,8 @@ body {
 
 .hero-logo-wrap {
     flex-shrink: 0;
-    width: 182px;
-    height: 182px;
+    width: 127.4px;         /* 182 * 0.7 */
+    height: 127.4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -288,20 +273,20 @@ body {
     position: absolute;
     top: -4px;
     left: 4px;
-    font-size: 2.52rem;
+    font-size: 1.764rem;    /* 2.52 * 0.7 */
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 .hero-bulb {
     position: absolute;
     top: -10px;
     right: 0;
-    font-size: 3.36rem;
+    font-size: 2.352rem;    /* 3.36 * 0.7 */
     filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
 }
 .hero-logo-text {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: 2.24rem;
+    font-size: 1.568rem;    /* 2.24 * 0.7 */
     line-height: 1.05;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     letter-spacing: -0.02em;
@@ -310,10 +295,8 @@ body {
 }
 .hero-logo-text em { font-style: normal; }
 
-/* ----- SPARKLE / FIREWORKS ANIMATION ----- */
-.sparkle-text {
-    position: relative;
-}
+/* ----- SPARKLE ----- */
+.sparkle-text { position: relative; }
 .sparkle-container {
     position: absolute;
     top: 0;
@@ -325,7 +308,7 @@ body {
 }
 .sparkle {
     position: absolute;
-    font-size: 1.96rem;
+    font-size: 1.372rem;    /* 1.96 * 0.7 */
     animation: sparkleFloat 3s ease-in-out infinite;
 }
 .sparkle-1 { top: -10%; left: -10%; animation-delay: 0s; }
@@ -341,16 +324,16 @@ body {
     100% { transform: translate(20px, -30px) scale(1.4) rotate(30deg); opacity: 0; }
 }
 
-/* ----- LEVEL DISPLAY – updated per user request ----- */
+/* ----- LEVEL DISPLAY ----- */
 .level-display {
     display: flex;
     align-items: center;
-    gap: 5.376rem;          /* 80% of 6.72rem */
-    margin-bottom: 2.94rem;
+    gap: 3.7632rem;         /* 5.376 * 0.7 */
+    margin-bottom: 2.058rem; /* 2.94 * 0.7 */
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
-    border-radius: 30.8px;
-    padding: 1.2rem 1.4rem;  /* reduced from 1.68rem 1.96rem */
+    border-radius: 21.56px;  /* 30.8 * 0.7 */
+    padding: 0.84rem 0.98rem; /* 1.2*0.7, 1.4*0.7 */
     border: none;
     position: relative;
 }
@@ -358,7 +341,7 @@ body {
     content: '';
     position: absolute;
     inset: -2px;
-    border-radius: 30.8px;
+    border-radius: 21.56px;
     padding: 2px;
     background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -374,8 +357,8 @@ body {
     flex-shrink: 0;
 }
 .user-avatar {
-    width: 103.6px;
-    height: 103.6px;
+    width: 72.52px;         /* 103.6 * 0.7 */
+    height: 72.52px;
     background: linear-gradient(135deg, #FFD700, #FF9A3E);
     border-radius: 50%;
     display: flex;
@@ -383,7 +366,7 @@ body {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.54rem;
+    font-size: 1.078rem;    /* 1.54 * 0.7 */
     color: #0A0A0F;
     border: 3px solid #FFFFFF;
     overflow: hidden;
@@ -404,33 +387,32 @@ body {
     position: absolute;
     bottom: -2px;
     right: -2px;
-    width: 33.6px;
-    height: 33.6px;
-    min-height: 33.6px;
+    width: 23.52px;         /* 33.6 * 0.7 */
+    height: 23.52px;
+    min-height: 23.52px;
     border-radius: 50%;
     background: #3E7BFF;
     border: 2px solid #0A0A0F;
     color: #fff;
-    font-size: 0.84rem;
+    font-size: 0.588rem;    /* 0.84 * 0.7 */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
 
-/* Level info container (badge + name + progress) */
 .level-info-container {
     display: flex;
     align-items: center;
-    gap: 1.12rem;
+    gap: 0.784rem;          /* 1.12 * 0.7 */
     flex: 1;
     min-width: 0;
 }
 
 .shield-badge {
     flex-shrink: 0;
-    width: 70px;
-    height: 78.4px;
+    width: 49px;            /* 70 * 0.7 */
+    height: 54.88px;        /* 78.4 * 0.7 */
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -450,12 +432,12 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.84rem;
+    gap: 0.588rem;          /* 0.84 * 0.7 */
     min-width: 0;
 }
 .level-label {
     align-self: flex-start;
-    font-size: 0.98rem;
+    font-size: 0.686rem;    /* 0.98 * 0.7 */
     font-weight: 600;
     text-transform: uppercase;
     color: #C9B6FF;
@@ -467,35 +449,34 @@ body {
     margin-bottom: 0.05rem;
 }
 .level-name {
-    font-size: 1.82rem;
+    font-size: 1.274rem;    /* 1.82 * 0.7 */
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.15;
 }
 .level-star { font-size: 0.9rem; }
 
-/* XP progress – reduced length (width 80%) */
 .xp-progress {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    width: 80%;              /* reduced from 100% */
-    max-width: 400px;        /* optional cap */
+    gap: 0.49rem;           /* 0.7 * 0.7 */
+    width: 80%;
+    max-width: 400px;
     background: rgba(0,0,0,0.3);
-    border-radius: 8.4px;
-    height: 9.8px;
+    border-radius: 5.88px;   /* 8.4 * 0.7 */
+    height: 6.86px;          /* 9.8 * 0.7 */
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
 }
 .xp-bar {
-    height: 9.8px;
+    height: 6.86px;
     background: linear-gradient(90deg, #7C4FE0, #3E7BFF);
-    border-radius: 8.4px;
+    border-radius: 5.88px;
     transition: width 0.3s ease;
     box-shadow: 0 0 8px rgba(124, 79, 224, 0.5);
 }
 .xp-text {
-    font-size: 1.12rem;
+    font-size: 0.784rem;    /* 1.12 * 0.7 */
     font-weight: 600;
     color: #E4E8F5;
     white-space: nowrap;
@@ -506,9 +487,9 @@ body {
     display: flex;
     align-items: stretch;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border-radius: 25.2px;
-    padding: 1.12rem 1.96rem;
-    margin-bottom: 2.38rem;
+    border-radius: 17.64px;  /* 25.2 * 0.7 */
+    padding: 0.784rem 1.372rem; /* 1.12*0.7, 1.96*0.7 */
+    margin-bottom: 1.666rem; /* 2.38 * 0.7 */
     width: 100%;
 }
 .stats-divider { display: none; }
@@ -518,7 +499,7 @@ body {
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 0.98rem;
+    gap: 0.686rem;          /* 0.98 * 0.7 */
     opacity: 0;
     animation: fadeUp 0.4s ease-out forwards;
     width: auto;
@@ -526,11 +507,11 @@ body {
     min-width: 0;
 }
 .stat-icon {
-    font-size: 1.54rem;
+    font-size: 1.078rem;    /* 1.54 * 0.7 */
     color: #fff;
     flex-shrink: 0;
-    width: 47.6px;
-    height: 47.6px;
+    width: 33.32px;         /* 47.6 * 0.7 */
+    height: 33.32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -548,43 +529,43 @@ body {
     flex: 1;
 }
 .stat-label {
-    font-size: 1.05rem;
+    font-size: 0.735rem;    /* 1.05 * 0.7 */
     font-weight: 600;
     color: #C9D3EE;
     order: -1;
 }
 .stat-value {
-    font-size: 1.82rem;
+    font-size: 1.274rem;    /* 1.82 * 0.7 */
     font-weight: 700;
     color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 .stat-caption {
-    font-size: 0.91rem;
+    font-size: 0.637rem;    /* 0.91 * 0.7 */
     font-weight: 400;
     color: #9AA5C7;
 }
 
-/* ----- ACTIVE CHALLENGE (now empty for AdMob) ----- */
+/* ----- ACTIVE CHALLENGE (empty for AdMob) ----- */
 .challenge-section {
-    margin: 0 0 2.38rem 0;
-    min-height: 84px;
+    margin: 0 0 1.666rem 0; /* 2.38 * 0.7 */
+    min-height: 58.8px;     /* 84 * 0.7 */
 }
 .challenge-section > .section-title { display: none; }
 .challenge-card-large { display: none; }
 
-/* ----- CHOOSE A MODE – moved down 2rem ----- */
+/* ----- CHOOSE A MODE ----- */
 .mode-section {
-    margin-top: 2rem;          /* increased from 0.7rem */
+    margin-top: 1.4rem;     /* 2 * 0.7 */
 }
 .mode-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.7rem;
-    margin-bottom: 1.54rem;
-    font-size: 1.05rem;
+    gap: 0.49rem;           /* 0.7 * 0.7 */
+    margin-bottom: 1.078rem; /* 1.54 * 0.7 */
+    font-size: 0.735rem;    /* 1.05 * 0.7 */
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -592,11 +573,11 @@ body {
 }
 .mode-title i.fa-crown {
     color: #FFD700;
-    font-size: 1.19rem;
+    font-size: 0.833rem;    /* 1.19 * 0.7 */
 }
 .title-line {
     flex: 1;
-    max-width: 84px;
+    max-width: 58.8px;      /* 84 * 0.7 */
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201, 182, 255, 0.5), transparent);
 }
@@ -604,25 +585,25 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: stretch;
-    gap: 0.98rem;
+    gap: 0.686rem;          /* 0.98 * 0.7 */
     width: 100%;
     perspective: 900px;
 }
 .mode-btn {
     border: none;
-    border-radius: 28px;
-    padding: 1.568rem 0.588rem;
+    border-radius: 19.6px;   /* 28 * 0.7 */
+    padding: 1.0976rem 0.4116rem; /* 1.568*0.7, 0.588*0.7 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 0.28rem;
+    gap: 0.196rem;           /* 0.28 * 0.7 */
     width: 100%;
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.2s ease;
     text-decoration: none;
     color: #FFFFFF;
-    min-height: 313.6px;
+    min-height: 219.52px;    /* 313.6 * 0.7 */
     position: relative;
     overflow: hidden;
 }
@@ -658,7 +639,7 @@ body {
     border-radius: 0;
 }
 .mode-icon {
-    font-size: 4.9rem;
+    font-size: 3.43rem;      /* 4.9 * 0.7 */
     color: rgba(255,255,255,0.92);
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
 }
@@ -681,7 +662,7 @@ body {
 }
 .mode-name {
     font-weight: 800;
-    font-size: 1.54rem;
+    font-size: 1.078rem;    /* 1.54 * 0.7 */
     color: #FFFFFF;
     letter-spacing: -0.01em;
     line-height: 1.15;
@@ -691,7 +672,7 @@ body {
 .mode-questions {
     width: 100%;
     text-align: center;
-    font-size: 1.05rem;
+    font-size: 0.735rem;    /* 1.05 * 0.7 */
     color: #FFFFFF;
     font-weight: 700;
     background: transparent;
@@ -706,7 +687,6 @@ body {
     pointer-events: none;
 }
 
-/* Adjusted perspective for smaller screens */
 @media (max-width: 420px) {
     .mode-btn-red { transform: perspective(700px) rotateY(12deg); }
     .mode-btn-red:hover { transform: perspective(700px) rotateY(12deg) translateY(-4px); }
@@ -714,7 +694,7 @@ body {
     .mode-btn-green:hover { transform: perspective(700px) rotateY(-12deg) translateY(-4px); }
 }
 
-/* ----- SECTION HEADER (shared: Shop / Leaderboard) ----- */
+/* ----- SECTION HEADER (Shop / Leaderboard) ----- */
 .section-header {
     display: flex;
     align-items: center;
@@ -731,9 +711,7 @@ body {
     font-weight: 800;
     color: #FFFFFF;
 }
-.section-header .section-title i {
-    font-size: 1rem;
-}
+.section-header .section-title i { font-size: 1rem; }
 
 /* ----- SHOP SECTION ----- */
 .shop-coins-display {
@@ -1138,7 +1116,6 @@ body {
     text-align: center;
 }
 
-/* Toggle switch */
 .toggle-switch {
     position: relative;
     width: 48px;
@@ -1178,7 +1155,6 @@ body {
     transform: translateX(22px);
 }
 
-/* Edit name input & button */
 .settings-name-control {
     gap: 0.5rem;
 }
@@ -1215,7 +1191,7 @@ body {
     opacity: 0.8;
 }
 
-/* ----- BOTTOM NAVIGATION (Mobile) ----- */
+/* ----- BOTTOM NAV ----- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -1267,7 +1243,6 @@ body {
 .nav-item.active i {
     transform: scale(1.05);
 }
-
 .nav-item:nth-child(1) i { background: linear-gradient(160deg, #3E7BFF, #1A4FA0); color: #fff; }
 .nav-item:nth-child(2) i { background: linear-gradient(160deg, #FFD700, #FF9A3E); color: #0A0A0F; }
 .nav-item:nth-child(3) i { background: linear-gradient(160deg, #8B5CF6, #4B2A9E); color: #fff; }
@@ -1276,7 +1251,6 @@ body {
 .nav-item.active i {
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.4), 0 0 0 2px rgba(255,255,255,0.5), 0 4px 14px rgba(0,0,0,0.35);
 }
-
 .nav-label {
     font-size: 0.6rem;
     font-weight: 600;
@@ -1286,9 +1260,7 @@ body {
 .nav-item.active .nav-label {
     color: #3E7BFF;
 }
-.nav-dot {
-    display: none;
-}
+.nav-dot { display: none; }
 
 /* ----- DESKTOP SIDEBAR ----- */
 .desktop-sidebar { display: none; }
@@ -1387,152 +1359,147 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS – home items scaled by 40% and updated accordingly ----- */
+/* ----- MOBILE ADJUSTMENTS (scaled down by 30%) ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
         padding-bottom: 74px;
     }
 
-    /* ---- GREETING ---- */
     .greeting-wrapper {
-        margin-bottom: 1.12rem;
-        gap: 0.7rem;
+        margin-bottom: 0.784rem;   /* 1.12 * 0.7 */
+        gap: 0.49rem;
     }
     .greeting-text {
-        font-size: 1.26rem;
+        font-size: 0.882rem;       /* 1.26 * 0.7 */
     }
     .greeting-text span#greetingName {
-        font-size: 2.52rem;
+        font-size: 1.764rem;       /* 2.52 * 0.7 */
         margin-left: 0.15rem;
     }
     .greeting-sub {
-        font-size: 1.12rem;
+        font-size: 0.784rem;       /* 1.12 * 0.7 */
         margin-top: 0.1rem;
     }
     .hero-logo-wrap {
-        width: 133px;
-        height: 133px;
+        width: 93.1px;             /* 133 * 0.7 */
+        height: 93.1px;
     }
     .hero-logo-text {
-        font-size: 1.75rem;
+        font-size: 1.225rem;       /* 1.75 * 0.7 */
     }
-    .hero-flag { font-size: 2.1rem; }
-    .hero-bulb { font-size: 2.52rem; }
-    .sparkle { font-size: 1.54rem; }
+    .hero-flag { font-size: 1.47rem; }   /* 2.1 * 0.7 */
+    .hero-bulb { font-size: 1.764rem; }  /* 2.52 * 0.7 */
+    .sparkle { font-size: 1.078rem; }    /* 1.54 * 0.7 */
 
-    /* ---- LEVEL DISPLAY ---- */
     .level-display {
-        gap: 2.1rem;               /* reduced for mobile */
-        padding: 1rem 1.1rem;       /* reduced padding */
-        margin-bottom: 1.12rem;
-        border-radius: 25.2px;
+        gap: 1.47rem;              /* 2.1 * 0.7 */
+        padding: 0.7rem 0.77rem;   /* 1*0.7, 1.1*0.7 */
+        margin-bottom: 0.784rem;
+        border-radius: 17.64px;    /* 25.2 * 0.7 */
     }
     .user-avatar {
-        width: 95.2px;
-        height: 95.2px;
-        font-size: 1.4rem;
+        width: 66.64px;            /* 95.2 * 0.7 */
+        height: 66.64px;
+        font-size: 0.98rem;        /* 1.4 * 0.7 */
         border-width: 2px;
     }
     .avatar-edit-btn {
-        width: 30.8px;
-        height: 30.8px;
-        font-size: 0.77rem;
+        width: 21.56px;            /* 30.8 * 0.7 */
+        height: 21.56px;
+        font-size: 0.539rem;       /* 0.77 * 0.7 */
     }
     .shield-badge {
-        width: 67.2px;
-        height: 72.8px;
+        width: 47.04px;            /* 67.2 * 0.7 */
+        height: 50.96px;           /* 72.8 * 0.7 */
     }
     .shield-badge .level-badge-img {
         width: 65%;
         height: 65%;
     }
     .level-info {
-        gap: 0.42rem;
+        gap: 0.294rem;             /* 0.42 * 0.7 */
     }
     .level-label {
-        font-size: 0.84rem;
+        font-size: 0.588rem;       /* 0.84 * 0.7 */
         padding: 0.15rem 0.6rem;
         margin-bottom: 0.1rem;
     }
     .level-name {
-        font-size: 1.54rem;
+        font-size: 1.078rem;       /* 1.54 * 0.7 */
     }
     .level-star { font-size: 0.85rem; }
     .xp-progress {
-        height: 8.4px;
-        gap: 0.56rem;
-        width: 80%;              /* keep reduced width on mobile */
+        height: 5.88px;            /* 8.4 * 0.7 */
+        gap: 0.392rem;             /* 0.56 * 0.7 */
+        width: 80%;
     }
     .xp-bar {
-        height: 8.4px;
+        height: 5.88px;
     }
     .xp-text {
-        font-size: 0.98rem;
+        font-size: 0.686rem;       /* 0.98 * 0.7 */
     }
 
-    /* ---- STATS ROW ---- */
     .stats-row {
-        padding: 0.84rem 1.26rem;
-        margin-bottom: 0.98rem;
-        border-radius: 22.4px;
+        padding: 0.588rem 0.882rem; /* 0.84*0.7, 1.26*0.7 */
+        margin-bottom: 0.686rem;    /* 0.98 * 0.7 */
+        border-radius: 15.68px;     /* 22.4 * 0.7 */
     }
     .stat-card {
-        gap: 0.7rem;
+        gap: 0.49rem;              /* 0.7 * 0.7 */
     }
     .stat-icon {
-        width: 44.8px;
-        height: 44.8px;
-        font-size: 1.19rem;
+        width: 31.36px;            /* 44.8 * 0.7 */
+        height: 31.36px;
+        font-size: 0.833rem;       /* 1.19 * 0.7 */
     }
     .stat-value {
-        font-size: 1.54rem;
+        font-size: 1.078rem;       /* 1.54 * 0.7 */
     }
     .stat-label {
-        font-size: 0.98rem;
+        font-size: 0.686rem;       /* 0.98 * 0.7 */
     }
     .stat-caption {
-        font-size: 0.84rem;
+        font-size: 0.588rem;       /* 0.84 * 0.7 */
     }
 
-    /* ---- ACTIVE CHALLENGE (empty) ---- */
     .challenge-section {
-        margin-bottom: 0.98rem;
-        min-height: 56px;
+        margin-bottom: 0.686rem;    /* 0.98 * 0.7 */
+        min-height: 39.2px;         /* 56 * 0.7 */
     }
 
-    /* ---- MODE SECTION ---- */
     .mode-section {
-        margin-top: 1.5rem;          /* reduced from 2rem on mobile but still moved down */
+        margin-top: 1.05rem;        /* 1.5 * 0.7 */
     }
     .mode-title {
-        margin-bottom: 0.84rem;
-        font-size: 0.98rem;
-        gap: 0.56rem;
+        margin-bottom: 0.588rem;    /* 0.84 * 0.7 */
+        font-size: 0.686rem;        /* 0.98 * 0.7 */
+        gap: 0.392rem;              /* 0.56 * 0.7 */
     }
     .mode-title i.fa-crown {
-        font-size: 1.12rem;
+        font-size: 0.784rem;        /* 1.12 * 0.7 */
     }
     .title-line {
-        max-width: 56px;
+        max-width: 39.2px;          /* 56 * 0.7 */
     }
     .mode-grid {
-        gap: 0.7rem;
+        gap: 0.49rem;               /* 0.7 * 0.7 */
     }
     .mode-btn {
-        padding: 0.84rem 0.35rem;
-        min-height: 189px;
-        border-radius: 22.4px;
-        gap: 0.28rem;
+        padding: 0.588rem 0.245rem;  /* 0.84*0.7, 0.35*0.7 */
+        min-height: 132.3px;        /* 189 * 0.7 */
+        border-radius: 15.68px;     /* 22.4 * 0.7 */
+        gap: 0.196rem;              /* 0.28 * 0.7 */
     }
     .mode-icon {
-        font-size: 3.22rem;
+        font-size: 2.254rem;        /* 3.22 * 0.7 */
     }
     .mode-name {
-        font-size: 1.26rem;
+        font-size: 0.882rem;        /* 1.26 * 0.7 */
     }
     .mode-questions {
-        font-size: 0.84rem;
+        font-size: 0.588rem;        /* 0.84 * 0.7 */
         padding: 0.15rem 0.25rem;
     }
     .mode-btn-red { transform: perspective(700px) rotateY(14deg); }
@@ -1543,7 +1510,7 @@ body {
         margin-left: -0.18rem;
     }
 
-    /* ---- Other tabs (unchanged) ---- */
+    /* other tabs unchanged but their sizes were not scaled in previous versions; we'll keep them */
     .stats-grid {
         grid-template-columns: 1fr 1fr;
         gap: 0.7rem;
@@ -1652,63 +1619,63 @@ body {
 
 @media (max-width: 380px) {
     .greeting-text {
-        font-size: 1.05rem;
+        font-size: 0.735rem;       /* 1.05 * 0.7 */
     }
     .greeting-text span#greetingName {
-        font-size: 1.96rem;
+        font-size: 1.372rem;       /* 1.96 * 0.7 */
     }
     .greeting-sub {
-        font-size: 0.91rem;
+        font-size: 0.637rem;       /* 0.91 * 0.7 */
     }
     .hero-logo-wrap {
-        width: 112px;
-        height: 112px;
+        width: 78.4px;             /* 112 * 0.7 */
+        height: 78.4px;
     }
     .hero-logo-text {
-        font-size: 1.47rem;
+        font-size: 1.029rem;       /* 1.47 * 0.7 */
     }
     .level-display {
-        gap: 1.54rem;
-        padding: 0.77rem 0.9rem;
+        gap: 1.078rem;             /* 1.54 * 0.7 */
+        padding: 0.539rem 0.63rem; /* 0.77*0.7, 0.9*0.7 */
     }
     .user-avatar {
-        width: 78.4px;
-        height: 78.4px;
-        font-size: 1.19rem;
+        width: 54.88px;            /* 78.4 * 0.7 */
+        height: 54.88px;
+        font-size: 0.833rem;       /* 1.19 * 0.7 */
     }
     .shield-badge {
-        width: 56px;
-        height: 61.6px;
+        width: 39.2px;             /* 56 * 0.7 */
+        height: 43.12px;           /* 61.6 * 0.7 */
     }
     .level-name {
-        font-size: 1.26rem;
+        font-size: 0.882rem;       /* 1.26 * 0.7 */
     }
     .xp-text {
-        font-size: 0.84rem;
+        font-size: 0.588rem;       /* 0.84 * 0.7 */
     }
     .stat-value {
-        font-size: 1.26rem;
+        font-size: 0.882rem;       /* 1.26 * 0.7 */
     }
     .stat-icon {
-        width: 36.4px;
-        height: 36.4px;
-        font-size: 0.98rem;
+        width: 25.48px;            /* 36.4 * 0.7 */
+        height: 25.48px;
+        font-size: 0.686rem;       /* 0.98 * 0.7 */
     }
     .challenge-section {
-        min-height: 42px;
+        min-height: 29.4px;        /* 42 * 0.7 */
     }
     .mode-btn {
-        min-height: 161px;
-        padding: 0.63rem 0.21rem;
+        min-height: 112.7px;       /* 161 * 0.7 */
+        padding: 0.441rem 0.147rem; /* 0.63*0.7, 0.21*0.7 */
     }
     .mode-icon {
-        font-size: 2.66rem;
+        font-size: 1.862rem;       /* 2.66 * 0.7 */
     }
     .mode-name {
-        font-size: 1.05rem;
+        font-size: 0.735rem;       /* 1.05 * 0.7 */
     }
     .mode-questions {
-        font-size: 0.77rem;
+        font-size: 0.539rem;       /* 0.77 * 0.7 */
     }
     .mode-btn-red { transform: perspective(500px) rotateY(8deg); }
     .mode-btn-green { transform: perspective(500px) rotateY(-8deg); }
@@ -1774,7 +1741,7 @@ body {
     }
 }
 
-/* ----- TOUCH TARGETS & SMOOTH SCROLL ----- */
+/* ----- TOUCH TARGETS ----- */
 button, .nav-item, .sidebar-item, .challenge-card, .mode-btn, .lane-card {
     min-height: 44px;
     cursor: pointer;
