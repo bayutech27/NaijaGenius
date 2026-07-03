@@ -9,17 +9,17 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Hide scrollbars everywhere */
+    scrollbar-width: none; /* Firefox */
+}
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
 }
 
 html, body {
     overflow-x: hidden;
     max-width: 100%;
     -webkit-overflow-scrolling: touch;
-    /* Hide scrollbars for cleaner look */
-    scrollbar-width: none; /* Firefox */
-}
-body::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
 }
 
 body {
