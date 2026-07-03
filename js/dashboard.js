@@ -8,6 +8,12 @@ import {
   serverTimestamp,
   getDocs,
   collection,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  where,
+  getCountFromServer,
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
@@ -169,12 +175,33 @@ async function handleAvatarUpload(file, userUID) {
   }
 }
 
-// ========== LEADERBOARD ==========
+// ========== LEADERBOARD (with pagination) ==========
 const leaderboardFilter = document.getElementById("leaderboardFilter");
 const fullLeaderboard = document.getElementById("fullLeaderboard");
 let currentUserUid = null;
+let leaderboardLastDoc = null;
+let leaderboardHasMore = true;
+const LEADERBOARD_PAGE_SIZE = 20;
+let currentFilter = "all";
 
-// Create a rank display element if it doesn't exist
+// Get the field to order by based on filter
+function getOrderField(filter) {
+  switch (filter) {
+    case "monthly":
+      return "monthlyCorrectAnswers";
+    case "weekly":
+      return "weeklyCorrectAnswers";
+    default:
+      return "totalCorrectAnswers";
+  }
+}
+
+// Get the display field for the score (same as order field)
+function getScoreField(filter) {
+  return getOrderField(filter);
+}
+
+// Create rank display element
 function ensureRankDisplay() {
   let rankDisplay = document.getElementById("userRankDisplay");
   if (!rankDisplay) {
@@ -184,7 +211,6 @@ function ensureRankDisplay() {
       rankDisplay.id = "userRankDisplay";
       rankDisplay.style.cssText =
         "font-size:0.8rem;font-weight:600;color:#FFD700;margin-left:0.5rem;white-space:nowrap;";
-      // Insert after the filter select (which is a child of section-header)
       const filter = sectionHeader.querySelector(".filter-select");
       if (filter) {
         filter.parentNode.insertBefore(rankDisplay, filter.nextSibling);
@@ -196,113 +222,193 @@ function ensureRankDisplay() {
   return rankDisplay;
 }
 
-async function loadLeaderboard(filter = "all") {
+// Compute user rank using a count query
+async function computeUserRank(uid, filter) {
+  try {
+    // Get user's correct count
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) return null;
+    const userScore = userSnap.data()[getScoreField(filter)] || 0;
+
+    // Count users with higher score
+    const q = query(
+      collection(db, "users"),
+      where(getScoreField(filter), ">", userScore)
+    );
+    const snapshot = await getCountFromServer(q);
+    const rank = snapshot.data().count + 1;
+    return rank;
+  } catch (err) {
+    console.warn("Failed to compute rank:", err);
+    return null;
+  }
+}
+
+// Render leaderboard items
+function renderLeaderboardItems(users, offset) {
+  const listContainer = document.getElementById("leaderboardItems") || fullLeaderboard;
+  // Ensure the container exists
+  if (!listContainer) return;
+
+  // If this is the first page, clear the list
+  if (offset === 0) {
+    listContainer.innerHTML = "";
+  }
+
+  let html = "";
+  users.forEach((user, index) => {
+    const rank = offset + index + 1;
+    let rankClass = "rank-badge";
+    if (rank === 1) rankClass += " rank-1";
+    else if (rank === 2) rankClass += " rank-2";
+    else if (rank === 3) rankClass += " rank-3";
+
+    let avatarHtml = "";
+    if (user.avatar) {
+      avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;">`;
+    } else {
+      const initials = user.displayName.slice(0, 2).toUpperCase();
+      avatarHtml = `<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FF9A3E);color:#0A0A0F;font-weight:700;font-size:0.8rem;">${initials}</span>`;
+    }
+
+    html += `
+      <div class="leaderboard-item">
+          <span class="${rankClass}">${rank}</span>
+          <div class="leaderboard-avatar" style="flex-shrink:0;width:40px;display:flex;align-items:center;justify-content:center;">
+              ${avatarHtml}
+          </div>
+          <span class="leaderboard-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#FFFFFF;">${user.displayName}</span>
+          <span class="leaderboard-level" style="flex:1;min-width:0;text-align:center;color:#C9B6FF;font-weight:600;">${user.level}</span>
+          <span class="leaderboard-score" style="font-family:'Orbitron',monospace;font-weight:700;color:#FFD700;min-width:40px;text-align:right;">${user.correct}</span>
+      </div>
+    `;
+  });
+  listContainer.innerHTML += html;
+
+  // Update "Load More" button visibility
+  const loadMoreContainer = document.getElementById("leaderboardLoadMore");
+  if (loadMoreContainer) {
+    if (leaderboardHasMore) {
+      loadMoreContainer.style.display = "block";
+      loadMoreContainer.innerHTML =
+        '<button id="loadMoreBtn" class="load-more-btn">Load More</button>';
+      document.getElementById("loadMoreBtn")?.addEventListener("click", loadMoreLeaderboard);
+    } else {
+      loadMoreContainer.style.display = "none";
+    }
+  }
+}
+
+async function loadLeaderboard(filter = "all", reset = true) {
   if (!fullLeaderboard) return;
-  fullLeaderboard.innerHTML =
-    '<div class="loading-skeleton">Loading leaderboard…</div>';
+
+  if (reset) {
+    leaderboardLastDoc = null;
+    leaderboardHasMore = true;
+    fullLeaderboard.innerHTML = '<div class="loading-skeleton">Loading leaderboard…</div>';
+  } else {
+    // Show a loading indicator for more items
+    const loadMoreContainer = document.getElementById("leaderboardLoadMore");
+    if (loadMoreContainer) {
+      loadMoreContainer.innerHTML = '<div class="loading-skeleton" style="padding:0.5rem;">Loading more…</div>';
+    }
+  }
 
   const rankDisplay = ensureRankDisplay();
-  if (rankDisplay) rankDisplay.textContent = "";
+  if (reset && rankDisplay) rankDisplay.textContent = "";
 
   try {
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    const allUsers = [];
-    usersSnapshot.forEach((doc) => {
-      const data = doc.data();
-      // Skip anonymous: require a displayName or username
-      const name = data.displayName || data.username;
-      if (!name || name.trim() === "" || name === "Anonymous") return;
+    const orderField = getOrderField(filter);
+    const q = query(
+      collection(db, "users"),
+      orderBy(orderField, "desc"),
+      limit(LEADERBOARD_PAGE_SIZE + 1) // fetch one extra to check if more exist
+    );
+    // If we have a lastDoc, use startAfter
+    let queryRef = q;
+    if (leaderboardLastDoc) {
+      queryRef = query(q, startAfter(leaderboardLastDoc));
+    }
 
-      let correct = 0;
-      if (filter === "all") {
-        correct = data.totalCorrectAnswers || 0;
-      } else if (filter === "monthly") {
-        correct =
-          data.monthlyCorrectAnswers !== undefined
-            ? data.monthlyCorrectAnswers
-            : data.totalCorrectAnswers || 0;
-      } else if (filter === "weekly") {
-        correct =
-          data.weeklyCorrectAnswers !== undefined
-            ? data.weeklyCorrectAnswers
-            : data.totalCorrectAnswers || 0;
-      }
-      allUsers.push({
+    const snapshot = await getDocs(queryRef);
+    const docs = snapshot.docs;
+    const hasMore = docs.length > LEADERBOARD_PAGE_SIZE;
+    const users = docs.slice(0, LEADERBOARD_PAGE_SIZE).map((doc) => {
+      const data = doc.data();
+      const name = data.displayName || data.username || "Anonymous";
+      return {
         uid: doc.id,
         displayName: name,
         avatar: data.avatar || null,
-        correct: correct,
-        level: getLevel(correct).name,
-      });
+        correct: data[orderField] || 0,
+        level: getLevel(data.totalCorrectAnswers || 0).name,
+      };
     });
 
-    // Sort by correct descending
-    allUsers.sort((a, b) => b.correct - a.correct);
+    // Store last doc for next page
+    if (users.length > 0) {
+      leaderboardLastDoc = docs[LEADERBOARD_PAGE_SIZE - 1];
+    } else {
+      leaderboardLastDoc = null;
+    }
+    leaderboardHasMore = hasMore;
 
-    // Take top 50
-    const top50 = allUsers.slice(0, 50);
+    // Render the items
+    const offset = reset ? 0 : (fullLeaderboard.querySelectorAll(".leaderboard-item").length || 0);
+    if (reset) {
+      // Create the list and load-more containers
+      fullLeaderboard.innerHTML = `
+        <div id="leaderboardItems"></div>
+        <div id="leaderboardLoadMore"></div>
+      `;
+    }
+    renderLeaderboardItems(users, offset);
 
-    if (top50.length === 0) {
-      fullLeaderboard.innerHTML =
-        '<div class="loading-skeleton">No players found.</div>';
-      return;
+    // If no users, show empty message
+    if (users.length === 0 && reset) {
+      const list = document.getElementById("leaderboardItems");
+      if (list) list.innerHTML = '<div class="loading-skeleton">No players found.</div>';
     }
 
-    let html = "";
-    top50.forEach((user, index) => {
-      const rank = index + 1;
-      let rankClass = "rank-badge";
-      if (rank === 1) rankClass += " rank-1";
-      else if (rank === 2) rankClass += " rank-2";
-      else if (rank === 3) rankClass += " rank-3";
-
-      let avatarHtml = "";
-      if (user.avatar) {
-        avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;">`;
-      } else {
-        const initials = user.displayName.slice(0, 2).toUpperCase();
-        avatarHtml = `<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FF9A3E);color:#0A0A0F;font-weight:700;font-size:0.8rem;">${initials}</span>`;
-      }
-
-      html += `
-                <div class="leaderboard-item">
-                    <span class="${rankClass}">${rank}</span>
-                    <div class="leaderboard-avatar" style="flex-shrink:0;width:40px;display:flex;align-items:center;justify-content:center;">
-                        ${avatarHtml}
-                    </div>
-                    <span class="leaderboard-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#FFFFFF;">${user.displayName}</span>
-                    <span class="leaderboard-level" style="flex:1;min-width:0;text-align:center;color:#C9B6FF;font-weight:600;">${user.level}</span>
-                    <span class="leaderboard-score" style="font-family:'Orbitron',monospace;font-weight:700;color:#FFD700;min-width:40px;text-align:right;">${user.correct}</span>
-                </div>
-            `;
-    });
-
-    fullLeaderboard.innerHTML = html;
-
-    // ---- Compute current user's rank ----
-    if (currentUserUid) {
-      const userIndex = allUsers.findIndex((u) => u.uid === currentUserUid);
-      if (userIndex !== -1) {
-        const rank = userIndex + 1;
-        if (rankDisplay) {
+    // Compute user rank (only on first load or when filter changes)
+    if (reset && currentUserUid) {
+      const rank = await computeUserRank(currentUserUid, filter);
+      if (rankDisplay) {
+        if (rank !== null) {
           rankDisplay.textContent = `🏆 Your Rank: #${rank}`;
+        } else {
+          rankDisplay.textContent = "🏆 Unranked";
         }
-      } else {
-        if (rankDisplay) rankDisplay.textContent = "🏆 Unranked";
       }
     }
+
   } catch (error) {
     console.error("Failed to load leaderboard:", error);
-    fullLeaderboard.innerHTML =
-      '<div class="loading-skeleton">Failed to load leaderboard. Please try again.</div>';
+    if (reset) {
+      fullLeaderboard.innerHTML =
+        '<div class="loading-skeleton">Failed to load leaderboard. Please try again.</div>';
+    } else {
+      const loadMoreContainer = document.getElementById("leaderboardLoadMore");
+      if (loadMoreContainer) {
+        loadMoreContainer.innerHTML =
+          '<div class="loading-skeleton" style="padding:0.5rem;">Failed to load more. <button id="retryLoadMoreBtn" class="load-more-btn">Retry</button></div>';
+        document.getElementById("retryLoadMoreBtn")?.addEventListener("click", loadMoreLeaderboard);
+      }
+    }
   }
+}
+
+function loadMoreLeaderboard() {
+  if (!leaderboardHasMore) return;
+  loadLeaderboard(currentFilter, false);
 }
 
 // Set up filter change listener
 if (leaderboardFilter) {
   leaderboardFilter.addEventListener("change", () => {
-    const filter = leaderboardFilter.value;
-    loadLeaderboard(filter);
+    currentFilter = leaderboardFilter.value;
+    loadLeaderboard(currentFilter, true);
   });
 }
 
@@ -405,9 +511,6 @@ onAuthStateChanged(auth, async (user) => {
     // ===== SHOP INIT =====
     renderShop(coins);
     setupAdButton(userRef, updateHeaderUI);
-
-    // ===== SET UP AD COOLDOWN BUTTON =====
-    setupAdCooldownButton(userRef);
 
     // ===== ACTIVE CHALLENGE SPACE – left empty for AdMob banner =====
     if (activeChallengesContainer) {
@@ -531,7 +634,8 @@ onAuthStateChanged(auth, async (user) => {
     // ===== LOAD LEADERBOARD =====
     // Ensure rank display element exists
     ensureRankDisplay();
-    loadLeaderboard("all");
+    currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
+    loadLeaderboard(currentFilter, true);
 
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -544,121 +648,6 @@ onAuthStateChanged(auth, async (user) => {
 function updateHeaderUI(coins, lives) {
   if (headerCoinsValue) headerCoinsValue.textContent = coins;
   if (headerLivesValue) headerLivesValue.textContent = lives;
-}
-
-// ========== AD COOLDOWN LOGIC ==========
-const WATCH_AD_BTN = document.getElementById("watchAdBtn");
-const AD_COOLDOWN_KEY = "adCooldownUntil";
-const AD_COOLDOWN_MINUTES = 30;
-let cooldownInterval = null;
-
-function isAdOnCooldown() {
-  const until = localStorage.getItem(AD_COOLDOWN_KEY);
-  if (!until) return false;
-  const untilTime = parseInt(until, 10);
-  return Date.now() < untilTime;
-}
-
-function getAdCooldownRemaining() {
-  const until = localStorage.getItem(AD_COOLDOWN_KEY);
-  if (!until) return 0;
-  const untilTime = parseInt(until, 10);
-  const remaining = untilTime - Date.now();
-  return remaining > 0 ? remaining : 0;
-}
-
-function startAdCooldown() {
-  const until = Date.now() + AD_COOLDOWN_MINUTES * 60 * 1000;
-  localStorage.setItem(AD_COOLDOWN_KEY, until.toString());
-}
-
-function updateAdButtonState() {
-  if (!WATCH_AD_BTN) return;
-  if (isAdOnCooldown()) {
-    const remaining = getAdCooldownRemaining();
-    const minutes = Math.floor(remaining / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-    WATCH_AD_BTN.disabled = true;
-    WATCH_AD_BTN.innerHTML = `<i class="fas fa-clock"></i> ${minutes}m ${seconds}s until available`;
-    WATCH_AD_BTN.style.opacity = "0.6";
-  } else {
-    WATCH_AD_BTN.disabled = false;
-    WATCH_AD_BTN.innerHTML = `<i class="fas fa-video"></i> Watch Ad for +200 Coins`;
-    WATCH_AD_BTN.style.opacity = "1";
-  }
-}
-
-function startCooldownTimer() {
-  if (cooldownInterval) clearInterval(cooldownInterval);
-  cooldownInterval = setInterval(() => {
-    updateAdButtonState();
-    // If cooldown ended, clear interval
-    if (!isAdOnCooldown()) {
-      clearInterval(cooldownInterval);
-      cooldownInterval = null;
-    }
-  }, 1000);
-}
-
-function setupAdCooldownButton(userRef) {
-  if (!WATCH_AD_BTN) return;
-
-  // Initial state
-  updateAdButtonState();
-  if (isAdOnCooldown()) {
-    startCooldownTimer();
-  }
-
-  // Remove any previous listeners (if any) by cloning and replacing? 
-  // We'll add a new listener with a flag to avoid duplicates.
-  // We'll remove existing listener by replacing the button with a clone.
-  // This ensures no conflict with the setupAdButton from shop.js
-  const newBtn = WATCH_AD_BTN.cloneNode(true);
-  WATCH_AD_BTN.parentNode.replaceChild(newBtn, WATCH_AD_BTN);
-  // Update reference
-  const btn = document.getElementById("watchAdBtn");
-  if (!btn) return;
-
-  btn.addEventListener("click", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (isAdOnCooldown()) {
-      showToast("Please wait for the cooldown to finish.", "warning");
-      return;
-    }
-
-    // Simulate ad trigger
-    showToast("Playing ad...", "info");
-    // Simulate ad completion after 3 seconds
-    setTimeout(() => {
-      // Reward user with 200 coins
-      const userRefLocal = doc(db, "users", currentUserUid);
-      getDoc(userRefLocal)
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            const currentCoins = data.coins || 0;
-            const newCoins = currentCoins + 200;
-            return updateDoc(userRefLocal, { coins: newCoins }).then(() => {
-              updateHeaderUI(newCoins, data.lives ?? 2);
-              if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
-              showToast("You earned 200 coins! 🎉", "success");
-              // Start cooldown
-              startAdCooldown();
-              updateAdButtonState();
-              startCooldownTimer();
-            });
-          } else {
-            showToast("User data not found.", "error");
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to reward coins:", err);
-          showToast("Failed to reward coins. Please try again.", "error");
-        });
-    }, 3000); // simulate 3‑second ad
-  });
 }
 
 // ========== MODE BUTTON NAVIGATION ==========
