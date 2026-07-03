@@ -19,7 +19,6 @@
         <div class="header-container">
             <div class="header-actions">
                 <div class="stat-badge-group">
-                    <!-- Coins -->
                     <span class="stat-badge" id="headerCoins">
                         <i class="fas fa-coins" style="color:#FFD700;"></i>
                         <span class="stat-label-text">Coins</span>
@@ -27,7 +26,6 @@
                         <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
                     </span>
                     <span class="header-divider"></span>
-                    <!-- Lives -->
                     <span class="stat-badge" id="headerLives">
                         <i class="fas fa-heart" style="color:#ff6b6b;"></i>
                         <span class="stat-label-text">Lives</span>
@@ -35,7 +33,6 @@
                         <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
                     </span>
                 </div>
-                <!-- Settings Gear (replaces notification bell) -->
                 <button class="icon-btn settings-btn" id="settingsBtn">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -126,12 +123,7 @@
                 </div>
             </div>
 
-            <!-- ===== ADMOB CONTAINER (kept empty for ads) ===== -->
-            <div class="ad-container" id="adContainer">
-                <!-- AdMob banner will be placed here by the JavaScript -->
-            </div>
-
-            <!-- ===== CHALLENGES FOR YOU (new section) ===== -->
+            <!-- ===== CHALLENGES FOR YOU ===== -->
             <div class="challenges-3d-container">
                 <h3 class="challenges-title"><i class="fas fa-tasks"></i> Challenges for You</h3>
                 <div class="challenges-grid">
@@ -169,6 +161,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ===== GAP BETWEEN CHALLENGES AND MODE (handled by CSS margin) ===== -->
 
             <!-- ---- CHOOSE A MODE ---- -->
             <div class="mode-section">
@@ -210,6 +204,11 @@
                         <i class="fas fa-arrow-right mode-arrow"></i>
                     </button>
                 </div>
+            </div>
+
+            <!-- ===== ADMOB CONTAINER (moved to the bottom) ===== -->
+            <div class="ad-container" id="adContainer">
+                <!-- AdMob banner will be placed here by the JavaScript -->
             </div>
 
         </section>
