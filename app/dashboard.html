@@ -126,9 +126,48 @@
                 </div>
             </div>
 
-            <!-- ---- ACTIVE CHALLENGE (now empty for AdMob) ---- -->
-            <div class="challenge-section" id="adContainer">
-                <!-- AdMob banner will be placed here -->
+            <!-- ===== ADMOB CONTAINER (kept empty for ads) ===== -->
+            <div class="ad-container" id="adContainer">
+                <!-- AdMob banner will be placed here by the JavaScript -->
+            </div>
+
+            <!-- ===== CHALLENGES FOR YOU (new section) ===== -->
+            <div class="challenges-3d-container">
+                <h3 class="challenges-title"><i class="fas fa-tasks"></i> Challenges for You</h3>
+                <div class="challenges-grid">
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-fire"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">2 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 5 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">3–4 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 10 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-star"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">5 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 20 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-crown"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">6+ correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 30 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                </div>
             </div>
 
             <!-- ---- CHOOSE A MODE ---- -->
@@ -176,7 +215,7 @@
         </section>
 
         <!-- ============================================================
-        PICK YOUR LANE SECTION (merged in — was pick-your-lane.html)
+        PICK YOUR LANE SECTION
         ============================================================ -->
         <section id="laneSection" class="page-section">
             <div class="lane-top-row">
@@ -352,7 +391,7 @@
         </section>
 
         <!-- ============================================================
-        SETTINGS SECTION (new – accessed via gear icon)
+        SETTINGS SECTION
         ============================================================ -->
         <section id="settingsSection" class="page-section">
             <div class="section-header">
@@ -393,7 +432,7 @@
 
     </main>
 
-    <!-- ===== BOTTOM NAVIGATION (Mobile) ===== -->
+    <!-- ===== BOTTOM NAVIGATION ===== -->
     <nav class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-nav="home">
             <i class="fas fa-house"></i>
