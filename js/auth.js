@@ -181,6 +181,7 @@ async function createUserProfile(user, userData) {
         lives: 2,
         level: "",
         badges: [],
+        adCooldownUntil: null,
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
         isAdmin: false
