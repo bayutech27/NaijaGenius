@@ -95,7 +95,6 @@ body {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* ---- Hide header on non-home pages ---- */
 .app-header.hidden {
     display: none !important;
 }
@@ -199,12 +198,11 @@ body {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    height: calc(100vh - 72px); /* default when header is visible */
+    height: calc(100vh - 72px);
     padding-top: 88px;
     padding-bottom: 96px;
 }
 
-/* ---- When header is hidden, main content takes full height ---- */
 .app-header.hidden ~ .main-content {
     height: calc(100vh - 0px);
     padding-top: 0px;
@@ -223,6 +221,14 @@ body {
     overflow-x: hidden;
 }
 .page-section.active-section { display: block; }
+
+/* ----- Push down non‑home sections by 3rem ----- */
+#playSection.active-section,
+#shopSection.active-section,
+#leaderboardSection.active-section,
+#settingsSection.active-section {
+    margin-top: 3rem;
+}
 
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
