@@ -84,18 +84,9 @@ export const CHALLENGES = [
     difficulty: "easy",
     condition: (stats) => stats.correctCount >= 5
   },
+
   {
     id: 8,
-    title: "Perfect Start",
-    description: "Answer the first 3 questions correctly.",
-    icon: "fa-play",
-    rewardType: "coins",
-    rewardValue: 10,
-    difficulty: "easy",
-    condition: (stats) => stats.firstThreeCorrect === true
-  },
-  {
-    id: 9,
     title: "Flawless Victory",
     description: "Answer 7 questions correctly without a wrong answer.",
     icon: "fa-shield-alt",
@@ -104,18 +95,9 @@ export const CHALLENGES = [
     difficulty: "easy",
     condition: (stats) => stats.correctCount >= 7 && stats.streakDirection === 'win'
   },
+  
   {
-    id: 10,
-    title: "Speedster",
-    description: "Answer a question correctly in under 2 seconds.",
-    icon: "fa-tachometer-alt",
-    rewardType: "coins",
-    rewardValue: 10,
-    difficulty: "easy",
-    condition: (stats) => stats.fastestAnswer < 2
-  },
-  {
-    id: 11,
+    id: 9,
     title: "Knowledge Seeker",
     description: "Play a full round (all 10 questions).",
     icon: "fa-book",
@@ -125,7 +107,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.totalQuestions === 10
   },
   {
-    id: 12,
+    id: 10,
     title: "No Time to Waste",
     description: "Finish a round with more than 5 seconds remaining on the timer.",
     icon: "fa-hourglass-end",
@@ -135,7 +117,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.finalTimer > 5
   },
   {
-    id: 13,
+    id: 11,
     title: "Lucky Seven",
     description: "Answer exactly 7 questions correctly.",
     icon: "fa-dice",
@@ -145,7 +127,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount === 7
   },
   {
-    id: 14,
+    id: 12,
     title: "One-Hit Wonder",
     description: "Get 1 correct answer and 1 wrong answer (minimum).",
     icon: "fa-meteor",
@@ -157,7 +139,7 @@ export const CHALLENGES = [
 
   // === MEDIUM (20) – reward 20–25 coins or one lifeline ===
   {
-    id: 15,
+    id: 13,
     title: "7 in a Row",
     description: "Answer 7 questions correctly in a row.",
     icon: "fa-fire",
@@ -167,7 +149,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.currentStreak >= 7 && stats.streakDirection === 'win'
   },
   {
-    id: 16,
+    id: 14,
     title: "Call a Friend",
     description: "Use the Call a Friend lifeline and still get the correct answer.",
     icon: "fa-phone",
@@ -177,7 +159,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.lifelineUsed === 'callFriend' && stats.isCorrectAfterLifeline
   },
   {
-    id: 17,
+    id: 15,
     title: "Ask the Crowd",
     description: "Use Ask Crowd lifeline and get the correct answer.",
     icon: "fa-users",
@@ -187,7 +169,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.lifelineUsed === 'ask_crowd' && stats.isCorrectAfterLifeline
   },
   {
-    id: 18,
+    id: 16,
     title: "50:50 Master",
     description: "Use 50:50 and get the correct answer.",
     icon: "fa-percent",
@@ -197,7 +179,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.lifelineUsed === 'fifty_fifty' && stats.isCorrectAfterLifeline
   },
   {
-    id: 19,
+    id: 17,
     title: "All or Nothing",
     description: "Answer all 10 questions correctly.",
     icon: "fa-star",
@@ -206,18 +188,9 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.correctCount === 10
   },
+  
   {
-    id: 20,
-    title: "Speed Demon",
-    description: "Answer 5 questions correctly in under 5 seconds each.",
-    icon: "fa-tachometer-alt",
-    rewardType: "coins",
-    rewardValue: 20,
-    difficulty: "medium",
-    condition: (stats) => stats.fastAnswersCount >= 5
-  },
-  {
-    id: 21,
+    id: 18,
     title: "The Comeback",
     description: "Win a round after being on a losing streak of 3 or more.",
     icon: "fa-undo-alt",
@@ -227,7 +200,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.streakDirection === 'win' && stats.previousStreak <= -3
   },
   {
-    id: 22,
+    id: 19,
     title: "Perfectionist",
     description: "Get 0 wrong answers in a round.",
     icon: "fa-check-double",
@@ -237,7 +210,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.wrongCount === 0 && stats.correctCount > 0
   },
   {
-    id: 23,
+    id: 20,
     title: "Lifeline Saver",
     description: "Complete a round without using any lifelines.",
     icon: "fa-life-ring",
@@ -246,18 +219,9 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.lifelinesUsed === 0 && stats.correctCount >= 5
   },
+  
   {
-    id: 24,
-    title: "Slow and Steady",
-    description: "Answer 7 questions correctly, taking more than 10 seconds each.",
-    icon: "fa-turtle",
-    rewardType: "coins",
-    rewardValue: 20,
-    difficulty: "medium",
-    condition: (stats) => stats.slowAnswersCount >= 7
-  },
-  {
-    id: 25,
+    id: 21,
     title: "Close Call",
     description: "Win a round with less than 2 seconds to spare.",
     icon: "fa-stopwatch",
@@ -267,7 +231,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.finalTimer < 2 && stats.correctCount >= 5
   },
   {
-    id: 26,
+    id: 22,
     title: "Mixed Bag",
     description: "Use both 50:50 and Ask Crowd in one round and get them both correct.",
     icon: "fa-layer-group",
@@ -277,7 +241,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.lifelineUsed === 'both' && stats.isCorrectAfterLifeline
   },
   {
-    id: 27,
+    id: 23,
     title: "The Streak Breaker",
     description: "End a losing streak of 2 or more with a correct answer.",
     icon: "fa-cut",
@@ -287,7 +251,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.streakDirection === 'win' && stats.previousStreak <= -2
   },
   {
-    id: 28,
+    id: 24,
     title: "Question Master",
     description: "Answer 8 questions correctly in a round.",
     icon: "fa-crown",
@@ -297,7 +261,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount >= 8
   },
   {
-    id: 29,
+    id: 25,
     title: "Lifeline Trio",
     description: "Use all three lifelines in a single round (call, crowd, 50:50).",
     icon: "fa-arrows-alt",
@@ -306,18 +270,9 @@ export const CHALLENGES = [
     difficulty: "medium",
     condition: (stats) => stats.lifelineUsed === 'all'
   },
+
   {
-    id: 30,
-    title: "Early Bird",
-    description: "Answer the first 5 questions correctly.",
-    icon: "fa-sun",
-    rewardType: "coins",
-    rewardValue: 20,
-    difficulty: "medium",
-    condition: (stats) => stats.firstFiveCorrect === true
-  },
-  {
-    id: 31,
+    id: 26,
     title: "The Survivor",
     description: "Finish a round with at least 5 correct answers and 5 wrong answers.",
     icon: "fa-skull",
@@ -327,7 +282,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount >= 5 && stats.wrongCount >= 5
   },
   {
-    id: 32,
+    id: 27,
     title: "The Lone Wolf",
     description: "Answer 9 questions correctly with only 1 wrong.",
     icon: "fa-user-astronaut",
@@ -337,7 +292,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount === 9 && stats.wrongCount === 1
   },
   {
-    id: 33,
+    id: 28,
     title: "No Pressure",
     description: "Answer 5 correct questions without using any lifelines.",
     icon: "fa-gem",
@@ -347,7 +302,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount >= 5 && stats.lifelinesUsed === 0
   },
   {
-    id: 34,
+    id: 29,
     title: "The Gambler",
     description: "Use 50:50 and get the correct answer with less than 5 seconds left.",
     icon: "fa-dice",
@@ -359,7 +314,7 @@ export const CHALLENGES = [
 
   // === HARD (15) – reward 30 coins or one lifeline ===
   {
-    id: 35,
+    id: 30,
     title: "10 in a Row",
     description: "Answer 10 questions correctly in a row (perfect round).",
     icon: "fa-fire",
@@ -369,7 +324,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.currentStreak === 10 && stats.streakDirection === 'win'
   },
   {
-    id: 36,
+    id: 31,
     title: "Flawless Victory",
     description: "Answer all 10 questions correctly without using any lifelines.",
     icon: "fa-shield-alt",
@@ -378,18 +333,9 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.correctCount === 10 && stats.lifelinesUsed === 0
   },
+  
   {
-    id: 37,
-    title: "The Speed King",
-    description: "Answer 8 questions correctly in under 3 seconds each.",
-    icon: "fa-bolt",
-    rewardType: "coins",
-    rewardValue: 30,
-    difficulty: "hard",
-    condition: (stats) => stats.fastAnswersCount >= 8
-  },
-  {
-    id: 38,
+    id: 32,
     title: "The Comeback King",
     description: "Win a round after being on a losing streak of 5 or more.",
     icon: "fa-undo",
@@ -399,7 +345,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.streakDirection === 'win' && stats.previousStreak <= -5
   },
   {
-    id: 39,
+    id: 33,
     title: "Lifeline Legend",
     description: "Use all three lifelines in one round and get them all correct.",
     icon: "fa-trophy",
@@ -408,18 +354,9 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.lifelineUsed === 'all' && stats.isCorrectAfterLifeline
   },
+  
   {
-    id: 40,
-    title: "The Perfectionist",
-    description: "Answer all 10 questions correctly with an average time of under 4 seconds.",
-    icon: "fa-clock",
-    rewardType: "coins",
-    rewardValue: 30,
-    difficulty: "hard",
-    condition: (stats) => stats.correctCount === 10 && stats.averageTime < 4
-  },
-  {
-    id: 41,
+    id: 34,
     title: "The Mastermind",
     description: "Answer 9 questions correctly and use no lifelines.",
     icon: "fa-brain",
@@ -429,7 +366,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount >= 9 && stats.lifelinesUsed === 0
   },
   {
-    id: 42,
+    id: 35,
     title: "The Survivor",
     description: "Finish a round with exactly 5 correct answers and 5 wrong answers.",
     icon: "fa-balance-scale",
@@ -439,7 +376,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount === 5 && stats.wrongCount === 5
   },
   {
-    id: 43,
+    id: 36,
     title: "The Comeback Kid II",
     description: "Win a round after being on a losing streak of 4 or more, with at least 7 correct answers.",
     icon: "fa-undo-alt",
@@ -449,7 +386,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.streakDirection === 'win' && stats.previousStreak <= -4 && stats.correctCount >= 7
   },
   {
-    id: 44,
+    id: 37,
     title: "The Loyalist",
     description: "Answer 10 questions correctly without using 50:50 lifeline.",
     icon: "fa-handshake",
@@ -459,7 +396,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.correctCount === 10 && stats.lifelineUsed !== 'fifty_fifty'
   },
   {
-    id: 45,
+    id: 38,
     title: "The Gambler II",
     description: "Use Call a Friend lifeline and get the correct answer with less than 3 seconds left.",
     icon: "fa-phone-volume",
@@ -469,7 +406,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.lifelineUsed === 'callFriend' && stats.lastAnswerTimeLeft < 3 && stats.isCorrectAfterLifeline
   },
   {
-    id: 46,
+    id: 39,
     title: "The Strategist",
     description: "Answer 8 correct questions, each with a different lifeline used at least once.",
     icon: "fa-chess-queen",
@@ -478,18 +415,9 @@ export const CHALLENGES = [
     difficulty: "hard",
     condition: (stats) => stats.correctCount >= 8 && stats.lifelineUsed === 'all'
   },
+  
   {
-    id: 47,
-    title: "The Gladiator",
-    description: "Answer 10 questions correctly without using any lifelines and finish in under 30 seconds total.",
-    icon: "fa-sword",
-    rewardType: "coins",
-    rewardValue: 30,
-    difficulty: "hard",
-    condition: (stats) => stats.correctCount === 10 && stats.lifelinesUsed === 0 && stats.totalTime < 30
-  },
-  {
-    id: 48,
+    id: 40,
     title: "The Oracle",
     description: "Answer 8 correct in a row and finish with a perfect round.",
     icon: "fa-eye",
@@ -499,7 +427,7 @@ export const CHALLENGES = [
     condition: (stats) => stats.currentStreak >= 8 && stats.streakDirection === 'win' && stats.correctCount === 10
   },
   {
-    id: 49,
+    id: 41,
     title: "The Legend",
     description: "Answer 10 correct in a row, use no lifelines, and finish under 25 seconds.",
     icon: "fa-crown",
