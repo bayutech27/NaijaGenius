@@ -137,7 +137,7 @@ async function handleSignup(e) {
         await createUserProfile(user, email, email.split('@')[0]);
         showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
         setTimeout(() => {
-            window.location.href = "/app/dashboard.html";  // absolute path
+            window.location.href = "/app/dashboard.html";
         }, 1500);
     } catch (error) {
         console.error("Signup error:", error);
@@ -164,7 +164,6 @@ async function handleLogin(e) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         showToast("Login successful! Redirecting...", "success");
-        // Redirect to dashboard immediately
         setTimeout(() => {
             window.location.href = "/app/dashboard.html";
         }, 500);
@@ -195,7 +194,6 @@ async function handleGoogleSignIn() {
         } else {
             showToast("Welcome back! 🎉", "success");
         }
-        // Redirect to dashboard
         setTimeout(() => {
             window.location.href = "/app/dashboard.html";
         }, 500);
@@ -204,8 +202,8 @@ async function handleGoogleSignIn() {
         let msg = "Google sign-in failed. Please try again.";
         if (error.code === "auth/popup-closed-by-user") msg = "Sign-in cancelled.";
         else if (error.code === "auth/unauthorized-domain") {
-            msg = "Domain not authorized. Please contact support.";
-            console.warn("Add your domain to Firebase Console > Authentication > Settings > Authorized domains.");
+            msg = "Domain not authorized. Please add your domain to Firebase Console > Authentication > Settings > Authorized domains.";
+            console.warn("Add your domain (e.g., naijagenius.vercel.app) to Firebase Console > Authentication > Settings > Authorized domains.");
         }
         showToast(msg, "error");
     } finally {
