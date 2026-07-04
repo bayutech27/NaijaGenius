@@ -133,7 +133,6 @@ async function handleSignup(e) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        // Create Firestore profile
         await createUserProfile(user, email, email.split('@')[0]);
         showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
         setTimeout(() => {
@@ -184,11 +183,9 @@ async function handleGoogleSignIn() {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        // Check if user document exists
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
-            // New user – create profile
             await createUserProfile(user, user.email, user.displayName || user.email.split('@')[0]);
             showToast("Account created with Google! 🎉", "success");
         } else {
