@@ -1,5 +1,5 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
-import { auth, db } from "/js/firebase.config.js";
+import { auth, db } from "/js/core/firebase.js";
 import {
   doc,
   getDoc,
@@ -17,6 +17,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
+import { logNavigation, logLevelUp } from "./analytics.js";
 
 // ========== DOM ELEMENTS (Home page) ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
@@ -57,6 +58,8 @@ function toggleHeaderVisibility(sectionId) {
   } else {
     appHeader.classList.add("hidden");
   }
+  // Log navigation
+  logNavigation(sectionId);
 }
 
 // ========== LEVEL DEFINITIONS ==========
@@ -67,6 +70,8 @@ const LEVELS = [
   { min: 3001, max: 6000, name: "Oga Patapata", badge: "oga-patapata.png" },
   { min: 6001, max: Infinity, name: "De Genius", badge: "de-genius.png" },
 ];
+
+let previousLevel = null;
 
 function getLevel(correctCount) {
   for (let lv of LEVELS) {
@@ -105,6 +110,12 @@ function updateLevel(correctCount) {
     } else {
       xpText.textContent = `${correctCount} / ${level.max}`;
     }
+  }
+
+  // Log level up if level changed
+  if (previousLevel !== level.name) {
+    logLevelUp(level.name);
+    previousLevel = level.name;
   }
 }
 
@@ -248,10 +259,8 @@ async function computeUserRank(uid, filter) {
 // Render leaderboard items
 function renderLeaderboardItems(users, offset) {
   const listContainer = document.getElementById("leaderboardItems") || fullLeaderboard;
-  // Ensure the container exists
   if (!listContainer) return;
 
-  // If this is the first page, clear the list
   if (offset === 0) {
     listContainer.innerHTML = "";
   }
@@ -286,7 +295,6 @@ function renderLeaderboardItems(users, offset) {
   });
   listContainer.innerHTML += html;
 
-  // Update "Load More" button visibility
   const loadMoreContainer = document.getElementById("leaderboardLoadMore");
   if (loadMoreContainer) {
     if (leaderboardHasMore) {
@@ -308,7 +316,6 @@ async function loadLeaderboard(filter = "all", reset = true) {
     leaderboardHasMore = true;
     fullLeaderboard.innerHTML = '<div class="loading-skeleton">Loading leaderboard…</div>';
   } else {
-    // Show a loading indicator for more items
     const loadMoreContainer = document.getElementById("leaderboardLoadMore");
     if (loadMoreContainer) {
       loadMoreContainer.innerHTML = '<div class="loading-skeleton" style="padding:0.5rem;">Loading more…</div>';
@@ -323,9 +330,8 @@ async function loadLeaderboard(filter = "all", reset = true) {
     const q = query(
       collection(db, "users"),
       orderBy(orderField, "desc"),
-      limit(LEADERBOARD_PAGE_SIZE + 1) // fetch one extra to check if more exist
+      limit(LEADERBOARD_PAGE_SIZE + 1)
     );
-    // If we have a lastDoc, use startAfter
     let queryRef = q;
     if (leaderboardLastDoc) {
       queryRef = query(q, startAfter(leaderboardLastDoc));
@@ -346,7 +352,6 @@ async function loadLeaderboard(filter = "all", reset = true) {
       };
     });
 
-    // Store last doc for next page
     if (users.length > 0) {
       leaderboardLastDoc = docs[LEADERBOARD_PAGE_SIZE - 1];
     } else {
@@ -354,10 +359,8 @@ async function loadLeaderboard(filter = "all", reset = true) {
     }
     leaderboardHasMore = hasMore;
 
-    // Render the items
     const offset = reset ? 0 : (fullLeaderboard.querySelectorAll(".leaderboard-item").length || 0);
     if (reset) {
-      // Create the list and load-more containers
       fullLeaderboard.innerHTML = `
         <div id="leaderboardItems"></div>
         <div id="leaderboardLoadMore"></div>
@@ -365,21 +368,15 @@ async function loadLeaderboard(filter = "all", reset = true) {
     }
     renderLeaderboardItems(users, offset);
 
-    // If no users, show empty message
     if (users.length === 0 && reset) {
       const list = document.getElementById("leaderboardItems");
       if (list) list.innerHTML = '<div class="loading-skeleton">No players found.</div>';
     }
 
-    // Compute user rank (only on first load or when filter changes)
     if (reset && currentUserUid) {
       const rank = await computeUserRank(currentUserUid, filter);
       if (rankDisplay) {
-        if (rank !== null) {
-          rankDisplay.textContent = `🏆 Your Rank: #${rank}`;
-        } else {
-          rankDisplay.textContent = "🏆 Unranked";
-        }
+        rankDisplay.textContent = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
       }
     }
 
@@ -404,7 +401,6 @@ function loadMoreLeaderboard() {
   loadLeaderboard(currentFilter, false);
 }
 
-// Set up filter change listener
 if (leaderboardFilter) {
   leaderboardFilter.addEventListener("change", () => {
     currentFilter = leaderboardFilter.value;
@@ -480,7 +476,6 @@ onAuthStateChanged(auth, async (user) => {
       console.log("🔄 Lives renewed to 2");
     }
 
-    // Update header and shop
     updateHeaderUI(coins, lives);
     if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
 
@@ -514,7 +509,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // ===== ACTIVE CHALLENGE SPACE – left empty for AdMob banner =====
     if (activeChallengesContainer) {
-      activeChallengesContainer.innerHTML = ""; // empty container for ad
+      activeChallengesContainer.innerHTML = "";
     }
 
     // ===== REAL‑TIME UPDATES =====
@@ -525,11 +520,9 @@ onAuthStateChanged(auth, async (user) => {
         const newLives = updated.lives ?? 2;
         const newCorrect = updated.totalCorrectAnswers || 0;
 
-        // Update header & shop
         updateHeaderUI(newCoins, newLives);
         if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
 
-        // Update home page stats
         if (totalGamesPlayed)
           totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
         if (correctAnswersEl) correctAnswersEl.textContent = newCorrect;
@@ -542,7 +535,6 @@ onAuthStateChanged(auth, async (user) => {
         });
         if (bestScoreValue) bestScoreValue.textContent = newBest;
 
-        // Update My Stats page
         if (correctAnswersStats) correctAnswersStats.textContent = newCorrect;
         if (bestScoreStats) bestScoreStats.textContent = newBest;
         if (livesStats) livesStats.textContent = newLives;
@@ -552,14 +544,12 @@ onAuthStateChanged(auth, async (user) => {
           levelStats.textContent = level.name;
         }
 
-        // Update avatar if changed
         if (updated.avatar) {
           userAvatarImg.src = updated.avatar;
           userAvatarImg.style.display = "block";
           userInitialsSpan.style.display = "none";
         }
 
-        // Update greeting name if displayName changed
         const newName = updated.displayName || updated.username || user.email || "Player";
         if (greetingText) {
           const currentGreeting = getGreeting();
@@ -632,7 +622,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     // ===== LOAD LEADERBOARD =====
-    // Ensure rank display element exists
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
