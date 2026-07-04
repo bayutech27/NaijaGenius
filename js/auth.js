@@ -172,6 +172,7 @@ async function createUserProfile(user, email, displayName) {
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
         isAdmin: false,
+        bonusNotified: false,
         hasReceivedBonus: false  // new field for bonus tracking
     };
     await setDoc(userDocRef, profile);
