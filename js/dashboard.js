@@ -679,7 +679,7 @@ function showAnnouncement(announcement) {
     const container = document.getElementById('announcementContainer');
     if (!container) return;
 
-    const message = announcement.current.message || '';
+    const message = announcement.message || '';
     const type = announcement.type || 'info';
 
     container.innerHTML = `
