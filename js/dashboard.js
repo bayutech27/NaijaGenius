@@ -74,13 +74,11 @@ const appHeader = document.querySelector(".app-header");
 
 function toggleHeaderVisibility(sectionId) {
   if (!appHeader) return;
-  // Show header only when the home section is active
   if (sectionId === "home" || sectionId === "homeSection") {
     appHeader.classList.remove("hidden");
   } else {
     appHeader.classList.add("hidden");
   }
-  // Log navigation
   logNavigation(sectionId);
 }
 
@@ -122,10 +120,7 @@ function updateLevel(correctCount) {
     if (maxVal === Infinity) {
       maxVal = correctCount + 1;
     }
-    const progress = Math.min(
-      100,
-      ((correctCount - level.min) / (maxVal - level.min)) * 100
-    );
+    const progress = Math.min(100, ((correctCount - level.min) / (maxVal - level.min)) * 100);
     xpBar.style.width = Math.min(100, progress) + "%";
     if (level.max === Infinity) {
       xpText.textContent = `${correctCount}+ / ∞`;
@@ -134,7 +129,6 @@ function updateLevel(correctCount) {
     }
   }
 
-  // Log level up if level changed
   if (previousLevel !== level.name) {
     logLevelUp(level.name);
     previousLevel = level.name;
@@ -217,24 +211,16 @@ let leaderboardHasMore = true;
 const LEADERBOARD_PAGE_SIZE = 20;
 let currentFilter = "all";
 
-// Get the field to order by based on filter
 function getOrderField(filter) {
   switch (filter) {
-    case "monthly":
-      return "monthlyCorrectAnswers";
-    case "weekly":
-      return "weeklyCorrectAnswers";
-    default:
-      return "totalCorrectAnswers";
+    case "monthly": return "monthlyCorrectAnswers";
+    case "weekly": return "weeklyCorrectAnswers";
+    default: return "totalCorrectAnswers";
   }
 }
 
-// Get the display field for the score (same as order field)
-function getScoreField(filter) {
-  return getOrderField(filter);
-}
+function getScoreField(filter) { return getOrderField(filter); }
 
-// Create rank display element
 function ensureRankDisplay() {
   let rankDisplay = document.getElementById("userRankDisplay");
   if (!rankDisplay) {
@@ -255,38 +241,25 @@ function ensureRankDisplay() {
   return rankDisplay;
 }
 
-// Compute user rank using a count query
 async function computeUserRank(uid, filter) {
   try {
-    // Get user's correct count
     const userRef = doc(db, "users", uid);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) return null;
     const userScore = userSnap.data()[getScoreField(filter)] || 0;
-
-    // Count users with higher score
-    const q = query(
-      collection(db, "users"),
-      where(getScoreField(filter), ">", userScore)
-    );
+    const q = query(collection(db, "users"), where(getScoreField(filter), ">", userScore));
     const snapshot = await getCountFromServer(q);
-    const rank = snapshot.data().count + 1;
-    return rank;
+    return snapshot.data().count + 1;
   } catch (err) {
     console.warn("Failed to compute rank:", err);
     return null;
   }
 }
 
-// Render leaderboard items
 function renderLeaderboardItems(users, offset) {
   const listContainer = document.getElementById("leaderboardItems") || fullLeaderboard;
   if (!listContainer) return;
-
-  if (offset === 0) {
-    listContainer.innerHTML = "";
-  }
-
+  if (offset === 0) listContainer.innerHTML = "";
   let html = "";
   users.forEach((user, index) => {
     const rank = offset + index + 1;
@@ -294,7 +267,6 @@ function renderLeaderboardItems(users, offset) {
     if (rank === 1) rankClass += " rank-1";
     else if (rank === 2) rankClass += " rank-2";
     else if (rank === 3) rankClass += " rank-3";
-
     let avatarHtml = "";
     if (user.avatar) {
       avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;">`;
@@ -302,7 +274,6 @@ function renderLeaderboardItems(users, offset) {
       const initials = user.displayName.slice(0, 2).toUpperCase();
       avatarHtml = `<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FF9A3E);color:#0A0A0F;font-weight:700;font-size:0.8rem;">${initials}</span>`;
     }
-
     html += `
       <div class="leaderboard-item">
           <span class="${rankClass}">${rank}</span>
@@ -316,13 +287,11 @@ function renderLeaderboardItems(users, offset) {
     `;
   });
   listContainer.innerHTML += html;
-
   const loadMoreContainer = document.getElementById("leaderboardLoadMore");
   if (loadMoreContainer) {
     if (leaderboardHasMore) {
       loadMoreContainer.style.display = "block";
-      loadMoreContainer.innerHTML =
-        '<button id="loadMoreBtn" class="load-more-btn">Load More</button>';
+      loadMoreContainer.innerHTML = '<button id="loadMoreBtn" class="load-more-btn">Load More</button>';
       document.getElementById("loadMoreBtn")?.addEventListener("click", loadMoreLeaderboard);
     } else {
       loadMoreContainer.style.display = "none";
@@ -332,7 +301,6 @@ function renderLeaderboardItems(users, offset) {
 
 async function loadLeaderboard(filter = "all", reset = true) {
   if (!fullLeaderboard) return;
-
   if (reset) {
     leaderboardLastDoc = null;
     leaderboardHasMore = true;
@@ -343,22 +311,15 @@ async function loadLeaderboard(filter = "all", reset = true) {
       loadMoreContainer.innerHTML = '<div class="loading-skeleton" style="padding:0.5rem;">Loading more…</div>';
     }
   }
-
   const rankDisplay = ensureRankDisplay();
   if (reset && rankDisplay) rankDisplay.textContent = "";
-
   try {
     const orderField = getOrderField(filter);
-    const q = query(
-      collection(db, "users"),
-      orderBy(orderField, "desc"),
-      limit(LEADERBOARD_PAGE_SIZE + 1)
-    );
+    const q = query(collection(db, "users"), orderBy(orderField, "desc"), limit(LEADERBOARD_PAGE_SIZE + 1));
     let queryRef = q;
     if (leaderboardLastDoc) {
       queryRef = query(q, startAfter(leaderboardLastDoc));
     }
-
     const snapshot = await getDocs(queryRef);
     const docs = snapshot.docs;
     const hasMore = docs.length > LEADERBOARD_PAGE_SIZE;
@@ -373,40 +334,31 @@ async function loadLeaderboard(filter = "all", reset = true) {
         level: getLevel(data.totalCorrectAnswers || 0).name,
       };
     });
-
     if (users.length > 0) {
       leaderboardLastDoc = docs[LEADERBOARD_PAGE_SIZE - 1];
     } else {
       leaderboardLastDoc = null;
     }
     leaderboardHasMore = hasMore;
-
     const offset = reset ? 0 : (fullLeaderboard.querySelectorAll(".leaderboard-item").length || 0);
     if (reset) {
-      fullLeaderboard.innerHTML = `
-        <div id="leaderboardItems"></div>
-        <div id="leaderboardLoadMore"></div>
-      `;
+      fullLeaderboard.innerHTML = `<div id="leaderboardItems"></div><div id="leaderboardLoadMore"></div>`;
     }
     renderLeaderboardItems(users, offset);
-
     if (users.length === 0 && reset) {
       const list = document.getElementById("leaderboardItems");
       if (list) list.innerHTML = '<div class="loading-skeleton">No players found.</div>';
     }
-
     if (reset && currentUserUid) {
       const rank = await computeUserRank(currentUserUid, filter);
       if (rankDisplay) {
         rankDisplay.textContent = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
       }
     }
-
   } catch (error) {
     console.error("Failed to load leaderboard:", error);
     if (reset) {
-      fullLeaderboard.innerHTML =
-        '<div class="loading-skeleton">Failed to load leaderboard. Please try again.</div>';
+      fullLeaderboard.innerHTML = '<div class="loading-skeleton">Failed to load leaderboard. Please try again.</div>';
     } else {
       const loadMoreContainer = document.getElementById("leaderboardLoadMore");
       if (loadMoreContainer) {
@@ -432,22 +384,15 @@ if (leaderboardFilter) {
 
 // ========== AUTH GUARD & DATA LOADING ==========
 onAuthStateChanged(auth, async (user) => {
-  console.log(
-    "🔐 Auth state changed (dashboard):",
-    user ? `User: ${user.uid}` : "No user"
-  );
-
+  console.log("🔐 Auth state changed (dashboard):", user ? `User: ${user.uid}` : "No user");
   if (!user) {
     window.location.href = "/login.html";
     return;
   }
-
   currentUserUid = user.uid;
-
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
-
     if (!userSnap.exists()) {
       console.warn("User profile not found in Firestore.");
       const displayName = user.email || "Player";
@@ -459,11 +404,9 @@ onAuthStateChanged(auth, async (user) => {
       if (userInitialsSpan) userInitialsSpan.textContent = initials;
       return;
     }
-
     const userData = userSnap.data();
     console.log("✅ User data loaded:", userData);
-
-    // ===== GREETING =====
+    // GREETING
     const displayName = userData.displayName || userData.username || user.email || "Player";
     const greeting = getGreeting();
     if (greetingText) {
@@ -471,8 +414,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     const initials = displayName.slice(0, 2).toUpperCase();
     if (userInitialsSpan) userInitialsSpan.textContent = initials;
-
-    // ===== AVATAR =====
+    // AVATAR
     if (userData.avatar) {
       userAvatarImg.src = userData.avatar;
       userAvatarImg.style.display = "block";
@@ -481,41 +423,31 @@ onAuthStateChanged(auth, async (user) => {
       userAvatarImg.style.display = "none";
       userInitialsSpan.style.display = "flex";
     }
-
-    // ===== COINS & LIVES =====
+    // COINS & LIVES
     let coins = userData.coins || 0;
     let lives = userData.lives ?? 2;
     let lastRenewal = userData.lastLiveRenewal?.toDate?.() || new Date(0);
-
     const now = new Date();
     const hoursSince = (now - lastRenewal) / (1000 * 60 * 60);
     if (hoursSince >= 24) {
       lives = 2;
-      await updateDoc(userRef, {
-        lives: 2,
-        lastLiveRenewal: serverTimestamp(),
-      });
+      await updateDoc(userRef, { lives: 2, lastLiveRenewal: serverTimestamp() });
       console.log("🔄 Lives renewed to 2");
     }
-
     updateHeaderUI(coins, lives);
     if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
-
-    // ===== GAME STATS =====
+    // GAME STATS
     const totalCorrect = userData.totalCorrectAnswers || 0;
-    if (totalGamesPlayed)
-      totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
+    if (totalGamesPlayed) totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
     if (correctAnswersEl) correctAnswersEl.textContent = totalCorrect;
     updateLevel(totalCorrect);
-
     let best = 0;
     const categories = userData.categoryStats || {};
     Object.values(categories).forEach((cat) => {
       if (cat.bestScore > best) best = cat.bestScore;
     });
     if (bestScoreValue) bestScoreValue.textContent = best;
-
-    // ===== UPDATE MY STATS PAGE =====
+    // UPDATE MY STATS PAGE
     if (correctAnswersStats) correctAnswersStats.textContent = totalCorrect;
     if (bestScoreStats) bestScoreStats.textContent = best;
     if (livesStats) livesStats.textContent = lives;
@@ -524,39 +456,31 @@ onAuthStateChanged(auth, async (user) => {
       const level = getLevel(totalCorrect);
       levelStats.textContent = level.name;
     }
-
-    // ===== SHOP INIT =====
+    // SHOP INIT
     renderShop(coins);
     setupAdButton(userRef, updateHeaderUI);
-
-    // ===== ACTIVE CHALLENGE SPACE – left empty for AdMob banner =====
+    // ACTIVE CHALLENGE SPACE
     if (activeChallengesContainer) {
       activeChallengesContainer.innerHTML = "";
     }
-
-    // ===== REAL‑TIME UPDATES =====
+    // REAL‑TIME UPDATES
     onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const updated = docSnap.data();
         const newCoins = updated.coins || 0;
         const newLives = updated.lives ?? 2;
         const newCorrect = updated.totalCorrectAnswers || 0;
-
         updateHeaderUI(newCoins, newLives);
         if (shopCoinsDisplay) shopCoinsDisplay.textContent = newCoins;
-
-        if (totalGamesPlayed)
-          totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
+        if (totalGamesPlayed) totalGamesPlayed.textContent = updated.lifetimeRoundPlayed || 0;
         if (correctAnswersEl) correctAnswersEl.textContent = newCorrect;
         updateLevel(newCorrect);
-
         let newBest = 0;
         const cats = updated.categoryStats || {};
         Object.values(cats).forEach((c) => {
           if (c.bestScore > newBest) newBest = c.bestScore;
         });
         if (bestScoreValue) bestScoreValue.textContent = newBest;
-
         if (correctAnswersStats) correctAnswersStats.textContent = newCorrect;
         if (bestScoreStats) bestScoreStats.textContent = newBest;
         if (livesStats) livesStats.textContent = newLives;
@@ -565,13 +489,11 @@ onAuthStateChanged(auth, async (user) => {
           const level = getLevel(newCorrect);
           levelStats.textContent = level.name;
         }
-
         if (updated.avatar) {
           userAvatarImg.src = updated.avatar;
           userAvatarImg.style.display = "block";
           userInitialsSpan.style.display = "none";
         }
-
         const newName = updated.displayName || updated.username || user.email || "Player";
         if (greetingText) {
           const currentGreeting = getGreeting();
@@ -579,8 +501,7 @@ onAuthStateChanged(auth, async (user) => {
         }
       }
     });
-
-    // ===== AVATAR UPLOAD HANDLERS =====
+    // AVATAR UPLOAD HANDLERS
     avatarFileInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -591,7 +512,6 @@ onAuthStateChanged(auth, async (user) => {
       await handleAvatarUpload(file, user.uid);
       avatarFileInput.value = "";
     });
-
     userAvatarBtn.addEventListener("click", () => {
       avatarFileInput.click();
     });
@@ -599,8 +519,7 @@ onAuthStateChanged(auth, async (user) => {
       e.stopPropagation();
       avatarFileInput.click();
     });
-
-    // ===== SETTINGS: VOLUME, SOUND, EDIT NAME =====
+    // SETTINGS
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
     if (volumeSlider && volumeValue) {
@@ -608,14 +527,12 @@ onAuthStateChanged(auth, async (user) => {
         volumeValue.textContent = volumeSlider.value + "%";
       });
     }
-
     const soundToggle = document.getElementById("soundToggle");
     if (soundToggle) {
       soundToggle.addEventListener("change", () => {
         console.log("Sound:", soundToggle.checked ? "ON" : "OFF");
       });
     }
-
     const editNameInput = document.getElementById("editNameInput");
     const saveNameBtn = document.getElementById("saveNameBtn");
     if (editNameInput && saveNameBtn) {
@@ -626,10 +543,7 @@ onAuthStateChanged(auth, async (user) => {
           return;
         }
         try {
-          await updateDoc(userRef, {
-            displayName: newName,
-            username: newName,
-          });
+          await updateDoc(userRef, { displayName: newName, username: newName });
           showToast("Name updated successfully!", "success");
           editNameInput.value = "";
           const currentGreeting = getGreeting();
@@ -642,15 +556,12 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
     }
-
-    // ===== LOAD LEADERBOARD =====
+    // LOAD LEADERBOARD
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
-
-    // ===== ANNOUNCEMENT LISTENER (set up after user is authenticated) =====
+    // SETUP ANNOUNCEMENT LISTENER (collection name: "announcement" – singular)
     setupAnnouncementListener();
-
   } catch (error) {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
@@ -658,62 +569,54 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ========== ANNOUNCEMENT FUNCTIONS ==========
-// Helper: safely convert a UTF-8 string to base64 (kept for future use)
-function utf8ToBase64(str) {
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(str);
-    let binary = '';
-    for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-}
-
+// ========== ANNOUNCEMENT ==========
 function showAnnouncement(announcement) {
-    if (!announcement || !announcement.message) {
-        hideAnnouncement();
-        return;
-    }
-
-    const container = document.getElementById('announcementContainer');
-    if (!container) return;
-
-    const message = announcement.message || '';
-    const type = announcement.type || 'info';
-
-    container.innerHTML = `
-        <div class="announcement-banner announcement-${type}">
-            <span class="announcement-text">${message}</span>
-            <button class="announcement-close" onclick="hideAnnouncement()">&times;</button>
-        </div>
-    `;
-    container.style.display = 'block';
+  if (!announcement || !announcement.message) {
+    hideAnnouncement();
+    return;
+  }
+  const container = document.getElementById('announcementContainer');
+  if (!container) return;
+  const message = announcement.message || '';
+  const type = announcement.type || 'info';
+  container.innerHTML = `
+    <div class="announcement-banner announcement-${type}">
+      <span class="announcement-text">${message}</span>
+      <button class="announcement-close" id="announcementCloseBtn">&times;</button>
+    </div>
+  `;
+  container.style.display = 'block';
+  // Attach close event listener
+  const closeBtn = document.getElementById('announcementCloseBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', hideAnnouncement);
+  }
 }
 
 function hideAnnouncement() {
-    const container = document.getElementById('announcementContainer');
-    if (container) {
-        container.style.display = 'none';
-    }
+  const container = document.getElementById('announcementContainer');
+  if (container) {
+    container.style.display = 'none';
+  }
 }
 
 function setupAnnouncementListener() {
-    try {
-        const announcementRef = doc(db, 'announcements', 'current');
-        onSnapshot(announcementRef, (doc) => {
-            if (doc.exists()) {
-                const data = doc.data();
-                showAnnouncement(data);
-            } else {
-                hideAnnouncement();
-            }
-        }, (error) => {
-            console.error('Announcement listener error:', error);
-        });
-    } catch (err) {
-        console.error('Failed to set up announcement listener:', err);
-    }
+  try {
+    // Collection name is "announcement" (singular)
+    const announcementRef = doc(db, 'announcement', 'current');
+    onSnapshot(announcementRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        showAnnouncement(data);
+      } else {
+        hideAnnouncement();
+      }
+    }, (error) => {
+      console.error('Announcement listener error:', error);
+    });
+  } catch (err) {
+    console.error('Failed to set up announcement listener:', err);
+  }
 }
 
 // ========== UI HELPERS ==========
@@ -736,7 +639,7 @@ document.getElementById("oneChanceBtnPlay")?.addEventListener("click", () => {
   window.location.replace("games.html?type=one_chance");
 });
 
-// ========== PICK YOUR LANE (merged tab) ==========
+// ========== PICK YOUR LANE ==========
 document.getElementById("chooseLaneBtn")?.addEventListener("click", () => {
   document.querySelectorAll(".page-section").forEach((section) => {
     section.classList.remove("active-section");
@@ -762,7 +665,6 @@ document.getElementById("laneBackBtn")?.addEventListener("click", () => {
   toggleHeaderVisibility("home");
 });
 
-// UPDATED: lane card navigation with replace
 document.querySelectorAll("#laneSection .lane-card").forEach((card) => {
   card.addEventListener("click", () => {
     const category = card.dataset.category;
@@ -830,18 +732,15 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
   });
 });
 
-// Ensure header is visible on initial load (home is active by default)
 toggleHeaderVisibility("home");
-
 console.log("Dashboard initialized successfully.");
-
 
 // ========== SETTINGS: LOGOUT ==========
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-        logoutUser();
-    });
+  logoutBtn.addEventListener("click", () => {
+    logoutUser();
+  });
 }
 
 // ========== FEEDBACK MODAL ==========
@@ -853,74 +752,69 @@ const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
 const feedbackMessage = document.getElementById("feedbackMessage");
 
 function openFeedbackModal() {
-    if (feedbackModal) {
-        feedbackModal.style.display = "flex";
-        feedbackMessage.value = "";
-        sendFeedbackBtn.disabled = false;
-        feedbackMessage.focus();
-    }
+  if (feedbackModal) {
+    feedbackModal.style.display = "flex";
+    feedbackMessage.value = "";
+    sendFeedbackBtn.disabled = false;
+    feedbackMessage.focus();
+  }
 }
 
 function closeFeedbackModal() {
-    if (feedbackModal) feedbackModal.style.display = "none";
+  if (feedbackModal) feedbackModal.style.display = "none";
 }
 
-// Event listeners
 if (feedbackBtn) {
-    feedbackBtn.addEventListener("click", openFeedbackModal);
+  feedbackBtn.addEventListener("click", openFeedbackModal);
 }
 if (closeFeedbackBtn) {
-    closeFeedbackBtn.addEventListener("click", closeFeedbackModal);
+  closeFeedbackBtn.addEventListener("click", closeFeedbackModal);
 }
 if (cancelFeedbackBtn) {
-    cancelFeedbackBtn.addEventListener("click", closeFeedbackModal);
+  cancelFeedbackBtn.addEventListener("click", closeFeedbackModal);
 }
-// Click outside modal to close
 if (feedbackModal) {
-    feedbackModal.addEventListener("click", (e) => {
-        if (e.target === feedbackModal) closeFeedbackModal();
-    });
+  feedbackModal.addEventListener("click", (e) => {
+    if (e.target === feedbackModal) closeFeedbackModal();
+  });
 }
 
-// Send feedback
 if (sendFeedbackBtn) {
-    sendFeedbackBtn.addEventListener("click", async () => {
-        const message = feedbackMessage.value.trim();
-        if (!message) {
-            showToast("Please type a message.", "error");
-            return;
-        }
-
-        sendFeedbackBtn.disabled = true;
-        sendFeedbackBtn.innerHTML = '<span class="loading-spinner"></span> Sending...';
-
-        try {
-            const userRef = doc(db, "users", currentUserUid);
-            const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) {
-                showToast("User data not found.", "error");
-                sendFeedbackBtn.disabled = false;
-                sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
-                return;
-            }
-            const userData = userSnap.data();
-            const feedbackData = {
-                uid: currentUserUid,
-                displayName: userData.displayName || "Anonymous",
-                email: userData.email || "",
-                message: message,
-                status: "new",
-                timestamp: serverTimestamp()
-            };
-            await addDoc(collection(db, "feedback"), feedbackData);
-            showToast("Feedback sent! Thank you 🙏", "success");
-            closeFeedbackModal();
-        } catch (err) {
-            console.error("Error sending feedback:", err);
-            showToast("Failed to send. Please try again.", "error");
-        } finally {
-            sendFeedbackBtn.disabled = false;
-            sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
-        }
-    });
+  sendFeedbackBtn.addEventListener("click", async () => {
+    const message = feedbackMessage.value.trim();
+    if (!message) {
+      showToast("Please type a message.", "error");
+      return;
+    }
+    sendFeedbackBtn.disabled = true;
+    sendFeedbackBtn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+    try {
+      const userRef = doc(db, "users", currentUserUid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        showToast("User data not found.", "error");
+        sendFeedbackBtn.disabled = false;
+        sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+        return;
+      }
+      const userData = userSnap.data();
+      const feedbackData = {
+        uid: currentUserUid,
+        displayName: userData.displayName || "Anonymous",
+        email: userData.email || "",
+        message: message,
+        status: "new",
+        timestamp: serverTimestamp()
+      };
+      await addDoc(collection(db, "feedback"), feedbackData);
+      showToast("Feedback sent! Thank you 🙏", "success");
+      closeFeedbackModal();
+    } catch (err) {
+      console.error("Error sending feedback:", err);
+      showToast("Failed to send. Please try again.", "error");
+    } finally {
+      sendFeedbackBtn.disabled = false;
+      sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+    }
+  });
 }
