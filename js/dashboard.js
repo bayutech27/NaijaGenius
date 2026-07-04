@@ -1,5 +1,5 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
-import { auth, db } from "/js/core/firebase.js";
+import { auth, db } from "/js/firebase.config.js";
 import { logoutUser } from "./auth.js";
 
 import {
@@ -430,77 +430,6 @@ if (leaderboardFilter) {
   });
 }
 
-// ========== ANNOUNCEMENT LISTENER ==========
-function listenForAnnouncements() {
-    const announcementRef = doc(db, "announcements", "current");
-    console.log("🔔 Setting up announcement listener for:", announcementRef.path);
-
-    onSnapshot(announcementRef, (docSnap) => {
-        console.log("🔔 Announcement snapshot received:", docSnap.exists());
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            console.log("🔔 Announcement data:", data);
-            if (data.message && data.message.trim() !== "") {
-                showAnnouncement(data);
-            } else {
-                console.log("🔔 Announcement message is empty, hiding.");
-                hideAnnouncement();
-            }
-        } else {
-            console.log("🔔 Announcement document does not exist.");
-            hideAnnouncement();
-        }
-    }, (error) => {
-        console.error("🔔 Announcement listener error:", error);
-    });
-}
-
-// ========== ANNOUNCEMENT DISPLAY ==========
-function utf8ToBase64(str) {
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(str);
-    let binary = '';
-    for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-}
-
-function showAnnouncement(announcement) {
-    console.log("📢 showAnnouncement called with:", announcement);
-    if (!announcement || !announcement.message) {
-        console.log("📢 No message, hiding announcement.");
-        hideAnnouncement();
-        return;
-    }
-
-    const container = document.getElementById('announcementContainer');
-    if (!container) {
-        console.warn("⚠️ #announcementContainer not found in DOM.");
-        return;
-    }
-
-    const message = announcement.message || '';
-    const type = announcement.type || 'info';
-
-    container.innerHTML = `
-        <div class="announcement-banner announcement-${type}">
-            <span class="announcement-text">${message}</span>
-            <button class="announcement-close" onclick="hideAnnouncement()">&times;</button>
-        </div>
-    `;
-    container.style.display = 'block';
-    console.log("📢 Announcement displayed.");
-}
-
-function hideAnnouncement() {
-    const container = document.getElementById('announcementContainer');
-    if (container) {
-        container.style.display = 'none';
-        console.log("📢 Announcement hidden.");
-    }
-}
-
 // ========== AUTH GUARD & DATA LOADING ==========
 onAuthStateChanged(auth, async (user) => {
   console.log(
@@ -604,9 +533,6 @@ onAuthStateChanged(auth, async (user) => {
     if (activeChallengesContainer) {
       activeChallengesContainer.innerHTML = "";
     }
-
-    // ===== START ANNOUNCEMENT LISTENER =====
-    listenForAnnouncements();
 
     // ===== REAL‑TIME UPDATES =====
     onSnapshot(userRef, (docSnap) => {
@@ -722,12 +648,73 @@ onAuthStateChanged(auth, async (user) => {
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
 
+    // ===== ANNOUNCEMENT LISTENER (set up after user is authenticated) =====
+    setupAnnouncementListener();
+
   } catch (error) {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
     if (greetingName) greetingName.textContent = "Player";
   }
 });
+
+// ========== ANNOUNCEMENT FUNCTIONS ==========
+// Helper: safely convert a UTF-8 string to base64 (kept for future use)
+function utf8ToBase64(str) {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(str);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
+function showAnnouncement(announcement) {
+    if (!announcement || !announcement.message) {
+        hideAnnouncement();
+        return;
+    }
+
+    const container = document.getElementById('announcementContainer');
+    if (!container) return;
+
+    const message = announcement.message || '';
+    const type = announcement.type || 'info';
+
+    container.innerHTML = `
+        <div class="announcement-banner announcement-${type}">
+            <span class="announcement-text">${message}</span>
+            <button class="announcement-close" onclick="hideAnnouncement()">&times;</button>
+        </div>
+    `;
+    container.style.display = 'block';
+}
+
+function hideAnnouncement() {
+    const container = document.getElementById('announcementContainer');
+    if (container) {
+        container.style.display = 'none';
+    }
+}
+
+function setupAnnouncementListener() {
+    try {
+        const announcementRef = doc(db, 'announcements', 'current');
+        onSnapshot(announcementRef, (doc) => {
+            if (doc.exists()) {
+                const data = doc.data();
+                showAnnouncement(data);
+            } else {
+                hideAnnouncement();
+            }
+        }, (error) => {
+            console.error('Announcement listener error:', error);
+        });
+    } catch (err) {
+        console.error('Failed to set up announcement listener:', err);
+    }
+}
 
 // ========== UI HELPERS ==========
 function updateHeaderUI(coins, lives) {
