@@ -426,8 +426,9 @@ body {
     justify-content: center;
 }
 
-/* ---- AVATAR EDIT BUTTON – reduced by 40% ---- */
+/* ---- AVATAR EDIT BUTTON – HIDDEN ---- */
 .avatar-edit-btn {
+    display: none; /* HIDDEN per user request */
     position: absolute;
     bottom: 0px;
     right: 0px;
@@ -2323,7 +2324,7 @@ body {
         margin-left: auto;
     }
     .mode-btn {
-        min-height: 140.9px;
+        min-height: 140.9rem;
         padding: 0.441rem 0.147rem;
         transform: none !important;
     }
