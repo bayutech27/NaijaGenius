@@ -9,7 +9,7 @@
     <title>NaijaGenius • Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
 
-    <!-- Preconnect hints -->
+    <!-- Preconnect hints for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -80,16 +80,8 @@
                 </div>
             </div>
 
-            <!-- ===== ANNOUNCEMENT BANNER ===== -->
-            <div id="announcementBanner" class="announcement-banner" style="display: none;">
-                <div class="announcement-content">
-                    <i class="fas fa-bullhorn announcement-icon"></i>
-                    <span id="announcementText" class="announcement-text">Loading announcement...</span>
-                </div>
-                <button id="announcementCloseBtn" class="announcement-close" aria-label="Close announcement">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <!-- ---- ANNOUNCEMENT CONTAINER ---- -->
+            <div id="announcementContainer" style="display: none;"></div>
 
             <!-- ---- LEVEL DISPLAY ---- -->
             <div class="level-display fade-in-up">
@@ -441,7 +433,13 @@
                         <button id="saveNameBtn">Save</button>
                     </div>
                 </div>
-                
+                <!-- Logout -->
+                <div class="settings-item settings-logout-item">
+                    <label for="logoutBtn">Account</label>
+                    <div class="settings-control">
+                        <button id="logoutBtn" class="logout-btn">Logout</button>
+                    </div>
+                </div>
                 <!-- Feedback -->
                 <div class="settings-item settings-feedback-item">
                     <label for="feedbackBtn">Feedback</label>
@@ -449,14 +447,6 @@
                         <button id="feedbackBtn" class="feedback-btn">Message Us</button>
                     </div>
                 </div>
-<!-- Logout -->
-                <div class="settings-item settings-logout-item">
-                    <label for="logoutBtn">Account</label>
-                    <div class="settings-control">
-                        <button id="logoutBtn" class="logout-btn">Logout</button>
-                    </div>
-                </div>
-
             </div>
         </section>
 
@@ -465,7 +455,7 @@
             <div class="modal-card feedback-modal-card">
                 <button id="closeFeedbackBtn" class="modal-close" aria-label="Close">&times;</button>
                 <h3 style="color:#FFD700; margin-bottom:0.5rem;"><i class="fas fa-comment-dots"></i> Send Feedback</h3>
-                <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1rem;">We’d love to hear your thoughts. Let us know how we can improve NaijaGenius.</p>
+                <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1rem;">We'd love to hear your thoughts. Let us know how we can improve NaijaGenius.</p>
                 <div class="input-group feedback-textarea-group">
                     <textarea id="feedbackMessage" placeholder="Type your message here..." rows="4"></textarea>
                 </div>
