@@ -8,6 +8,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <title>NaijaGenius • Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
+
+    <!-- Preconnect hints for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -55,7 +61,7 @@
                     <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
                 </div>
                 <div class="hero-logo-wrap" id="heroLogoWrap">
-                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius"
+                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius" loading="lazy"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div class="hero-logo-fallback">
                         <span class="hero-flag" aria-hidden="true">🇳🇬</span>
@@ -79,7 +85,7 @@
                 <!-- Left: Avatar container (height increased) -->
                 <div class="avatar-container">
                     <div class="user-avatar" id="userAvatarBtn">
-                        <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar"
+                        <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar" loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                         <span id="userInitials" class="avatar-fallback"></span>
                     </div>
