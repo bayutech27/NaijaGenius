@@ -28,6 +28,8 @@
         <button class="tab-btn active" data-tab="questions">Questions Uploader</button>
         <button class="tab-btn" data-tab="tournaments">Tournament Table</button>
         <button class="tab-btn" data-tab="withdrawals">Withdrawals</button>
+        <button class="tab-btn" data-tab="announcement">Announcement</button>
+        <button class="tab-btn" data-tab="feedbacks">Feedbacks</button>
     </nav>
 
     <!-- Content Area -->
@@ -127,6 +129,59 @@
                             <tbody id="withdrawalsTbody"></tbody>
                         </table>
                         <div id="withdrawalsEmpty" class="empty-state" style="display:none;">No withdrawal requests yet.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: Announcement -->
+        <section id="tab-announcement" class="tab-panel">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Manage Announcement</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="announcementInput">Announcement Message</label>
+                        <textarea id="announcementInput" class="form-control" rows="4" placeholder="Write your announcement here..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.8rem; margin-top: 0.5rem;">
+                        <button id="announcementSaveBtn" class="btn primary">Save Announcement</button>
+                        <button id="announcementCancelBtn" class="btn secondary" style="display:none;">Cancel Edit</button>
+                    </div>
+                    <div id="announcementDisplay" style="margin-top: 2rem;">
+                        <h3 style="color: #F5C518; font-weight: 600; font-size: 1rem;">Current Announcement</h3>
+                        <div id="announcementCurrent" class="announcement-current">
+                            <p style="color: #CBD5E1; padding: 1rem 0;">No announcement set.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 5: Feedbacks -->
+        <section id="tab-feedbacks" class="tab-panel">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>User Feedbacks</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper" id="feedbacksTableWrapper">
+                        <div class="loading-spinner" id="feedbacksSpinner">Loading feedbacks...</div>
+                        <table id="feedbacksTable" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Message</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbacksTbody"></tbody>
+                        </table>
+                        <div id="feedbacksEmpty" class="empty-state" style="display:none;">No feedbacks yet.</div>
                     </div>
                 </div>
             </div>
