@@ -9,7 +9,7 @@
     <title>NaijaGenius • Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
 
-    <!-- Preconnect hints for performance -->
+    <!-- Preconnect hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -78,6 +78,17 @@
                         </span>
                     </div>
                 </div>
+            </div>
+
+            <!-- ===== ANNOUNCEMENT BANNER ===== -->
+            <div id="announcementBanner" class="announcement-banner" style="display: none;">
+                <div class="announcement-content">
+                    <i class="fas fa-bullhorn announcement-icon"></i>
+                    <span id="announcementText" class="announcement-text">Loading announcement...</span>
+                </div>
+                <button id="announcementCloseBtn" class="announcement-close" aria-label="Close announcement">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <!-- ---- LEVEL DISPLAY ---- -->
@@ -430,13 +441,7 @@
                         <button id="saveNameBtn">Save</button>
                     </div>
                 </div>
-                <!-- Logout -->
-                <div class="settings-item settings-logout-item">
-                    <label for="logoutBtn">Account</label>
-                    <div class="settings-control">
-                        <button id="logoutBtn" class="logout-btn">Logout</button>
-                    </div>
-                </div>
+                
                 <!-- Feedback -->
                 <div class="settings-item settings-feedback-item">
                     <label for="feedbackBtn">Feedback</label>
@@ -444,6 +449,14 @@
                         <button id="feedbackBtn" class="feedback-btn">Message Us</button>
                     </div>
                 </div>
+<!-- Logout -->
+                <div class="settings-item settings-logout-item">
+                    <label for="logoutBtn">Account</label>
+                    <div class="settings-control">
+                        <button id="logoutBtn" class="logout-btn">Logout</button>
+                    </div>
+                </div>
+
             </div>
         </section>
 
