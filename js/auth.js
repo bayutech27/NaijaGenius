@@ -357,3 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (emailField) emailField.value = emailParam;
     }
 });
+
+// Add export at the end of auth.js
+export { logoutUser };
