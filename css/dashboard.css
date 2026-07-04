@@ -433,7 +433,6 @@ body {
     right: 0px;
     width: 26px;
     height: 26px;
-    min-height: 26px;
     border-radius: 50%;
     background: #3E7BFF;
     border: 2.5px solid #0A0A0F;
@@ -448,6 +447,8 @@ body {
     padding: 0;
     line-height: 1;
     text-align: center;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
 }
 .avatar-edit-btn:hover {
     transform: scale(1.1);
@@ -1972,7 +1973,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS (for other parts, not settings – already handled above) ----- */
+/* ----- MOBILE ADJUSTMENTS ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -2023,6 +2024,7 @@ body {
         width: 20px;
         height: 20px;
         font-size: 0.55rem;
+        aspect-ratio: 1 / 1;
     }
     .shield-badge {
         width: 60px;
@@ -2272,6 +2274,7 @@ body {
         width: 16px;
         height: 16px;
         font-size: 0.45rem;
+        aspect-ratio: 1 / 1;
     }
     .shield-badge {
         width: 48px;
