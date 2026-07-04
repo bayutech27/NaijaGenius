@@ -47,7 +47,9 @@ function initApp() {
     const panels = {
         questions: document.getElementById('tab-questions'),
         tournaments: document.getElementById('tab-tournaments'),
-        withdrawals: document.getElementById('tab-withdrawals')
+        withdrawals: document.getElementById('tab-withdrawals'),
+        announcement: document.getElementById('tab-announcement'),
+        feedbacks: document.getElementById('tab-feedbacks')
     };
 
     tabs.forEach((btn) => {
@@ -61,6 +63,8 @@ function initApp() {
             // Load data only when the tab is first activated
             if (target === 'tournaments') loadTournaments();
             if (target === 'withdrawals') loadWithdrawals();
+            if (target === 'feedbacks') loadFeedbacks();
+            if (target === 'announcement') loadAnnouncement();
         });
     });
 
@@ -75,7 +79,9 @@ function initApp() {
     // Initialise uploader (always available)
     initUploader();
 
-    // Do NOT auto‑load tournaments or withdrawals – they load when tab is clicked.
+    // Load announcement and feedbacks on first visit if tab is active? We'll lazy load on tab click.
+    // But we can also preload the announcement if the tab is active by default? The tab is not active initially,
+    // so it's fine.
 }
 
 // ==================================================================
@@ -596,6 +602,186 @@ function loadWithdrawals() {
             spinner.style.display = 'none';
             empty.style.display = 'block';
             empty.textContent = 'Error loading withdrawals.';
+        }
+    );
+}
+
+// ==================================================================
+// 4. ANNOUNCEMENT (CRUD)
+// ==================================================================
+let announcementUnsubscribe = null;
+let isEditing = false;
+
+function loadAnnouncement() {
+    // If already listening, detach to avoid duplicates
+    if (announcementUnsubscribe) {
+        announcementUnsubscribe();
+        announcementUnsubscribe = null;
+    }
+
+    const input = document.getElementById('announcementInput');
+    const saveBtn = document.getElementById('announcementSaveBtn');
+    const cancelBtn = document.getElementById('announcementCancelBtn');
+    const displayDiv = document.getElementById('announcementCurrent');
+
+    // Listen to the single document "current" in collection "announcement"
+    const docRef = doc(db, 'announcement', 'current');
+    announcementUnsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const message = data.message || '';
+            displayDiv.innerHTML = `
+                <p style="color: #CBD5E1; padding: 0.5rem 0;">${message || 'No announcement set.'}</p>
+                <div class="announcement-actions">
+                    <button class="btn secondary small" id="editAnnouncementBtn">Edit</button>
+                    <button class="btn danger small" id="deleteAnnouncementBtn">Delete</button>
+                </div>
+            `;
+            // Attach edit and delete handlers
+            document.getElementById('editAnnouncementBtn')?.addEventListener('click', () => {
+                input.value = message;
+                isEditing = true;
+                saveBtn.textContent = 'Update Announcement';
+                cancelBtn.style.display = 'inline-block';
+                input.focus();
+            });
+            document.getElementById('deleteAnnouncementBtn')?.addEventListener('click', async () => {
+                if (!confirm('Delete this announcement?')) return;
+                try {
+                    await setDoc(docRef, { message: '' });
+                    showToast('Announcement deleted.', 'success');
+                    // UI will update via onSnapshot
+                } catch (err) {
+                    console.error('Error deleting announcement:', err);
+                    showToast('Error deleting announcement.', 'error');
+                }
+            });
+        } else {
+            displayDiv.innerHTML = `<p style="color: #CBD5E1; padding: 1rem 0;">No announcement set.</p>`;
+        }
+    }, (err) => {
+        console.error('Announcement listener error:', err);
+        displayDiv.innerHTML = `<p style="color: #CBD5E1; padding: 1rem 0;">Error loading announcement.</p>`;
+    });
+
+    // Save/Create
+    saveBtn.addEventListener('click', async () => {
+        const message = input.value.trim();
+        if (!message) {
+            showToast('Please enter a message.', 'error');
+            return;
+        }
+        try {
+            await setDoc(docRef, { message: message });
+            showToast('Announcement saved!', 'success');
+            input.value = '';
+            if (isEditing) {
+                isEditing = false;
+                saveBtn.textContent = 'Save Announcement';
+                cancelBtn.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Error saving announcement:', err);
+            showToast('Error saving announcement.', 'error');
+        }
+    });
+
+    // Cancel edit
+    cancelBtn.addEventListener('click', () => {
+        input.value = '';
+        isEditing = false;
+        saveBtn.textContent = 'Save Announcement';
+        cancelBtn.style.display = 'none';
+        // Reload the current message to reset view
+        // The onSnapshot will update automatically
+    });
+}
+
+// ==================================================================
+// 5. FEEDBACKS (real‑time)
+// ==================================================================
+let feedbacksUnsubscribe = null;
+
+function loadFeedbacks() {
+    if (feedbacksUnsubscribe) {
+        feedbacksUnsubscribe();
+        feedbacksUnsubscribe = null;
+    }
+
+    const tbody = document.getElementById('feedbacksTbody');
+    const table = document.getElementById('feedbacksTable');
+    const spinner = document.getElementById('feedbacksSpinner');
+    const empty = document.getElementById('feedbacksEmpty');
+
+    table.style.display = 'none';
+    empty.style.display = 'none';
+    spinner.style.display = 'block';
+    tbody.innerHTML = '';
+
+    const q = query(collection(db, 'feedback'), orderBy('timestamp', 'desc'));
+
+    feedbacksUnsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+            spinner.style.display = 'none';
+            if (snapshot.empty) {
+                empty.style.display = 'block';
+                table.style.display = 'none';
+                return;
+            }
+            table.style.display = 'table';
+            let html = '';
+            let index = 1;
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const id = doc.id;
+                const status = data.status || 'new';
+                let dateStr = '-';
+                if (data.timestamp) {
+                    const d = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
+                    dateStr = d.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+                html += `<tr>
+                    <td>${index++}</td>
+                    <td>${data.displayName || '-'}</td>
+                    <td>${data.email || '-'}</td>
+                    <td style="max-width: 200px; word-break: break-word;">${data.message || '-'}</td>
+                    <td>${dateStr}</td>
+                    <td>
+                        <select class="status-select feedback-status ${status}" data-docid="${id}">
+                            <option value="new" ${status === 'new' ? 'selected' : ''}>New</option>
+                            <option value="read" ${status === 'read' ? 'selected' : ''}>Read</option>
+                            <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+
+            document.querySelectorAll('.feedback-status').forEach((sel) => {
+                sel.addEventListener('change', function () {
+                    const docId = this.dataset.docid;
+                    const newStatus = this.value;
+                    updateDoc(doc(db, 'feedback', docId), {
+                        status: newStatus,
+                    }).catch((err) => {
+                        console.error('Error updating feedback status:', err);
+                        alert('Failed to update status. Please try again.');
+                    });
+                });
+            });
+        },
+        (err) => {
+            console.error('Feedbacks listener error:', err);
+            spinner.style.display = 'none';
+            empty.style.display = 'block';
+            empty.textContent = 'Error loading feedbacks.';
         }
     );
 }
