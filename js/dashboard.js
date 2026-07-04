@@ -64,7 +64,6 @@ const levelStats = document.getElementById("levelStats");
 
 // ----- Avatar elements -----
 const userAvatarBtn = document.getElementById("userAvatarBtn");
-const avatarEditBtn = document.getElementById("avatarEditBtn");
 const avatarFileInput = document.getElementById("avatarFileInput");
 const userAvatarImg = document.getElementById("userAvatarImg");
 const userInitialsSpan = document.getElementById("userInitials");
@@ -526,10 +525,7 @@ onAuthStateChanged(auth, async (user) => {
     userAvatarBtn.addEventListener("click", () => {
       avatarFileInput.click();
     });
-    avatarEditBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      avatarFileInput.click();
-    });
+    // (Avatar edit button logic removed – element no longer exists in HTML)
     // SETTINGS
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
