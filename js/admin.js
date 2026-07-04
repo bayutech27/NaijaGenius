@@ -33,7 +33,7 @@ import {
 // ==================================================================
 onAuthStateChanged(auth, (user) => {
     if (!user) {
-        window.location.href = '/index.html';
+        window.location.href = '/login.html';
         return;
     }
     initApp();
@@ -68,10 +68,11 @@ function initApp() {
         });
     });
 
+    // --- LOGOUT: redirect to index.html ---
     document.getElementById('logoutBtn').addEventListener('click', () => {
         signOut(auth)
             .then(() => {
-                window.location.href = '/login.html';
+                window.location.href = '/index.html';
             })
             .catch(() => {});
     });
