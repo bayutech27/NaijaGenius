@@ -1,6 +1,20 @@
 // Firebase Modular SDK v12.14.0
 import { auth, db, storage, analytics } from "./firebase.config.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+  runTransaction,
+  increment,
+} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
@@ -67,7 +81,58 @@ async function getUniqueReferralCode() {
     return referralCode;
 }
 
-// ========== CREATE USER PROFILE (minimal) ==========
+// ========== WELCOME BONUS (first 200 users) ==========
+const MAX_BONUS_USERS = 200;
+const BONUS_AMOUNT = 1000;
+
+async function applyWelcomeBonusIfEligible(userRef, user) {
+    const counterRef = doc(db, 'appState', 'registrationCounter');
+
+    try {
+        // Ensure the counter document exists
+        const counterSnap = await getDoc(counterRef);
+        if (!counterSnap.exists()) {
+            await setDoc(counterRef, { count: 0 });
+        }
+
+        // Run a transaction to safely increment and check eligibility
+        await runTransaction(db, async (transaction) => {
+            const counterDoc = await transaction.get(counterRef);
+            if (!counterDoc.exists()) {
+                // Shouldn't happen now, but just in case
+                transaction.set(counterRef, { count: 1 });
+                // For the first user, we add bonus
+                transaction.update(userRef, {
+                    coins: increment(BONUS_AMOUNT),
+                    hasReceivedBonus: true
+                });
+                console.log(`🎉 User ${user.uid} received ${BONUS_AMOUNT} coins (User #1)`);
+                return;
+            }
+            const currentCount = counterDoc.data().count;
+            if (currentCount < MAX_BONUS_USERS) {
+                // Eligible: increment counter, add bonus coins and set flag
+                transaction.update(counterRef, { count: currentCount + 1 });
+                transaction.update(userRef, {
+                    coins: increment(BONUS_AMOUNT),
+                    hasReceivedBonus: true
+                });
+                console.log(`🎉 User ${user.uid} received ${BONUS_AMOUNT} coins (User #${currentCount + 1})`);
+            } else {
+                // Not eligible: just increment counter (count all users)
+                transaction.update(counterRef, { count: currentCount + 1 });
+                // Optionally, you could log that the user didn't get the bonus
+                console.log(`ℹ️ User ${user.uid} did not receive bonus (User #${currentCount + 1} beyond ${MAX_BONUS_USERS})`);
+            }
+        });
+    } catch (bonusErr) {
+        console.error('Failed to apply welcome bonus:', bonusErr);
+        // Non‑critical – user still created without bonus.
+        // We could log this to a separate collection for manual review.
+    }
+}
+
+// ========== CREATE USER PROFILE ==========
 async function createUserProfile(user, email, displayName) {
     const uniqueReferralCode = await getUniqueReferralCode();
     const userDocRef = doc(db, "users", user.uid);
@@ -106,7 +171,8 @@ async function createUserProfile(user, email, displayName) {
         lastAdRewardTime: null,
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
-        isAdmin: false
+        isAdmin: false,
+        hasReceivedBonus: false  // new field for bonus tracking
     };
     await setDoc(userDocRef, profile);
     return profile;
@@ -167,7 +233,13 @@ async function handleSignup(e) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        // Create the user profile (without bonus yet)
         await createUserProfile(user, email, email.split('@')[0]);
+
+        // Apply welcome bonus (if eligible)
+        const userRef = doc(db, "users", user.uid);
+        await applyWelcomeBonusIfEligible(userRef, user);
+
         showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
         // Redirect after signup (new user is not admin)
         setTimeout(() => {
@@ -220,12 +292,21 @@ async function handleGoogleSignIn() {
         const user = result.user;
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
+        let isNewUser = false;
         if (!userSnap.exists()) {
+            // Create the user profile
             await createUserProfile(user, user.email, user.displayName || user.email.split('@')[0]);
+            isNewUser = true;
             showToast("Account created with Google! 🎉", "success");
         } else {
             showToast("Welcome back! 🎉", "success");
         }
+
+        // If new user, apply welcome bonus (if eligible)
+        if (isNewUser) {
+            await applyWelcomeBonusIfEligible(userRef, user);
+        }
+
         // Redirect based on admin status
         await redirectUserAfterAuth(user);
     } catch (error) {
