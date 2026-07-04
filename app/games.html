@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>NaijaGenius • Game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
 
@@ -137,7 +140,7 @@
 
     <script type="module" src="/js/games.js"></script>
 
-    <!-- Back‑button handling with replace -->
+    <!-- Back‑button handling with replace + bfcache + cache control -->
     <script>
         (function() {
             // 1. Replace the back arrow click behaviour
@@ -145,30 +148,43 @@
             if (backBtn) {
                 backBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    // Use replace to remove game from history
                     window.location.replace('/app/dashboard.html');
                 });
             }
 
-            // 2. Handle the device back button (popstate) – if the user goes back, redirect to dashboard using replace
-            // This ensures that even if the user uses the phone's back button, they are taken to the dashboard
-            // and the game page is removed from history.
-            window.addEventListener('popstate', function(event) {
-                // If we are still on the game page when popstate fires, it means the user pressed back.
-                // We'll redirect to dashboard using replace so the game is not in history anymore.
+            // 2. Handle device back button (popstate) – redirect to dashboard with replace
+            function goToDashboard() {
+                // If we are still on the game page, replace it with dashboard
                 if (window.location.pathname.includes('games.html')) {
                     window.location.replace('/app/dashboard.html');
                 }
+            }
+
+            // Listen for popstate (device back)
+            window.addEventListener('popstate', function(event) {
+                // If we are on the game page, replace it with dashboard
+                goToDashboard();
             });
 
-            // Push a dummy state so that the first popstate (if any) is caught.
-            // This is useful because some browsers fire popstate on page load or if history has no state.
-            // We'll push a state that we can later identify.
+            // 3. Handle bfcache (pageshow) – if the page is restored from cache, redirect to dashboard
+            window.addEventListener('pageshow', function(event) {
+                // If the page is restored from the bfcache (event.persisted is true), go to dashboard
+                if (event.persisted) {
+                    goToDashboard();
+                }
+            });
+
+            // 4. Push a dummy state so that popstate is triggered when the user presses back
+            // This ensures the popstate listener fires even if the history is empty.
             if (history.state === null) {
                 history.pushState({ game: true }, document.title, window.location.href);
             } else {
-                // If there is already a state, we can also push to ensure we have a state to pop.
                 history.pushState({ game: true }, document.title, window.location.href);
             }
+
+            // 5. Prevent caching of the game page (already done via meta tags)
+            // This ensures the page is not served from cache, so the back button always fetches fresh.
         })();
     </script>
 </body>
