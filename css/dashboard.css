@@ -1510,6 +1510,130 @@ body {
     max-width: 100%;
 }
 
+/* ----- FEEDBACK BUTTON ----- */
+.settings-feedback-item .feedback-btn {
+    background: linear-gradient(160deg, #FFD700 0%, #E0A400 100%);
+    border: none;
+    padding: 0.45rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #0A0A0F;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    min-width: 100px;
+}
+
+.settings-feedback-item .feedback-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.5);
+}
+
+.settings-feedback-item .feedback-btn:active {
+    transform: scale(0.97);
+}
+
+.settings-feedback-item label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #FFFFFF;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.settings-feedback-item .settings-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* ----- FEEDBACK MODAL ----- */
+.feedback-modal-card {
+    max-width: 500px;
+}
+
+.feedback-modal-card h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.feedback-textarea-group {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+}
+
+.feedback-textarea-group textarea {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: rgba(10, 14, 23, 0.6);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    color: #f0f3fa;
+    transition: all 0.25s ease;
+    outline: none;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.feedback-textarea-group textarea:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+    background: rgba(18, 24, 38, 0.9);
+}
+
+.feedback-textarea-group textarea::placeholder {
+    color: #8C97B8;
+}
+
+.modal-btn-cancel,
+.modal-btn-send {
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: #a0b3d9;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.modal-btn-send {
+    background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(62, 123, 255, 0.3);
+}
+
+.modal-btn-send:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(62, 123, 255, 0.5);
+}
+
+.modal-btn-send:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 @media (max-width: 480px) {
     .settings-item {
         padding: 0.5rem 0.6rem;
