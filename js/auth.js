@@ -92,6 +92,7 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
         // Ensure the counter document exists
         const counterSnap = await getDoc(counterRef);
         if (!counterSnap.exists()) {
+            console.log('📄 Creating appState/registrationCounter document...');
             await setDoc(counterRef, { count: 0 });
         }
 
@@ -101,7 +102,6 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
             if (!counterDoc.exists()) {
                 // Shouldn't happen now, but just in case
                 transaction.set(counterRef, { count: 1 });
-                // For the first user, we add bonus
                 transaction.update(userRef, {
                     coins: increment(BONUS_AMOUNT),
                     hasReceivedBonus: true
@@ -110,6 +110,7 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
                 return;
             }
             const currentCount = counterDoc.data().count;
+            console.log(`📊 Current registration count: ${currentCount}`);
             if (currentCount < MAX_BONUS_USERS) {
                 // Eligible: increment counter, add bonus coins and set flag
                 transaction.update(counterRef, { count: currentCount + 1 });
@@ -121,7 +122,6 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
             } else {
                 // Not eligible: just increment counter (count all users)
                 transaction.update(counterRef, { count: currentCount + 1 });
-                // Optionally, you could log that the user didn't get the bonus
                 console.log(`ℹ️ User ${user.uid} did not receive bonus (User #${currentCount + 1} beyond ${MAX_BONUS_USERS})`);
             }
         });
@@ -129,6 +129,8 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
         console.error('Failed to apply welcome bonus:', bonusErr);
         // Non‑critical – user still created without bonus.
         // We could log this to a separate collection for manual review.
+        // Re-throw so the calling function can handle it (optional)
+        throw bonusErr;
     }
 }
 
@@ -172,8 +174,8 @@ async function createUserProfile(user, email, displayName) {
         bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
         isAdmin: false,
-        bonusNotified: false,
-        hasReceivedBonus: false  // new field for bonus tracking
+        hasReceivedBonus: false,
+        bonusNotified: false
     };
     await setDoc(userDocRef, profile);
     return profile;
