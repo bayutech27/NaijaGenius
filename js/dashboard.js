@@ -648,6 +648,9 @@ onAuthStateChanged(auth, async (user) => {
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
 
+    // ===== INIT ANNOUNCEMENT LISTENER =====
+    listenForAnnouncement();
+
   } catch (error) {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
@@ -861,5 +864,144 @@ if (sendFeedbackBtn) {
             sendFeedbackBtn.disabled = false;
             sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
         }
+    });
+}
+
+// ========== ANNOUNCEMENT BANNER ==========
+const announcementBanner = document.getElementById("announcementBanner");
+const announcementText = document.getElementById("announcementText");
+const announcementCloseBtn = document.getElementById("announcementCloseBtn");
+
+// Inject announcement styles (only once)
+function injectAnnouncementStyles() {
+    if (document.getElementById("announcementStyles")) return;
+    const style = document.createElement("style");
+    style.id = "announcementStyles";
+    style.textContent = `
+        .announcement-banner {
+            background: linear-gradient(135deg, #FFD700 0%, #FF9A3E 50%, #FF6B6B 100%);
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem 0 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+            animation: slideDown 0.4s ease-out;
+        }
+        .announcement-content {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex: 1;
+            min-width: 0;
+        }
+        .announcement-icon {
+            font-size: 1.6rem;
+            color: #0A0A0F;
+            flex-shrink: 0;
+        }
+        .announcement-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0A0A0F;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .announcement-close {
+            background: rgba(0,0,0,0.15);
+            border: none;
+            color: #0A0A0F;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .announcement-close:hover {
+            background: rgba(0,0,0,0.25);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 480px) {
+            .announcement-banner {
+                padding: 0.6rem 0.8rem;
+                border-radius: 12px;
+            }
+            .announcement-icon {
+                font-size: 1.2rem;
+            }
+            .announcement-text {
+                font-size: 0.8rem;
+            }
+            .announcement-close {
+                width: 26px;
+                height: 26px;
+                font-size: 0.9rem;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function showAnnouncement(message) {
+    if (!announcementBanner || !announcementText) return;
+    // Check if user has dismissed this announcement (using localStorage with message hash)
+    const hash = btoa(message).slice(0, 20);
+    if (localStorage.getItem(`announcement_${hash}`) === "dismissed") {
+        announcementBanner.style.display = "none";
+        return;
+    }
+    announcementText.textContent = message;
+    announcementBanner.style.display = "flex";
+}
+
+function hideAnnouncement() {
+    if (announcementBanner) {
+        announcementBanner.style.display = "none";
+    }
+}
+
+function listenForAnnouncement() {
+    if (!announcementBanner || !announcementText) return;
+    injectAnnouncementStyles();
+
+    const announcementRef = doc(db, "announcement", "current");
+    onSnapshot(announcementRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const message = data.message || "";
+            if (message && message.trim() !== "") {
+                showAnnouncement(message.trim());
+            } else {
+                hideAnnouncement();
+            }
+        } else {
+            hideAnnouncement();
+        }
+    }, (error) => {
+        console.warn("Announcement listener error:", error);
+        hideAnnouncement();
+    });
+}
+
+// Close button event
+if (announcementCloseBtn) {
+    announcementCloseBtn.addEventListener("click", () => {
+        if (announcementText) {
+            const message = announcementText.textContent;
+            const hash = btoa(message).slice(0, 20);
+            localStorage.setItem(`announcement_${hash}`, "dismissed");
+        }
+        hideAnnouncement();
     });
 }
