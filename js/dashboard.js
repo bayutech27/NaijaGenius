@@ -16,6 +16,7 @@ import {
   startAfter,
   where,
   getCountFromServer,
+  addDoc,
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
@@ -760,5 +761,86 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
         logoutUser();
+    });
+}
+
+// ========== FEEDBACK MODAL ==========
+const feedbackBtn = document.getElementById("feedbackBtn");
+const feedbackModal = document.getElementById("feedbackModal");
+const closeFeedbackBtn = document.getElementById("closeFeedbackBtn");
+const cancelFeedbackBtn = document.getElementById("cancelFeedbackBtn");
+const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
+const feedbackMessage = document.getElementById("feedbackMessage");
+
+function openFeedbackModal() {
+    if (feedbackModal) {
+        feedbackModal.style.display = "flex";
+        feedbackMessage.value = "";
+        sendFeedbackBtn.disabled = false;
+        feedbackMessage.focus();
+    }
+}
+
+function closeFeedbackModal() {
+    if (feedbackModal) feedbackModal.style.display = "none";
+}
+
+// Event listeners
+if (feedbackBtn) {
+    feedbackBtn.addEventListener("click", openFeedbackModal);
+}
+if (closeFeedbackBtn) {
+    closeFeedbackBtn.addEventListener("click", closeFeedbackModal);
+}
+if (cancelFeedbackBtn) {
+    cancelFeedbackBtn.addEventListener("click", closeFeedbackModal);
+}
+// Click outside modal to close
+if (feedbackModal) {
+    feedbackModal.addEventListener("click", (e) => {
+        if (e.target === feedbackModal) closeFeedbackModal();
+    });
+}
+
+// Send feedback
+if (sendFeedbackBtn) {
+    sendFeedbackBtn.addEventListener("click", async () => {
+        const message = feedbackMessage.value.trim();
+        if (!message) {
+            showToast("Please type a message.", "error");
+            return;
+        }
+
+        sendFeedbackBtn.disabled = true;
+        sendFeedbackBtn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+
+        try {
+            const userRef = doc(db, "users", currentUserUid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                showToast("User data not found.", "error");
+                sendFeedbackBtn.disabled = false;
+                sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+                return;
+            }
+            const userData = userSnap.data();
+            const feedbackData = {
+                uid: currentUserUid,
+                displayName: userData.displayName || "Anonymous",
+                email: userData.email || "",
+                message: message,
+                status: "new",
+                timestamp: serverTimestamp()
+            };
+            await addDoc(collection(db, "feedback"), feedbackData);
+            showToast("Feedback sent! Thank you 🙏", "success");
+            closeFeedbackModal();
+        } catch (err) {
+            console.error("Error sending feedback:", err);
+            showToast("Failed to send. Please try again.", "error");
+        } finally {
+            sendFeedbackBtn.disabled = false;
+            sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
+        }
     });
 }
