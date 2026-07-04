@@ -1,5 +1,5 @@
 // ========== IMPORTS ==========
-import { auth, db } from '/js/core/firebase.js';
+import { auth, db } from '/js/firebase.config.js';
 import {
   doc, getDoc, updateDoc, addDoc, collection,
   serverTimestamp, increment
