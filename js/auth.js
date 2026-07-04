@@ -137,7 +137,7 @@ async function handleSignup(e) {
         await createUserProfile(user, email, email.split('@')[0]);
         showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
         setTimeout(() => {
-            window.location.href = "dashboard.html";
+            window.location.href = "/app/dashboard.html";  // absolute path
         }, 1500);
     } catch (error) {
         console.error("Signup error:", error);
@@ -164,7 +164,10 @@ async function handleLogin(e) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         showToast("Login successful! Redirecting...", "success");
-        // Redirect will be handled by onAuthStateChanged
+        // Redirect to dashboard immediately
+        setTimeout(() => {
+            window.location.href = "/app/dashboard.html";
+        }, 500);
     } catch (err) {
         let msg = "Invalid email or password";
         if (err.code === "auth/user-not-found") msg = "No account found";
@@ -192,14 +195,18 @@ async function handleGoogleSignIn() {
         } else {
             showToast("Welcome back! 🎉", "success");
         }
-        // Redirect after a moment
+        // Redirect to dashboard
         setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 1500);
+            window.location.href = "/app/dashboard.html";
+        }, 500);
     } catch (error) {
         console.error("Google sign-in error:", error);
         let msg = "Google sign-in failed. Please try again.";
         if (error.code === "auth/popup-closed-by-user") msg = "Sign-in cancelled.";
+        else if (error.code === "auth/unauthorized-domain") {
+            msg = "Domain not authorized. Please contact support.";
+            console.warn("Add your domain to Firebase Console > Authentication > Settings > Authorized domains.");
+        }
         showToast(msg, "error");
     } finally {
         setButtonLoading(btn, false);
@@ -256,7 +263,7 @@ function observeToggleIcons() {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// ========== MODAL CLOSE (reset & terms) ==========
+// ========== MODAL CLOSE ==========
 function initModals() {
     // Reset modal
     const resetModal = document.getElementById("resetModal");
@@ -298,7 +305,6 @@ function initModals() {
             e.preventDefault();
             const modal = document.getElementById("termsModal");
             if (modal) {
-                // Show the correct tab
                 const tab = this.dataset.tab || 'terms';
                 tabButtons.forEach(b => b.classList.remove("active"));
                 tabContents.forEach(c => c.style.display = "none");
@@ -324,11 +330,6 @@ async function logoutUser() {
         showToast("Logout error", "error");
     }
 }
-
-// ========== AUTH STATE LISTENER ==========
-// Note: onAuthStateChanged is already used in dashboard.js; we can handle redirects here as well.
-// We'll keep it minimal; the dashboard will redirect if not authenticated.
-// But for login page we'll rely on the form handlers.
 
 // ========== DOMContentLoaded ==========
 document.addEventListener("DOMContentLoaded", () => {
@@ -358,5 +359,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Add export at the end of auth.js
+// Export logout for dashboard.js
 export { logoutUser };
