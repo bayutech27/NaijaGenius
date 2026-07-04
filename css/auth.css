@@ -155,7 +155,7 @@ input::placeholder {
 
 /* ----- BUTTONS ----- */
 .auth-btn {
-    background: linear-gradient(160deg, #98FF98 0%, #98FG47 100%);
+    background: linear-gradient(160deg, #98FF98 0%, #000080 100%);
     border: none;
     padding: 0.9rem;
     font-size: 1rem;
