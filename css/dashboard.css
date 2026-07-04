@@ -426,38 +426,7 @@ body {
     justify-content: center;
 }
 
-/* ---- AVATAR EDIT BUTTON – HIDDEN ---- */
-.avatar-edit-btn {
-    display: none; /* HIDDEN per user request */
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #3E7BFF;
-    border: 2.5px solid #0A0A0F;
-    color: #fff;
-    font-size: 0.7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    transition: transform 0.2s, background 0.2s;
-    padding: 0;
-    line-height: 1;
-    text-align: center;
-    flex-shrink: 0;
-    aspect-ratio: 1 / 1;
-}
-.avatar-edit-btn:hover {
-    transform: scale(1.1);
-    background: #2a5fd0;
-}
-.avatar-edit-btn i {
-    margin: 0;
-    display: block;
+
 }
 
 /* Level container (right) – align items left */
@@ -465,25 +434,25 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     justify-content: center;
     min-width: 0;
-    text-align: left;
+    text-align: right;
     gap: 0.25rem;
 }
 
 .level-top-row {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.1rem;
+    gap: 0.8rem;
+    margin-bottom: 0.4rem;
 }
 
 /* ---- SHIELD BADGE – increased by 30% ---- */
 .shield-badge {
     flex-shrink: 0;
-    width: 78px;
-    height: 88px;
+    width: 85px;
+    height: 95px;
     background: #1A1D2E;
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
@@ -525,7 +494,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    width: 75%;
+    width: 65%;
     max-width: 260px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 20px;
@@ -546,7 +515,7 @@ body {
 }
 
 .xp-text {
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     font-weight: 700;
     color: #FFFFFF;
     text-shadow: 0 0 8px rgba(62, 123, 255, 0.4);
@@ -622,7 +591,7 @@ body {
     color: #9AA5C7;
 }
 
-/* ===== CHALLENGES FOR YOU ===== */
+/* ===== TIPS FOR EARNING COINS ===== */
 .challenges-3d-container {
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
@@ -658,7 +627,7 @@ body {
 
 .challenges-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 1.05rem;
+    font-size: 1.4rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -670,7 +639,7 @@ body {
 }
 .challenges-title i {
     color: #FFD700;
-    font-size: 1.2rem;
+    font-size: 1.7rem;
 }
 
 .challenges-grid {
