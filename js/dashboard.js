@@ -23,7 +23,7 @@ import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
 
 // ========== TOAST NOTIFICATIONS ==========
-function showToast(message, type = 'success', duration = 4000) {
+function showToast(message, type = 'success', duration = 10000) {
     let container = document.getElementById('toastContainer');
     if (!container) {
         container = document.createElement('div');
@@ -441,7 +441,7 @@ onAuthStateChanged(auth, async (user) => {
     if (userData.hasReceivedBonus === true && userData.bonusNotified !== true) {
         // Show a special toast for the bonus
         setTimeout(() => {
-            showToast('🎉 Congratulations! You earned 1000 bonus coins for being one of our first 200 users!', 'success', 6000);
+            showToast('🎉 Congratulations! You earned 1000 bonus coins for being one of our first 200 users!', 'success', 15000);
         }, 1000); // slight delay to ensure dashboard has loaded
         // Update the flag in Firestore so it doesn't appear again
         await updateDoc(userRef, { bonusNotified: true });
