@@ -1465,6 +1465,51 @@ body {
     opacity: 0.8;
 }
 
+
+/* ----- SETTINGS LOGOUT BUTTON ----- */
+.settings-logout-item .logout-btn {
+    background: linear-gradient(160deg, #FF5757 0%, #C21E1E 100%);
+    border: none;
+    padding: 0.45rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(255, 87, 87, 0.3);
+    min-width: 100px;
+}
+
+.settings-logout-item .logout-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(255, 87, 87, 0.5);
+}
+
+.settings-logout-item .logout-btn:active {
+    transform: scale(0.97);
+}
+
+/* Align the logout button with other controls */
+.settings-logout-item label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #FFFFFF;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.settings-logout-item .settings-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+    max-width: 100%;
+}
+
 @media (max-width: 480px) {
     .settings-item {
         padding: 0.5rem 0.6rem;
