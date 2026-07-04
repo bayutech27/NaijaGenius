@@ -545,3 +545,25 @@ input::placeholder {
     from { opacity: 0; transform: translateY(25px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* ----- PROUDLY NAIJA FOOTER ----- */
+.proudly-naija {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: #8C97B8;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}
+
+.proudly-naija i,
+.proudly-naija .flag {
+    margin-right: 0.4rem;
+    font-size: 1.1rem;
+}
+
+.proudly-naija span {
+    color: #98FF98;
+    font-weight: 700;
+}
