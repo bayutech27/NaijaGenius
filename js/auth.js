@@ -1,7 +1,7 @@
 // Firebase Modular SDK v12.14.0
 import { auth, db, storage, analytics } from "./firebase.config.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
 // Helper: Toast notifications
@@ -45,43 +45,6 @@ function setButtonLoading(btn, isLoading) {
     }
 }
 
-// ========== PHONE NUMBER AUTO-FORMATTING ==========
-function formatPhoneNumber(value) {
-    let cleaned = value.replace(/\D/g, '');
-    if (!cleaned.startsWith('234')) {
-        cleaned = '234' + cleaned;
-    }
-    if (cleaned.length > 13) cleaned = cleaned.slice(0, 13);
-    let formatted = '+';
-    if (cleaned.length >= 4) {
-        formatted += cleaned.slice(0, 3) + ' ' + cleaned.slice(3, 6);
-        if (cleaned.length >= 7) {
-            formatted += ' ' + cleaned.slice(6, 10);
-            if (cleaned.length >= 11) {
-                formatted += ' ' + cleaned.slice(10, 14);
-            }
-        }
-    } else {
-        formatted += cleaned;
-    }
-    return formatted.trim();
-}
-
-function setupPhoneFormatter() {
-    const phoneInput = document.getElementById("phoneNumber");
-    if (!phoneInput) return;
-    phoneInput.placeholder = "+234 801 234 5678";
-    phoneInput.addEventListener("input", function() {
-        let digits = this.value.replace(/\D/g, '');
-        if (digits.length === 0) {
-            this.value = '+234 ';
-            return;
-        }
-        if (!digits.startsWith('234')) digits = '234' + digits;
-        this.value = formatPhoneNumber('+' + digits);
-    });
-}
-
 // ========== REFERRAL CODE GENERATOR ==========
 function generateReferralCode() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -104,58 +67,16 @@ async function getUniqueReferralCode() {
     return referralCode;
 }
 
-// ========== USERNAME AVAILABILITY (PUBLIC - NO AUTH REQUIRED) ==========
-async function isUsernameAvailable(username) {
-    if (!username || username.length < 3) return false;
-    // Use the usernames collection with a direct document read (public)
-    const usernameDoc = doc(db, "usernames", username.toLowerCase());
-    const snapshot = await getDoc(usernameDoc);
-    return !snapshot.exists();
-}
-
-function setupUsernameListener() {
-    const usernameInput = document.getElementById("username");
-    const statusSpan = document.getElementById("usernameStatus");
-    if (!usernameInput || !statusSpan) return;
-    let debounceTimer;
-    usernameInput.addEventListener("input", async () => {
-        clearTimeout(debounceTimer);
-        const username = usernameInput.value.trim();
-        if (username.length < 3) {
-            statusSpan.textContent = "Min 3 characters";
-            statusSpan.className = "username-status taken";
-            return;
-        }
-        debounceTimer = setTimeout(async () => {
-            try {
-                const available = await isUsernameAvailable(username);
-                if (available) {
-                    statusSpan.textContent = "✓ Username Available";
-                    statusSpan.className = "username-status available";
-                } else {
-                    statusSpan.textContent = "✗ Username Already Taken";
-                    statusSpan.className = "username-status taken";
-                }
-            } catch (error) {
-                // If network error, show a neutral message
-                statusSpan.textContent = "⚠️ Checking...";
-                statusSpan.className = "username-status taken";
-            }
-        }, 500);
-    });
-}
-
-// ========== CREATE USER PROFILE ==========
-async function createUserProfile(user, userData) {
-    const { username, email, phone, state } = userData;
+// ========== CREATE USER PROFILE (minimal) ==========
+async function createUserProfile(user, email, displayName) {
     const uniqueReferralCode = await getUniqueReferralCode();
     const userDocRef = doc(db, "users", user.uid);
     const profile = {
         uid: user.uid,
-        displayName: username,
+        displayName: displayName || email.split('@')[0] || "User",
         email: email,
-        phone: phone || "",
-        state: state,
+        phone: "",
+        state: "",
         avatarUrl: "",
         referralCode: uniqueReferralCode,
         referredBy: "",
@@ -191,44 +112,15 @@ async function createUserProfile(user, userData) {
     return profile;
 }
 
-// ========== CREATE USERNAME DOCUMENT ==========
-async function createUsernameDocument(username, uid) {
-    const usernameRef = doc(db, "usernames", username.toLowerCase());
-    await setDoc(usernameRef, {
-        uid: uid,
-        createdAt: serverTimestamp()
-    });
-}
-
-// ========== ROLLBACK FUNCTIONS (for error handling) ==========
-async function deleteUserProfile(uid) {
-    const userRef = doc(db, "users", uid);
-    await deleteDoc(userRef);
-}
-
-// ========== HANDLE SIGNUP ==========
+// ========== HANDLE SIGNUP (email/password) ==========
 async function handleSignup(e) {
     e.preventDefault();
-    const username = document.getElementById("username")?.value.trim();
     const email = document.getElementById("signupEmail")?.value.trim();
-    let phone = document.getElementById("phoneNumber")?.value.trim();
-    const state = document.getElementById("state")?.value.trim();
     const password = document.getElementById("signupPassword")?.value;
-    const confirm = document.getElementById("confirmPassword")?.value;
     const signupBtn = document.getElementById("signupBtn");
 
-    // Validation
-    if (!username || !email || !phone || !state || !password) {
-        showToast("All fields are required", "error");
-        return;
-    }
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (!phoneDigits.startsWith('234') || phoneDigits.length < 13) {
-        showToast("Enter a valid Nigerian phone number (e.g., +234 801 234 5678)", "error");
-        return;
-    }
-    if (password !== confirm) {
-        showToast("Passwords do not match", "error");
+    if (!email || !password) {
+        showToast("Email and password required", "error");
         return;
     }
     if (password.length < 6) {
@@ -238,70 +130,27 @@ async function handleSignup(e) {
 
     setButtonLoading(signupBtn, true);
 
-    // Step 1: Check username availability (public, no auth)
     try {
-        const available = await isUsernameAvailable(username);
-        if (!available) {
-            showToast("Username already taken. Please choose another.", "error");
-            setButtonLoading(signupBtn, false);
-            return;
-        }
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Create Firestore profile
+        await createUserProfile(user, email, email.split('@')[0]);
+        showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1500);
     } catch (error) {
-        console.error("Username check error:", error);
-        showToast("Network error. Please try again.", "error");
-        setButtonLoading(signupBtn, false);
-        return;
-    }
-
-    // Step 2: Create Firebase Auth user
-    let userCredential;
-    try {
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        console.error("Firebase Auth error:", error);
-        let msg = error.message;
-        if (msg.includes("email-already-in-use")) msg = "Email already registered. Please login.";
-        else if (msg.includes("weak-password")) msg = "Password is too weak. Use at least 6 characters.";
-        else msg = "Authentication failed. Please try again.";
+        console.error("Signup error:", error);
+        let msg = "Signup failed. Please try again.";
+        if (error.code === "auth/email-already-in-use") msg = "Email already registered. Please login.";
+        else if (error.code === "auth/weak-password") msg = "Password is too weak. Use at least 6 characters.";
+        else if (error.code === "auth/invalid-email") msg = "Invalid email address.";
         showToast(msg, "error");
         setButtonLoading(signupBtn, false);
-        return;
     }
-
-    const user = userCredential.user;
-
-    // Step 3: Create Firestore user profile (users/{uid})
-    try {
-        await createUserProfile(user, { username, email, phone, state });
-    } catch (error) {
-        console.error("User profile creation error:", error);
-        showToast("Account created but profile setup failed. Please contact support.", "error");
-        await user.delete(); // clean up auth user
-        setButtonLoading(signupBtn, false);
-        return;
-    }
-
-    // Step 4: Create username document (usernames/{username})
-    try {
-        await createUsernameDocument(username, user.uid);
-    } catch (error) {
-        console.error("Username document creation error:", error);
-        // Rollback: delete user profile and auth user
-        await deleteUserProfile(user.uid);
-        await user.delete();
-        showToast("Signup failed due to a system error. Please try again.", "error");
-        setButtonLoading(signupBtn, false);
-        return;
-    }
-
-    // Step 5: Success
-    showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 1500);
 }
 
-// ========== HANDLE LOGIN (with admin redirection) ==========
+// ========== HANDLE LOGIN (email/password) ==========
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById("loginEmail")?.value.trim();
@@ -315,44 +164,45 @@ async function handleLogin(e) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         showToast("Login successful! Redirecting...", "success");
-        const user = auth.currentUser;
-        if (user) {
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
-                const isAdmin = data.isAdmin === true;
-
-                // Update login streak
-                const today = new Date().toISOString().split('T')[0];
-                const last = data.lastLoginDate;
-                let streak = data.loginStreak || 0;
-                if (last !== today) {
-                    if (last === new Date(Date.now() - 86400000).toISOString().split('T')[0]) streak += 1;
-                    else streak = 1;
-                    await updateDoc(userRef, { lastLoginDate: today, loginStreak: streak });
-                }
-
-                // Redirect based on admin status
-                if (isAdmin) {
-                    window.location.href = "/admin/admin.html";
-                } else {
-                    // Regular user → dashboard
-                    window.location.href = "/app/dashboard.html";
-                }
-            } else {
-                // User document not found – fallback to login
-                window.location.href = "/login.html";
-            }
-        } else {
-            window.location.href = "/login.html";
-        }
+        // Redirect will be handled by onAuthStateChanged
     } catch (err) {
         let msg = "Invalid email or password";
         if (err.code === "auth/user-not-found") msg = "No account found";
         if (err.code === "auth/wrong-password") msg = "Wrong password";
         showToast(msg, "error");
         setButtonLoading(loginBtn, false);
+    }
+}
+
+// ========== HANDLE GOOGLE SIGN-IN / SIGN-UP ==========
+async function handleGoogleSignIn() {
+    const provider = new GoogleAuthProvider();
+    const btn = document.getElementById("googleBtn");
+    setButtonLoading(btn, true);
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        // Check if user document exists
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            // New user – create profile
+            await createUserProfile(user, user.email, user.displayName || user.email.split('@')[0]);
+            showToast("Account created with Google! 🎉", "success");
+        } else {
+            showToast("Welcome back! 🎉", "success");
+        }
+        // Redirect after a moment
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1500);
+    } catch (error) {
+        console.error("Google sign-in error:", error);
+        let msg = "Google sign-in failed. Please try again.";
+        if (error.code === "auth/popup-closed-by-user") msg = "Sign-in cancelled.";
+        showToast(msg, "error");
+    } finally {
+        setButtonLoading(btn, false);
     }
 }
 
@@ -406,39 +256,65 @@ function observeToggleIcons() {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// ========== MODAL CLOSE ==========
-function initModal() {
-    const modal = document.getElementById("resetModal");
-    const closeBtn = document.getElementById("closeModalBtn");
-    if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => modal.style.display = "none");
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.style.display = "none";
+// ========== MODAL CLOSE (reset & terms) ==========
+function initModals() {
+    // Reset modal
+    const resetModal = document.getElementById("resetModal");
+    const closeResetBtn = document.getElementById("closeModalBtn");
+    if (closeResetBtn && resetModal) {
+        closeResetBtn.addEventListener("click", () => resetModal.style.display = "none");
+        resetModal.addEventListener("click", (e) => {
+            if (e.target === resetModal) resetModal.style.display = "none";
         });
     }
-}
 
-// ========== STATE INPUT VALIDATION ==========
-function setupStateInput() {
-    const stateInput = document.getElementById("state");
-    if (!stateInput) return;
-    const validStates = [
-        "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno",
-        "Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT Abuja","Gombe",
-        "Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos",
-        "Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto",
-        "Taraba","Yobe","Zamfara"
-    ];
-    stateInput.addEventListener("change", function() {
-        const value = this.value.trim();
-        if (value && !validStates.includes(value)) {
-            showToast("Please select a valid Nigerian state from the list", "error");
-            this.value = "";
-        }
+    // Terms modal
+    const termsModal = document.getElementById("termsModal");
+    const closeTermsBtn = document.getElementById("closeTermsBtn");
+    if (closeTermsBtn && termsModal) {
+        closeTermsBtn.addEventListener("click", () => termsModal.style.display = "none");
+        termsModal.addEventListener("click", (e) => {
+            if (e.target === termsModal) termsModal.style.display = "none";
+        });
+    }
+
+    // Tab switching
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            tabButtons.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            const target = this.dataset.tab;
+            tabContents.forEach(content => {
+                content.style.display = content.id === target ? "block" : "none";
+            });
+        });
+    });
+
+    // Open terms modal from links
+    document.querySelectorAll('.terms-link, .privacy-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modal = document.getElementById("termsModal");
+            if (modal) {
+                // Show the correct tab
+                const tab = this.dataset.tab || 'terms';
+                tabButtons.forEach(b => b.classList.remove("active"));
+                tabContents.forEach(c => c.style.display = "none");
+                const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add("active");
+                    const content = document.getElementById(tab);
+                    if (content) content.style.display = "block";
+                }
+                modal.style.display = "flex";
+            }
+        });
     });
 }
 
-// ========== LOGOUT (redirects to index.html in root) ==========
+// ========== LOGOUT ==========
 async function logoutUser() {
     try {
         await signOut(auth);
@@ -449,24 +325,35 @@ async function logoutUser() {
     }
 }
 
+// ========== AUTH STATE LISTENER ==========
+// Note: onAuthStateChanged is already used in dashboard.js; we can handle redirects here as well.
+// We'll keep it minimal; the dashboard will redirect if not authenticated.
+// But for login page we'll rely on the form handlers.
+
 // ========== DOMContentLoaded ==========
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM ready - initializing...");
+    console.log("DOM ready - initializing auth...");
     initPasswordToggles();
     observeToggleIcons();
-    initModal();
-    setupPhoneFormatter();
-    setupStateInput();
+    initModals();
 
     const loginForm = document.getElementById("loginForm");
     if (loginForm) loginForm.addEventListener("submit", handleLogin);
 
     const signupForm = document.getElementById("signupForm");
-    if (signupForm) {
-        signupForm.addEventListener("submit", handleSignup);
-        setupUsernameListener();
-    }
+    if (signupForm) signupForm.addEventListener("submit", handleSignup);
 
     const resetForm = document.getElementById("resetForm");
     if (resetForm) resetForm.addEventListener("submit", handleResetPassword);
+
+    const googleBtn = document.getElementById("googleBtn");
+    if (googleBtn) googleBtn.addEventListener("click", handleGoogleSignIn);
+
+    // Pre-populate email from URL params (optional)
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    if (emailParam) {
+        const emailField = document.getElementById("loginEmail") || document.getElementById("signupEmail");
+        if (emailField) emailField.value = emailParam;
+    }
 });
