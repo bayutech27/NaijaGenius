@@ -1,5 +1,5 @@
 // ========== IMPORTS ==========
-import { auth, db } from '/js/firebase.config.js';
+import { auth, db } from '/js/core/firebase.js';
 import {
   doc, getDoc, updateDoc, addDoc, collection,
   serverTimestamp, increment
@@ -13,6 +13,7 @@ import {
   onFiveStreakWin,
   getEndOfRoundComment
 } from './comments.js';
+import { logGameStarted, logGameCompleted, logLifelineUsed } from './analytics.js';
 
 console.log('🎮 games.js loaded');
 
@@ -419,6 +420,10 @@ async function loadQuestionsFromJS(exportNameParam) {
     roundCoins = 0;
     lifelineUsed = null;
     isCorrectAfterLifeline = false;
+
+    // Log game started
+    logGameStarted(questionType, category);
+
     showCountdown(() => loadQuestion(0));
 
   } catch (err) {
@@ -474,6 +479,10 @@ async function loadMixedQuestions() {
   roundCoins = 0;
   lifelineUsed = null;
   isCorrectAfterLifeline = false;
+
+  // Log game started (mixed)
+  logGameStarted('mixed', 'mixed');
+
   showCountdown(() => loadQuestion(0));
 }
 
@@ -584,7 +593,6 @@ function loadQuestion(index) {
   if (progressBar)  progressBar.style.width       = progress + '%';
   if (progressLabel) progressLabel.textContent    = `Question ${index + 1} of ${TOTAL_QUESTIONS}`;
 
-  // Reset all option buttons
   ['A', 'B', 'C', 'D'].forEach(letter => {
     const btn = optionBtns[letter];
     if (btn) {
@@ -598,12 +606,10 @@ function loadQuestion(index) {
     }
   });
 
-  // Hide crowd bars
   document.querySelectorAll('.option-crowd').forEach(el => {
     el.style.display = 'none';
   });
 
-  // Reset pending wrong-answer variables
   pendingSelectedLetter = null;
   pendingCorrectLetter = null;
 
@@ -627,16 +633,14 @@ function startTimer() {
   timerInterval = setInterval(timerTick, 1000);
 }
 
-// Freezes the countdown in place (used while the Call a Friend modal is open)
 function pauseTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
 }
 
-// Resumes the countdown from exactly where it was paused — does not reset timeLeft
 function resumeTimer() {
   if (questionAnswered) return;
-  if (timerInterval) return; // already running
+  if (timerInterval) return;
   timerInterval = setInterval(timerTick, 1000);
 }
 
@@ -655,7 +659,6 @@ function timerTick() {
     lifelinesDisabled = true;
     updateLifelineUI();
 
-    // Lock all option buttons
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const btn = optionBtns[letter];
       if (btn) {
@@ -666,29 +669,22 @@ function timerTick() {
 
     const correctAns = currentQuestions[currentQuestionIndex]?.correctAnswer;
 
-    // ── ONE CHANCE: immediate feedback & end round ──
     if (questionType === 'one_chance') {
-      // Reveal correct answer in green
       if (correctAns && optionBtns[correctAns]) {
         applyCorrectStyle(optionBtns[correctAns]);
       }
-      // Streak update (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
-      // End round immediately
       endRound();
       return;
     }
 
-    // ── OTHER MODES (Jollof Mix, Pick Your Lane): delayed feedback ──
     if (correctAns) {
       pendingCorrectLetter = correctAns;
       pendingSelectedLetter = null;
     }
-    // Streak update (wrong)
     const comment = handleStreakUpdate(false);
     if (comment) showCommentModal(comment);
-    // Handle wrong answer (replay or delayed feedback)
     handleWrongAnswer();
   }
 }
@@ -830,7 +826,7 @@ function showReplayModal(onYes, onNo) {
   });
 }
 
-// ========== APPLY WRONG FEEDBACK (called after "No" or when lives = 0) ==========
+// ========== APPLY WRONG FEEDBACK ==========
 function applyWrongFeedback(selectedLetter, correctLetter) {
   if (selectedLetter && optionBtns[selectedLetter]) {
     applyWrongStyle(optionBtns[selectedLetter]);
@@ -840,13 +836,12 @@ function applyWrongFeedback(selectedLetter, correctLetter) {
   }
 }
 
-// ========== HANDLE WRONG ANSWER (replay or continue – only for non‑One‑Chance) ==========
+// ========== HANDLE WRONG ANSWER ==========
 function handleWrongAnswer() {
   const hasLives = livesRemaining > 0;
 
   if (hasLives) {
     showReplayModal(
-      // Yes: replay the question
       async () => {
         try {
           const userRef = doc(db, 'users', currentUserUID);
@@ -854,7 +849,6 @@ function handleWrongAnswer() {
             lives: increment(-1)
           });
           livesRemaining = Math.max(0, livesRemaining - 1);
-          // Reset question state
           questionAnswered = false;
           ['A', 'B', 'C', 'D'].forEach(letter => {
             const btn = optionBtns[letter];
@@ -883,14 +877,12 @@ function handleWrongAnswer() {
           proceedAfterWrong();
         }
       },
-      // No: continue, show feedback now
       () => {
         applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
         proceedAfterWrong();
       }
     );
   } else {
-    // No lives – immediately show feedback and continue
     applyWrongFeedback(pendingSelectedLetter, pendingCorrectLetter);
     proceedAfterWrong();
   }
@@ -919,11 +911,9 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
-    // ── 1. Stop timer ──
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
-    // ── 2. Lock options ──
     ['A', 'B', 'C', 'D'].forEach(letter => {
       const b = optionBtns[letter];
       if (b) {
@@ -932,7 +922,6 @@ function attachOptionListener() {
       }
     });
 
-    // ── 3. Validate ──
     const selectedLetter = btn.dataset.option;
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!currentQ) {
@@ -943,24 +932,11 @@ function attachOptionListener() {
     const correctLetter = currentQ.correctAnswer;
     const isCorrect = (selectedLetter === correctLetter);
 
-    // ── 4. Handle correct answer (immediate feedback) ──
     if (isCorrect) {
       applyCorrectStyle(btn);
-
-      // ===== NEW STREAK-BASED COIN REWARD =====
-      // After incrementing streak via handleStreakUpdate, we compute reward based on streak.
-      // We need to call handleStreakUpdate first to update currentStreak, then determine reward.
-      // However handleStreakUpdate also triggers comment modals, which we want to keep.
-      // So we call it before computing reward, then use the updated currentStreak.
-      // But we need to capture the reward value after streak is updated.
-      // We'll compute reward based on currentStreak after handleStreakUpdate.
-      // We'll store a variable to add coins later.
-      
-      // First, handle streak update (which updates currentStreak and may show comment)
       const comment = handleStreakUpdate(true);
       if (comment) showCommentModal(comment);
 
-      // Now compute coin reward based on the updated streak
       let streakReward = 0;
       const streak = currentStreak;
       if (streak >= 6) {
@@ -972,26 +948,21 @@ function attachOptionListener() {
       } else if (streak >= 2) {
         streakReward = 5;
       }
-      // For streak 1 or less, no coin reward.
-      
-      // Add the reward to roundCoins and update displayed coins
+
       roundCoins += streakReward;
       displayedCoins += streakReward;
       if (gameCoinsValue) gameCoinsValue.textContent = displayedCoins.toLocaleString();
 
-      // Log the reward
       if (streakReward > 0) {
         console.log(`💰 Streak ${streak} → +${streakReward} coins`);
       } else {
         console.log(`💡 Streak ${streak} → no coin reward (need 2+ streak)`);
       }
 
-      // Round score (points) still based on timeLeft (existing logic)
       roundScore += pointsEarned;
       correctCount += 1;
       console.log(`✅ Correct! +${pointsEarned} pts, +${streakReward} coins (streak ${streak})`);
 
-      // If a lifeline was used and the answer is correct, mark it (no challenge now, but keep)
       if (lifelineUsed) {
         isCorrectAfterLifeline = true;
       }
@@ -1001,32 +972,21 @@ function attachOptionListener() {
       updateLifelineUI();
       nextBtn.disabled = false;
     } else {
-      // ── 5. Wrong answer ──
-      // ── ONE CHANCE: immediate feedback & end round ──
       if (questionType === 'one_chance') {
-        // Highlight selected as wrong
         applyWrongStyle(btn);
-        // Highlight correct answer in green
         if (correctLetter && optionBtns[correctLetter]) {
           applyCorrectStyle(optionBtns[correctLetter]);
         }
-        // Streak update (wrong)
         const comment = handleStreakUpdate(false);
         if (comment) showCommentModal(comment);
-        // End round immediately
         endRound();
         return;
       }
 
-      // ── OTHER MODES: store info for delayed feedback ──
       pendingSelectedLetter = selectedLetter;
       pendingCorrectLetter = correctLetter;
-
-      // Streak update (wrong)
       const comment = handleStreakUpdate(false);
       if (comment) showCommentModal(comment);
-
-      // Handle wrong answer (replay or delayed feedback)
       handleWrongAnswer();
     }
   });
@@ -1067,7 +1027,6 @@ lifelineFifty?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Track lifeline usage (no challenge, but keep for future)
   if (lifelineUsed === null) lifelineUsed = 'fifty_fifty';
   else if (lifelineUsed === 'ask_crowd') lifelineUsed = 'both';
   else if (lifelineUsed === 'callFriend') lifelineUsed = 'both';
@@ -1091,6 +1050,9 @@ lifelineFifty?.addEventListener('click', async () => {
     console.log('🆓 Used free fifty_fifty');
   }
 
+  // Log lifeline usage
+  logLifelineUsed('fifty_fifty');
+
   const correct = currentQ.correctAnswer;
   const wrongOptions = ['A', 'B', 'C', 'D'].filter(l => l !== correct);
   const toHide = fisherYatesShuffle(wrongOptions).slice(0, 2);
@@ -1108,7 +1070,6 @@ lifelineAsk?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Track lifeline usage
   if (lifelineUsed === null) lifelineUsed = 'ask_crowd';
   else if (lifelineUsed === 'fifty_fifty') lifelineUsed = 'both';
   else if (lifelineUsed === 'callFriend') lifelineUsed = 'both';
@@ -1131,6 +1092,9 @@ lifelineAsk?.addEventListener('click', async () => {
     freeLifelines.ask_crowd = false;
     console.log('🆓 Used free ask_crowd');
   }
+
+  // Log lifeline usage
+  logLifelineUsed('ask_crowd');
 
   const correct = currentQ.correctAnswer;
   const correctPct = Math.floor(Math.random() * 26) + 45;
@@ -1169,7 +1133,6 @@ lifelineCallFriend?.addEventListener('click', async () => {
   const currentQ = currentQuestions[currentQuestionIndex];
   if (!currentQ) return;
 
-  // Track lifeline usage
   if (lifelineUsed === null) lifelineUsed = 'callFriend';
   else if (lifelineUsed === 'fifty_fifty') lifelineUsed = 'both';
   else if (lifelineUsed === 'ask_crowd') lifelineUsed = 'both';
@@ -1193,12 +1156,15 @@ lifelineCallFriend?.addEventListener('click', async () => {
     console.log('🆓 Used free callFriend');
   }
 
+  // Log lifeline usage
+  logLifelineUsed('callFriend');
+
   const correctLetter = currentQ.correctAnswer;
   pauseTimer();
   showCallFriendModal(correctLetter);
 });
 
-// ========== CALL FRIEND MODAL (3D, themed to match games.html/css) ==========
+// ========== CALL FRIEND MODAL ==========
 function showCallFriendModal(correctLetter) {
   ensureCommentModalAnimStyle();
 
@@ -1342,6 +1308,9 @@ async function endRound() {
 
   showRoundEndModal(false);
 
+  // Log game completed
+  logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
+
   // --- Background Firestore saves ---
   (async () => {
     try {
@@ -1415,7 +1384,7 @@ async function endRound() {
   })();
 }
 
-// ========== COMMENT MODAL (3D, themed to match games.html/css) ==========
+// ========== COMMENT MODAL ==========
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
   const style = document.createElement('style');
@@ -1510,7 +1479,7 @@ function showCommentModal(comment) {
   document.body.appendChild(overlay);
 }
 
-// ========== FIREWORKS (themed rocket-launch display, ~5s) ==========
+// ========== FIREWORKS ==========
 function showFireworks() {
   const canvas = document.createElement('canvas');
   canvas.id = 'fireworksCanvas';
@@ -1524,8 +1493,6 @@ function showFireworks() {
   let w = canvas.width  = window.innerWidth;
   let h = canvas.height = window.innerHeight;
 
-  // Palette pulled straight from the games theme (question-box gradient border,
-  // timer/coins gold, correct green, lifeline blue) instead of generic colors.
   const THEME_COLORS = ['#FFD700', '#FFB020', '#FF9A3E', '#7C4FE0', '#3E7BFF', '#2FBF5B'];
 
   class Spark {
@@ -1607,14 +1574,12 @@ function showFireworks() {
   function explode(x, y, color) {
     const count = 60 + Math.floor(Math.random() * 40);
     for (let i = 0; i < count; i++) sparks.push(new Spark(x, y, color));
-    // white sparkle ring layered on top for a brighter, more premium burst
     for (let i = 0; i < 18; i++) sparks.push(new Spark(x, y, '#FFFFFF'));
   }
 
   const duration = 5000;
   launchRocket();
   const launchInterval = setInterval(launchRocket, 550);
-  // Stop launching new rockets before the end so the last bursts can fade out cleanly
   setTimeout(() => clearInterval(launchInterval), duration - 1200);
 
   let frameId = null;
@@ -1650,9 +1615,8 @@ function showFireworks() {
   });
 }
 
-// ========== ROUND END MODAL (3D, themed to match games.html/css) ==========
+// ========== ROUND END MODAL ==========
 function showRoundEndModal(newBest = false) {
-  // Inject the 3D pop-in keyframes once
   if (!document.getElementById('roundEndModalAnimStyle')) {
     const style = document.createElement('style');
     style.id = 'roundEndModalAnimStyle';
@@ -1692,7 +1656,6 @@ function showRoundEndModal(newBest = false) {
     animation: roundEndPopIn3D 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   `;
 
-  // Gradient border ring (matches question-box treatment)
   const borderRing = document.createElement('div');
   borderRing.style.cssText = `
     position:absolute; inset:-2px; border-radius:28px; padding:2px;
@@ -1749,7 +1712,6 @@ function showRoundEndModal(newBest = false) {
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
   inner.appendChild(scoreDiv);
 
-  // For One Chance, show correct count out of attempted questions
   let attempted = TOTAL_QUESTIONS;
   let correctOutOfText = '';
   if (questionType === 'one_chance') {
