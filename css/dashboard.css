@@ -42,7 +42,7 @@ body {
     letter-spacing: -0.5px;
 }
 .naija-white { color: #FFFFFF; }
-.genius-mint { color: #98FF98; font-style: normal; }  /* changed to mint green */
+.genius-mint { color: #98FF98; font-style: normal; }
 
 .stat-value,
 .best-score-value {
@@ -227,6 +227,11 @@ body {
 #shopSection.active-section,
 #leaderboardSection.active-section,
 #settingsSection.active-section {
+    margin-top: 3rem;
+}
+
+/* ----- Push down "Pick Your Lane" section by 3rem ----- */
+#laneSection .lane-top-row {
     margin-top: 3rem;
 }
 
@@ -513,6 +518,7 @@ body {
 }
 .level-star { font-size: 0.9rem; }
 
+/* ----- PROGRESS BAR – moved 2rem to the left ----- */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -525,7 +531,7 @@ body {
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.2rem;
     overflow: hidden;
-    margin-left: calc(78px + 0.6rem);
+    margin-left: calc(78px + 0.6rem - 2rem);
 }
 
 .xp-bar {
@@ -1205,6 +1211,7 @@ body {
     align-items: center;
     gap: 0.8rem;
     margin-bottom: 1.5rem;
+    /* margin-top added above */;
 }
 #laneSection .hero-section {
     flex: 1;
@@ -1297,38 +1304,6 @@ body {
     border-color: #FFD700;
 }
 
-/* ----- Leaderboard "Load More" button ----- */
-.load-more-btn {
-  background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: #ffffff;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 1rem auto;
-  box-shadow: 0 8px 20px rgba(62, 123, 255, 0.35);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.load-more-btn:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 28px rgba(62, 123, 255, 0.5);
-}
-.load-more-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-#leaderboardLoadMore {
-  display: flex;
-  justify-content: center;
-  padding: 0.5rem 0;
-}
 /* ============================================================
    SETTINGS SECTION – overflow fixes for mobile (320px–768px)
    ============================================================ */
@@ -1516,8 +1491,6 @@ body {
         padding: 0.2rem 0.6rem;
     }
 }
-
-
 
 /* ----- BOTTOM NAV ----- */
 .bottom-nav {
@@ -1762,7 +1735,7 @@ body {
         width: 85%;
         max-width: 200px;
         height: 8px;
-        margin-left: calc(60px + 0.6rem);
+        margin-left: calc(60px + 0.6rem - 2rem);
     }
     .xp-text {
         font-size: 0.65rem;
@@ -2011,7 +1984,7 @@ body {
         width: 100%;
         max-width: 140px;
         height: 6px;
-        margin-left: calc(48px + 0.6rem);
+        margin-left: calc(48px + 0.6rem - 2rem);
     }
     .xp-text {
         font-size: 0.55rem;
