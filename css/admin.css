@@ -88,6 +88,7 @@ body {
     top: 70px;
     z-index: 99;
     background: #0B1120;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -264,6 +265,10 @@ body {
     background: #e74c3c;
     color: #fff;
 }
+.btn.small {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+}
 
 /* ------------------------------------------------------------------
    Upload Summary & Progress
@@ -344,6 +349,25 @@ table tbody tr:nth-child(even) {
 .status-select.Pending { background: #b45309; color: #fff; }
 .status-select.Paid { background: #00C853; color: #fff; }
 .status-select.Cancelled { background: #e74c3c; color: #fff; }
+
+/* ------------------------------------------------------------------
+   Announcement Section
+------------------------------------------------------------------ */
+.announcement-current {
+    background: #0B1120;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-top: 0.5rem;
+    min-height: 60px;
+}
+.announcement-current p {
+    margin: 0;
+}
+.announcement-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
 
 /* ------------------------------------------------------------------
    Loading Spinner
