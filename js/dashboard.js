@@ -1,5 +1,5 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
-import { auth, db } from "/js/firebase-config.js";
+import { auth, db } from "/js/firebase.config.js";
 import {
   doc,
   getDoc,
