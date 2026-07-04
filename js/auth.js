@@ -112,6 +112,40 @@ async function createUserProfile(user, email, displayName) {
     return profile;
 }
 
+// ========== HELPER: REDIRECT USER BASED ON ADMIN STATUS ==========
+async function redirectUserAfterAuth(user) {
+    if (!user) return;
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            const isAdmin = data.isAdmin === true;
+            // Update login streak (only for regular users? or both – we'll keep it for both)
+            const today = new Date().toISOString().split('T')[0];
+            const last = data.lastLoginDate;
+            let streak = data.loginStreak || 0;
+            if (last !== today) {
+                if (last === new Date(Date.now() - 86400000).toISOString().split('T')[0]) streak += 1;
+                else streak = 1;
+                await updateDoc(userRef, { lastLoginDate: today, loginStreak: streak });
+            }
+            if (isAdmin) {
+                window.location.href = "/admin/admin.html";
+            } else {
+                window.location.href = "/app/dashboard.html";
+            }
+        } else {
+            // User document not found – fallback to login
+            window.location.href = "/login.html";
+        }
+    } catch (err) {
+        console.error("Error checking admin status:", err);
+        // Fallback: redirect to dashboard
+        window.location.href = "/app/dashboard.html";
+    }
+}
+
 // ========== HANDLE SIGNUP (email/password) ==========
 async function handleSignup(e) {
     e.preventDefault();
@@ -135,6 +169,7 @@ async function handleSignup(e) {
         const user = userCredential.user;
         await createUserProfile(user, email, email.split('@')[0]);
         showToast("Account created successfully! Welcome to NaijaGenius 🎉", "success");
+        // Redirect after signup (new user is not admin)
         setTimeout(() => {
             window.location.href = "/app/dashboard.html";
         }, 1500);
@@ -161,11 +196,11 @@ async function handleLogin(e) {
     }
     setButtonLoading(loginBtn, true);
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
         showToast("Login successful! Redirecting...", "success");
-        setTimeout(() => {
-            window.location.href = "/app/dashboard.html";
-        }, 500);
+        // Redirect based on admin status
+        await redirectUserAfterAuth(user);
     } catch (err) {
         let msg = "Invalid email or password";
         if (err.code === "auth/user-not-found") msg = "No account found";
@@ -191,9 +226,8 @@ async function handleGoogleSignIn() {
         } else {
             showToast("Welcome back! 🎉", "success");
         }
-        setTimeout(() => {
-            window.location.href = "/app/dashboard.html";
-        }, 500);
+        // Redirect based on admin status
+        await redirectUserAfterAuth(user);
     } catch (error) {
         console.error("Google sign-in error:", error);
         let msg = "Google sign-in failed. Please try again.";
