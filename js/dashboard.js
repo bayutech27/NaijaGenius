@@ -436,6 +436,18 @@ onAuthStateChanged(auth, async (user) => {
     }
     updateHeaderUI(coins, lives);
     if (shopCoinsDisplay) shopCoinsDisplay.textContent = coins;
+
+// ===== CHECK FOR WELCOME BONUS NOTIFICATION =====
+if (userData.hasReceivedBonus === true && userData.bonusNotified !== true) {
+    // Show a special toast for the bonus
+    setTimeout(() => {
+        showToast('🎉 Congratulations! You earned 1000 bonus coins for being one of our first 200 users!', 'success', 6000);
+    }, 1000); // slight delay to ensure dashboard has loaded
+    // Update the flag in Firestore so it doesn't appear again
+    await updateDoc(userRef, { bonusNotified: true });
+}
+
+
     // GAME STATS
     const totalCorrect = userData.totalCorrectAnswers || 0;
     if (totalGamesPlayed) totalGamesPlayed.textContent = userData.lifetimeRoundPlayed || 0;
