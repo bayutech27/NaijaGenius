@@ -4,21 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>NaijaGenius • Login</title>
-    <!-- Google Fonts + Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-     <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <div class="auth-container">
         <div class="glass-card fade-in-up">
-            <!-- Branding Header -->
             <div class="brand-header">
                 <h1 class="logo"><span class="naija">Naija</span><span class="genius">Genius</span></h1>
                 <p class="tagline">Welcome back, trivia champion</p>
             </div>
 
-            <!-- Login Form -->
             <form id="loginForm" class="auth-form">
                 <div class="input-group">
                     <i class="fas fa-envelope input-icon"></i>
@@ -37,6 +34,13 @@
                 </button>
             </form>
 
+            <div class="divider">or</div>
+
+            <button id="googleBtn" class="auth-btn google-btn">
+                <i class="fab fa-google"></i>
+                <span>Continue with Google</span>
+            </button>
+
             <div class="auth-links">
                 <p>Not registered? <a href="signup.html" class="highlight-link">Signup here</a></p>
                 <p>Forgot password? <a href="reset-password.html" class="highlight-link">Reset here</a></p>
@@ -44,7 +48,7 @@
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
     <script type="module" src="/js/auth.js"></script>
