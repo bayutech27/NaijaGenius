@@ -1,4 +1,4 @@
-// js/core/firebase.js
+// js/firebase.config.js
 
 // ── IMPORTS ──
 import { initializeApp }        from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
