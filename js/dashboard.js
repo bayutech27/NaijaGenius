@@ -1,5 +1,5 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
-import { auth, db } from "/js/firebase.config.js";
+import { auth, db } from "/js/core/firebase.js";
 import {
   doc,
   getDoc,
@@ -641,16 +641,16 @@ function updateHeaderUI(coins, lives) {
 
 // ========== MODE BUTTON NAVIGATION ==========
 document.getElementById("jollofMixBtn")?.addEventListener("click", () => {
-  window.location.href = "games.html";
+  window.location.replace("games.html");
 });
 document.getElementById("jollofMixBtnPlay")?.addEventListener("click", () => {
-  window.location.href = "games.html";
+  window.location.replace("games.html");
 });
 document.getElementById("oneChanceBtn")?.addEventListener("click", () => {
-  window.location.href = "games.html?type=one_chance";
+  window.location.replace("games.html?type=one_chance");
 });
 document.getElementById("oneChanceBtnPlay")?.addEventListener("click", () => {
-  window.location.href = "games.html?type=one_chance";
+  window.location.replace("games.html?type=one_chance");
 });
 
 // ========== PICK YOUR LANE (merged tab) ==========
@@ -679,12 +679,13 @@ document.getElementById("laneBackBtn")?.addEventListener("click", () => {
   toggleHeaderVisibility("home");
 });
 
+// UPDATED: lane card navigation with replace
 document.querySelectorAll("#laneSection .lane-card").forEach((card) => {
   card.addEventListener("click", () => {
     const category = card.dataset.category;
     const exportName = card.dataset.export;
     if (category && exportName) {
-      window.location.href = `/app/games.html?category=${category}&export=${exportName}`;
+      window.location.replace(`/app/games.html?category=${category}&export=${exportName}`);
     }
   });
 });
