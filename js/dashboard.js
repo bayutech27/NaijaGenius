@@ -1,5 +1,7 @@
 // dashboard.js – Firebase Modular SDK v12.14.0
 import { auth, db } from "/js/firebase.config.js";
+import { logoutUser } from "./auth.js";
+
 import {
   doc,
   getDoc,
@@ -751,3 +753,12 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
 toggleHeaderVisibility("home");
 
 console.log("Dashboard initialized successfully.");
+
+
+// ========== SETTINGS: LOGOUT ==========
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        logoutUser();
+    });
+}
