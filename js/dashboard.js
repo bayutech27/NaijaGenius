@@ -796,10 +796,24 @@ if (sendFeedbackBtn) {
         return;
       }
       const userData = userSnap.data();
+      
+      // ---- Fetch private document to get email ----
+      let email = "";
+      try {
+        const privateRef = doc(db, "users", currentUserUid, "private", "info");
+        const privateSnap = await getDoc(privateRef);
+        if (privateSnap.exists()) {
+          email = privateSnap.data().email || "";
+        }
+      } catch (privateErr) {
+        console.warn("Could not fetch private email:", privateErr);
+        // Continue with empty email
+      }
+      
       const feedbackData = {
         uid: currentUserUid,
         displayName: userData.displayName || "Anonymous",
-        email: userData.email || "",
+        email: email,
         message: message,
         status: "new",
         timestamp: serverTimestamp()
