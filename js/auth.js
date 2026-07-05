@@ -162,7 +162,8 @@ async function createUserProfile(user, email, displayName) {
             nigeria_culture: { played: 0, bestScore: 0, mastery: 0 },
             nigeria_proverbs: { played: 0, bestScore: 0, mastery: 0 }
         },
-        lifeline: { fifty_fifty: 1, ask_crowd: 1, ask_friend: 1 },
+        // ---- LIFELINE FIX: set extras to 0 and use correct field names ----
+        lifeline: { fifty_fifty: 0, ask_crowd: 0, callFriend: 0 },
         coins: 0,
         lives: 2,
         level: "",
@@ -179,7 +180,7 @@ async function createUserProfile(user, email, displayName) {
     const privateProfile = {
         email: email,
         phone: "",
-        state: "",          // We're moving state to private too (optional)
+        state: "",
         age: null,
         dateOfBirth: null,
         bankDetails: { bankName: "", accountNumber: "", accountName: "" }
