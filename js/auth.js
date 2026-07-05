@@ -134,16 +134,16 @@ async function applyWelcomeBonusIfEligible(userRef, user) {
     }
 }
 
-// ========== CREATE USER PROFILE ==========
+// ========== CREATE USER PROFILE (public + private) ==========
 async function createUserProfile(user, email, displayName) {
     const uniqueReferralCode = await getUniqueReferralCode();
     const userDocRef = doc(db, "users", user.uid);
-    const profile = {
+    const privateDocRef = doc(db, "users", user.uid, "private", "info");
+
+    // ---- PUBLIC FIELDS ----
+    const publicProfile = {
         uid: user.uid,
         displayName: displayName || email.split('@')[0] || "User",
-        email: email,
-        phone: "",
-        state: "",
         avatarUrl: "",
         referralCode: uniqueReferralCode,
         referredBy: "",
@@ -152,8 +152,6 @@ async function createUserProfile(user, email, displayName) {
         lifetimeRoundPlayed: 0,
         loginStreak: 0,
         lastLoginDate: new Date().toISOString().split('T')[0],
-        age: null,
-        dateOfBirth: null,
         categoryStats: {
             afrobeats: { played: 0, bestScore: 0, mastery: 0 },
             nollywood: { played: 0, bestScore: 0, mastery: 0 },
@@ -171,14 +169,27 @@ async function createUserProfile(user, email, displayName) {
         badges: [],
         adCooldownUntil: null,
         lastAdRewardTime: null,
-        bankDetails: { bankName: "", accountNumber: "", accountName: "" },
         createdAt: serverTimestamp(),
         isAdmin: false,
         hasReceivedBonus: false,
         bonusNotified: false
     };
-    await setDoc(userDocRef, profile);
-    return profile;
+
+    // ---- PRIVATE FIELDS ----
+    const privateProfile = {
+        email: email,
+        phone: "",
+        state: "",          // We're moving state to private too (optional)
+        age: null,
+        dateOfBirth: null,
+        bankDetails: { bankName: "", accountNumber: "", accountName: "" }
+    };
+
+    // Write both documents
+    await setDoc(userDocRef, publicProfile);
+    await setDoc(privateDocRef, privateProfile);
+
+    return { publicProfile, privateProfile };
 }
 
 // ========== HELPER: REDIRECT USER BASED ON ADMIN STATUS ==========
