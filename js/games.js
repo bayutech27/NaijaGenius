@@ -1299,89 +1299,94 @@ function hideLoader() {
   if (overlay) overlay.remove();
 }
 
-// ========== END ROUND ==========
+// ========== END ROUND – FIXED WITH AWAIT AND LOADER ==========
 async function endRound() {
   if (roundEnded) return;
   roundEnded    = true;
   gameRoundActive = false;
   clearInterval(timerInterval);
 
-  showRoundEndModal(false);
+  // Show loader immediately
+  showLoader('Saving your progress...');
 
-  // Log game completed
+  let newBest = false;
+  let saveError = false;
+
+  // Log game completed (non‑critical, we can do it before or after; keep before)
   logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
 
-  // --- Background Firestore saves ---
-  (async () => {
+  try {
+    // --- Read previous best (and other data) ---
+    let previousBest = 0;
     try {
-      let previousBest = 0;
-      try {
-        const userRef = doc(db, 'users', currentUserUID);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          const catStats = data.categoryStats || {};
-          previousBest = catStats[category]?.bestScore || 0;
-        }
-      } catch (err) {
-        console.warn('Could not read previous best:', err);
-        previousBest = 0;
-      }
-
-      const pointRef = collection(db, 'regular_points');
-      await addDoc(pointRef, {
-        uid:              currentUserUID,
-        gameType:         questionType,
-        category:         category,
-        point:            roundScore,
-        correctAnswers:   correctCount,
-        totalQuestions:   TOTAL_QUESTIONS,
-        questionsReached: currentQuestionIndex + 1,
-        coinsEarned:      roundCoins,
-        time:             serverTimestamp()
-      });
-
       const userRef = doc(db, 'users', currentUserUID);
-      await updateDoc(userRef, {
-        lifetimeRoundPlayed:  increment(1),
-        totalScore:           increment(roundScore),
-        totalCorrectAnswers:  increment(correctCount),
-        coins:                increment(roundCoins)
-      });
-
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
-        const data     = userSnap.data();
+        const data = userSnap.data();
         const catStats = data.categoryStats || {};
-        const catKey   = category;
-        if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
+        previousBest = catStats[category]?.bestScore || 0;
+      }
+    } catch (err) {
+      console.warn('Could not read previous best:', err);
+      previousBest = 0;
+    }
 
-        const currentBest = catStats[catKey].bestScore || 0;
-        const newBest     = roundScore > currentBest ? roundScore : currentBest;
+    // Save regular_points (optional but we keep)
+    const pointRef = collection(db, 'regular_points');
+    await addDoc(pointRef, {
+      uid:              currentUserUID,
+      gameType:         questionType,
+      category:         category,
+      point:            roundScore,
+      correctAnswers:   correctCount,
+      totalQuestions:   TOTAL_QUESTIONS,
+      questionsReached: currentQuestionIndex + 1,
+      coinsEarned:      roundCoins,
+      time:             serverTimestamp()
+    });
 
-        await updateDoc(userRef, {
-          [`categoryStats.${catKey}.played`]:    increment(1),
-          [`categoryStats.${catKey}.bestScore`]: newBest
-        });
+    // Update user document (first update)
+    const userRef = doc(db, 'users', currentUserUID);
+    await updateDoc(userRef, {
+      lifetimeRoundPlayed:  increment(1),
+      totalScore:           increment(roundScore),
+      totalCorrectAnswers:  increment(correctCount),
+      coins:                increment(roundCoins)
+    });
 
-        if (roundScore > previousBest) {
-          const container = document.getElementById('newBestBadgeContainer');
-          if (container) {
-            container.innerHTML = `
-              <div style="font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);">
-                🏆 New Best Score!
-              </div>
-            `;
-          }
-          setTimeout(() => showFireworks(), 300);
-        }
+    // Now update categoryStats
+    const userSnap2 = await getDoc(userRef); // re-fetch to get latest
+    if (userSnap2.exists()) {
+      const data     = userSnap2.data();
+      const catStats = data.categoryStats || {};
+      const catKey   = category;
+      if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
+
+      const currentBest = catStats[catKey].bestScore || 0;
+      const newBestVal  = roundScore > currentBest ? roundScore : currentBest;
+
+      // Determine if new best (before updating)
+      if (roundScore > previousBest) {
+        newBest = true;
       }
 
-    } catch (err) {
-      console.error('Error saving round data:', err);
-      showToast('Some data could not be saved, but your round is complete.', 'warning', 6000);
+      // Now update
+      await updateDoc(userRef, {
+        [`categoryStats.${catKey}.played`]:    increment(1),
+        [`categoryStats.${catKey}.bestScore`]: newBestVal
+      });
     }
-  })();
+
+    // If newBest, we can show fireworks later in the modal
+  } catch (err) {
+    console.error('Error saving round data:', err);
+    showToast('Some data could not be saved, but your round is complete.', 'warning', 8000);
+    saveError = true;
+  } finally {
+    hideLoader();
+    // Now show the round-end modal (pass newBest flag)
+    showRoundEndModal(newBest);
+  }
 }
 
 // ========== COMMENT MODAL ==========
@@ -1693,6 +1698,8 @@ function showRoundEndModal(newBest = false) {
     badge.textContent = '🏆 New Best Score!';
     badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);`;
     badgeContainer.appendChild(badge);
+    // Trigger fireworks after a short delay
+    setTimeout(() => showFireworks(), 300);
   }
   inner.appendChild(badgeContainer);
 
