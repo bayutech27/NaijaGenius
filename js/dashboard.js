@@ -266,19 +266,10 @@ function renderLeaderboardItems(users, offset) {
     if (rank === 1) rankClass += " rank-1";
     else if (rank === 2) rankClass += " rank-2";
     else if (rank === 3) rankClass += " rank-3";
-    let avatarHtml = "";
-    if (user.avatar) {
-      avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #FFD700;">`;
-    } else {
-      const initials = user.displayName.slice(0, 2).toUpperCase();
-      avatarHtml = `<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FF9A3E);color:#0A0A0F;font-weight:700;font-size:0.8rem;">${initials}</span>`;
-    }
+    // Avatar removed – display name only
     html += `
       <div class="leaderboard-item">
           <span class="${rankClass}">${rank}</span>
-          <div class="leaderboard-avatar" style="flex-shrink:0;width:40px;display:flex;align-items:center;justify-content:center;">
-              ${avatarHtml}
-          </div>
           <span class="leaderboard-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#FFFFFF;">${user.displayName}</span>
           <span class="leaderboard-level" style="flex:1;min-width:0;text-align:center;color:#C9B6FF;font-weight:600;">${user.level}</span>
           <span class="leaderboard-score" style="font-family:'Orbitron',monospace;font-weight:700;color:#FFD700;min-width:40px;text-align:right;">${user.correct}</span>
@@ -328,7 +319,7 @@ async function loadLeaderboard(filter = "all", reset = true) {
       return {
         uid: doc.id,
         displayName: name,
-        avatar: data.avatar || null,
+        // avatar removed
         correct: data[orderField] || 0,
         level: getLevel(data.totalCorrectAnswers || 0).name,
       };
