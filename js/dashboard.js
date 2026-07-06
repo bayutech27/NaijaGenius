@@ -516,7 +516,6 @@ onAuthStateChanged(auth, async (user) => {
     userAvatarBtn.addEventListener("click", () => {
       avatarFileInput.click();
     });
-    // (Avatar edit button logic removed – element no longer exists in HTML)
     // SETTINGS
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
@@ -777,6 +776,7 @@ if (feedbackModal) {
   });
 }
 
+// ========== UPDATED FEEDBACK SEND HANDLER (with private email) ==========
 if (sendFeedbackBtn) {
   sendFeedbackBtn.addEventListener("click", async () => {
     const message = feedbackMessage.value.trim();
@@ -796,8 +796,8 @@ if (sendFeedbackBtn) {
         return;
       }
       const userData = userSnap.data();
-      
-      // ---- Fetch private document to get email ----
+
+      // ---- FIX: fetch email from private subcollection ----
       let email = "";
       try {
         const privateRef = doc(db, "users", currentUserUid, "private", "info");
@@ -809,7 +809,7 @@ if (sendFeedbackBtn) {
         console.warn("Could not fetch private email:", privateErr);
         // Continue with empty email
       }
-      
+
       const feedbackData = {
         uid: currentUserUid,
         displayName: userData.displayName || "Anonymous",
