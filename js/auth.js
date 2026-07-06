@@ -173,7 +173,8 @@ async function createUserProfile(user, email, displayName) {
         createdAt: serverTimestamp(),
         isAdmin: false,
         hasReceivedBonus: false,
-        bonusNotified: false
+        bonusNotified: false,
+        totalCorrectAnswers: 0
     };
 
     // ---- PRIVATE FIELDS ----
