@@ -358,7 +358,7 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – redesigned
+   LEVEL DISPLAY – redesigned (left‑aligned, badge fills shield)
    ============================================================ */
 .level-display {
     display: flex;
@@ -426,34 +426,31 @@ body {
     justify-content: center;
 }
 
-
-}
-
-/* Level container (right) – align items left */
+/* Level container (right) – left aligned, modern layout */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;      /* changed from flex-end */
     justify-content: center;
     min-width: 0;
-    text-align: right;
-    gap: 0.25rem;
+    text-align: left;             /* changed from right */
+    gap: 0.5rem;
 }
 
 .level-top-row {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.2rem;
 }
 
-/* ---- SHIELD BADGE – increased by 30% ---- */
+/* ---- SHIELD BADGE – image fills entire shield ---- */
 .shield-badge {
     flex-shrink: 0;
     width: 85px;
     height: 95px;
-    background: #1A1D2E;
+    background: transparent;               /* remove background color */
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
     align-items: center;
@@ -462,9 +459,10 @@ body {
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 18px rgba(255,215,0,0.3);
 }
 .shield-badge .level-badge-img {
-    width: 70%;
-    height: 70%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;             /* fill the entire shield */
+    display: block;
 }
 
 .level-label {
@@ -477,6 +475,7 @@ body {
     border: 1px solid rgba(124, 79, 224, 0.4);
     padding: 0.2rem 0.8rem;
     border-radius: 20px;
+    white-space: nowrap;
 }
 
 .level-name {
@@ -485,25 +484,24 @@ body {
     color: #FFFFFF;
     line-height: 1.2;
     margin: 0.1rem 0 0.1rem;
-    margin-left: calc(78px + 0.6rem);
+    /* removed margin-left hack */
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- PROGRESS BAR – moved 2rem to the left ----- */
+/* ----- PROGRESS BAR – cleaned up, no left margin hack ----- */
 .xp-progress {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    width: 65%;
+    width: 100%;
     max-width: 260px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 20px;
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.5rem;
-    margin-right: 0.5rem;
+    margin-right: 0;
     overflow: hidden;
-    margin-left: calc(78px + 0.6rem - 2rem);
 }
 
 .xp-bar {
@@ -1944,7 +1942,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS ----- */
+/* ----- MOBILE ADJUSTMENTS (level container updated) ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -2007,13 +2005,13 @@ body {
     }
     .level-name {
         font-size: 1.2rem;
-        margin-left: calc(60px + 0.6rem);
+        /* margin-left removed */
     }
     .xp-progress {
-        width: 85%;
+        width: 100%;
         max-width: 200px;
         height: 8px;
-        margin-left: calc(60px + 0.6rem - 2rem);
+        /* margin-left removed */
     }
     .xp-text {
         font-size: 0.65rem;
@@ -2257,13 +2255,13 @@ body {
     }
     .level-name {
         font-size: 1rem;
-        margin-left: calc(48px + 0.6rem);
+        /* margin-left removed */
     }
     .xp-progress {
         width: 100%;
         max-width: 140px;
         height: 6px;
-        margin-left: calc(48px + 0.6rem - 2rem);
+        /* margin-left removed */
     }
     .xp-text {
         font-size: 0.55rem;
