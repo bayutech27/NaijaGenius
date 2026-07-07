@@ -358,13 +358,13 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – redesigned (left‑aligned, badge fills shield)
+   LEVEL DISPLAY – perfectly aligned, spacious layout
    ============================================================ */
 .level-display {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2.5rem;
+    gap: 3rem;                   /* generous space between avatar and level info */
     margin-bottom: 2.058rem;
     background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     backdrop-filter: blur(8px);
@@ -426,16 +426,16 @@ body {
     justify-content: center;
 }
 
-/* Level container (right) – left aligned, modern layout */
+/* Level container (right) – left‑aligned with even spacing */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;      /* changed from flex-end */
+    align-items: flex-start;      /* all children aligned left */
     justify-content: center;
     min-width: 0;
-    text-align: left;             /* changed from right */
-    gap: 0.5rem;
+    text-align: left;
+    gap: 0.5rem;                  /* consistent vertical rhythm */
 }
 
 .level-top-row {
@@ -450,7 +450,7 @@ body {
     flex-shrink: 0;
     width: 85px;
     height: 95px;
-    background: transparent;               /* remove background color */
+    background: transparent;      /* no background, just the border and image */
     clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
     display: flex;
     align-items: center;
@@ -461,7 +461,7 @@ body {
 .shield-badge .level-badge-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;             /* fill the entire shield */
+    object-fit: cover;             /* fills the entire shield shape */
     display: block;
 }
 
@@ -483,12 +483,11 @@ body {
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
-    margin: 0.1rem 0 0.1rem;
-    /* removed margin-left hack */
+    margin: 0;                     /* perfectly aligned left, no forced shift */
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- PROGRESS BAR – cleaned up, no left margin hack ----- */
+/* ----- PROGRESS BAR – left-aligned with breathing room ----- */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -2005,13 +2004,13 @@ body {
     }
     .level-name {
         font-size: 1.2rem;
-        /* margin-left removed */
+        /* margin-left removed – left aligned */
     }
     .xp-progress {
         width: 100%;
         max-width: 200px;
         height: 8px;
-        /* margin-left removed */
+        /* margin-left removed – left aligned */
     }
     .xp-text {
         font-size: 0.65rem;
@@ -2255,13 +2254,11 @@ body {
     }
     .level-name {
         font-size: 1rem;
-        /* margin-left removed */
     }
     .xp-progress {
         width: 100%;
         max-width: 140px;
         height: 6px;
-        /* margin-left removed */
     }
     .xp-text {
         font-size: 0.55rem;
