@@ -1,5 +1,514 @@
 <!DOCTYPE html>
+<html <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0A0F" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>NaijaGenius • Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
+
+    <!-- Preconnect hints for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-actions">
+                <div class="stat-badge-group">
+                    <span class="stat-badge" id="headerCoins">
+                        <i class="fas fa-coins" style="color:#FFD700;"></i>
+                        <span class="stat-label-text">Coins</span>
+                        <span id="headerCoinsValue">Loading...</span>
+                        <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
+                    </span>
+                    <span class="header-divider"></span>
+                    <span class="stat-badge" id="headerLives">
+                        <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+                        <span class="stat-label-text">Lives</span>
+                        <span id="headerLivesValue">Loading...</span>
+                        <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
+                    </span>
+                </div>
+                <button class="icon-btn settings-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ============================================================
+        HOME SECTION
+        ============================================================ -->
+        <section id="homeSection" class="page-section active-section">
+
+            <!-- ---- GREETING ---- -->
+            <div class="greeting-wrapper fade-in-up">
+                <div class="greeting-copy">
+                    <p class="greeting-text" id="greetingText"> <span id="greetingName"></span></p>
+                    <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
+                </div>
+                <div class="hero-logo-wrap" id="heroLogoWrap">
+                    <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius" loading="lazy"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="hero-logo-fallback">
+                        <span class="hero-flag" aria-hidden="true">🇳🇬</span>
+                        <span class="hero-bulb" aria-hidden="true">💡</span>
+                        <span class="hero-logo-text sparkle-text">
+                            <span class="naija-white">Naija</span><br /><em class="genius-mint">Genius</em>
+                            <span class="sparkle-container" aria-hidden="true">
+                                <span class="sparkle sparkle-1">✨</span>
+                                <span class="sparkle sparkle-2">🎆</span>
+                                <span class="sparkle sparkle-3">✨</span>
+                                <span class="sparkle sparkle-4">🎇</span>
+                                <span class="sparkle sparkle-5">✨</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- LEVEL DISPLAY – restructured for perfect alignment ---- -->
+            <div class="level-display fade-in-up">
+                <div class="avatar-container">
+                    <div class="user-avatar" id="userAvatarBtn">
+                        <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar" loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <span id="userInitials" class="avatar-fallback"></span>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
+                </div>
+
+                <div class="level-container">
+                    <div class="level-top-row">
+                        <div class="shield-badge">
+                            <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
+                        </div>
+                        <div class="level-text">
+                            <span class="level-label" id="levelLabel">Current Level</span>
+                            <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div class="xp-progress">
+                        <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
+                        <span class="xp-text" id="xpText">0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- STATS ROW ---- -->
+            <div class="stats-row">
+                <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
+                    <i class="fas fa-arrow-trend-up stat-icon"></i>
+                    <div class="stat-info">
+                        <span class="stat-label" id="correctAnswersLabel">Answers</span>
+                        <span class="stat-value" id="correctAnswers">Loading...</span>
+                        <span class="stat-caption">Total Correct</span>
+                    </div>
+                </div>
+                <div class="stats-divider" aria-hidden="true"></div>
+                <div class="stat-card fade-in-up" style="animation-delay: 0.15s">
+                    <i class="fas fa-trophy stat-icon"></i>
+                    <div class="stat-info">
+                        <span class="stat-label" id="bestScoreLabel">Best Score</span>
+                        <span class="stat-value" id="bestScoreValue">Loading...</span>
+                        <span class="stat-caption">Your Highest</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ANNOUNCEMENT CONTAINER ===== -->
+            <div id="announcementContainer" style="display:none;"></div>
+
+            <!-- ===== TIPS FOR EARNING COINS ===== -->
+            <div class="challenges-3d-container">
+                <h3 class="challenges-title"><i class="fas fa-tasks"></i> Tips for Earning Coins</h3>
+                <div class="challenges-grid">
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-fire"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">2 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 5 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">3–4 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 10 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-star"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">5 correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 20 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon"><i class="fas fa-crown"></i></div>
+                        <div class="challenge-info">
+                            <span class="challenge-condition">6+ correct in a row</span>
+                            <span class="challenge-reward"><i class="fas fa-coins"></i> 30 coins</span>
+                        </div>
+                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- CHOOSE A MODE ---- -->
+            <div class="mode-section">
+                <h2 class="section-title mode-title">
+                    <span class="title-line" aria-hidden="true"></span>
+                    <i class="fas fa-crown"></i>
+                    <span class="mode-title-text">Choose a Mode</span>
+                    <span class="title-line" aria-hidden="true"></span>
+                </h2>
+                <div class="mode-grid">
+                    <button class="mode-btn mode-btn-red" id="jollofMixBtn">
+                        <div class="mode-details">
+                            <span class="mode-name">Jollof Mix</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-fire mode-icon animate-icon"></i>
+                        </div>
+                        <span class="mode-questions">10 Questions</span>
+                        <i class="fas fa-arrow-right mode-arrow"></i>
+                    </button>
+                    <button class="mode-btn mode-btn-blue" id="chooseLaneBtn">
+                        <div class="mode-details">
+                            <span class="mode-name">Pick Your Lane</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-road mode-icon animate-icon"></i>
+                        </div>
+                        <span class="mode-questions">10 Categories</span>
+                        <i class="fas fa-arrow-right mode-arrow"></i>
+                    </button>
+                    <button class="mode-btn mode-btn-green" id="oneChanceBtn">
+                        <div class="mode-details">
+                            <span class="mode-name">One Chance</span>
+                        </div>
+                        <div class="mode-icon-wrap">
+                            <i class="fas fa-bolt mode-icon animate-icon"></i>
+                        </div>
+                        <span class="mode-questions">One miss, game ends</span>
+                        <i class="fas fa-arrow-right mode-arrow"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== ADMOB CONTAINER (bottom of home) ===== -->
+            <div class="ad-container" id="adContainer">
+                <!-- AdMob banner will be placed here -->
+            </div>
+
+        </section>
+
+        <!-- ============================================================
+        PICK YOUR LANE SECTION
+        ============================================================ -->
+        <section id="laneSection" class="page-section">
+            <div class="lane-top-row">
+                <button class="back-arrow-btn" id="laneBackBtn" aria-label="Back to Home">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="hero-section" id="laneHero">
+                    <h2 class="page-title">Test Your Skill</h2>
+                    <p class="page-subtitle">Pick a category that suits your vibe</p>
+                </div>
+            </div>
+
+            <div class="lane-grid">
+                <div class="lane-card" data-category="afrobeats" data-export="afrobeats">
+                    <div class="lane-icon">🎵</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Afrobeats</div>
+                        <div class="lane-desc">From Fela to Burna Boy</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nollywood" data-export="nollywood">
+                    <div class="lane-icon">🎬</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Nollywood</div>
+                        <div class="lane-desc">Movies, actors, iconic lines</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="lagos_slang" data-export="lagosSlang">
+                    <div class="lane-icon">🗣️</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Lagos Slang</div>
+                        <div class="lane-desc">Street language &amp; pidgin</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="super_eagles" data-export="superEagles">
+                    <div class="lane-icon">⚽</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Super Eagles</div>
+                        <div class="lane-desc">History, players, World Cup</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_proverbs" data-export="nigeriaProverbs">
+                    <div class="lane-icon">📖</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Proverbs</div>
+                        <div class="lane-desc">Yoruba, Igbo, Hausa wisdom</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_history" data-export="nigeriaHistory">
+                    <div class="lane-icon">🏛️</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija History</div>
+                        <div class="lane-desc">Independence &amp; key events</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_food" data-export="nigeriaFood">
+                    <div class="lane-icon">🍲</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Food</div>
+                        <div class="lane-desc">Dishes, ingredients, street food</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_geography" data-export="nigeriaGeography">
+                    <div class="lane-icon">🌍</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Geography</div>
+                        <div class="lane-desc">States, capitals, rivers</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_culture" data-export="nigeriaCulture">
+                    <div class="lane-icon">🎭</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Culture</div>
+                        <div class="lane-desc">Festivals &amp; traditions</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+                <div class="lane-card" data-category="nigeria_sports" data-export="nigeriaSports">
+                    <div class="lane-icon">🏏</div>
+                    <div class="lane-info">
+                        <div class="lane-name">Naija Sports</div>
+                        <div class="lane-desc">Athletes, teams, and sporting glory</div>
+                    </div>
+                    <i class="fas fa-arrow-right lane-arrow"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        PLAY SECTION (My Stats)
+        ============================================================ -->
+        <section id="playSection" class="page-section">
+            <div class="stats-full">
+                <h2 class="section-title">My Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-detail">
+                        <i class="fas fa-gamepad stat-detail-icon"></i>
+                        <span class="stat-detail-label">Games Played</span>
+                        <span class="stat-detail-value" id="totalGamesPlayed">0</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="fas fa-check-circle stat-detail-icon"></i>
+                        <span class="stat-detail-label">Total Correct</span>
+                        <span class="stat-detail-value" id="correctAnswersStats">0</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="fas fa-trophy stat-detail-icon"></i>
+                        <span class="stat-detail-label">Best Score</span>
+                        <span class="stat-detail-value" id="bestScoreStats">0</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="fas fa-heart stat-detail-icon"></i>
+                        <span class="stat-detail-label">Lives</span>
+                        <span class="stat-detail-value" id="livesStats">2</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="fas fa-coins stat-detail-icon"></i>
+                        <span class="stat-detail-label">Coins</span>
+                        <span class="stat-detail-value" id="coinsStats">0</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="fas fa-crown stat-detail-icon"></i>
+                        <span class="stat-detail-label">Level</span>
+                        <span class="stat-detail-value" id="levelStats">Ajebutter</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SHOP SECTION
+        ============================================================ -->
+        <section id="shopSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-store"></i> Shop</h2>
+                <span class="shop-coins-display">Coins: <strong id="shopCoinsDisplay">0</strong></span>
+            </div>
+            <div class="shop-grid" id="shopGrid">
+                <!-- Rendered by shop.js -->
+            </div>
+            <div class="ad-life-container">
+                <i class="fas fa-video ad-life-icon" aria-hidden="true"></i>
+                <button id="watchAdBtn" class="ad-life-btn">
+                    <i class="fas fa-video"></i> Watch Ad for <i class="fas fa-coins" style="color:#FFD700;"></i> +200 Coins
+                </button>
+                <p class="ad-life-note">Watch a short video to earn 200 coins.</p>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        LEADERBOARD SECTION
+        ============================================================ -->
+        <section id="leaderboardSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-trophy" style="color:#FFD700;"></i> Global Leaderboard</h2>
+                <select id="leaderboardFilter" class="filter-select">
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            <div class="leaderboard-full" id="fullLeaderboard">
+                <div class="loading-skeleton">Loading leaderboard…</div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SETTINGS SECTION
+        ============================================================ -->
+        <section id="settingsSection" class="page-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-cog"></i> Settings</h2>
+                <button class="back-arrow-btn settings-close-btn" id="settingsCloseBtn" aria-label="Close settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="settings-container">
+                <!-- Volume -->
+                <div class="settings-item">
+                    <label for="volumeSlider">Volume</label>
+                    <div class="settings-control">
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70" />
+                        <span id="volumeValue">70%</span>
+                    </div>
+                </div>
+                <!-- Sound toggle -->
+                <div class="settings-item">
+                    <label for="soundToggle">Sound</label>
+                    <div class="settings-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="soundToggle" checked />
+                            <label for="soundToggle" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Edit Name -->
+                <div class="settings-item">
+                    <label for="editNameInput">Edit Name</label>
+                    <div class="settings-control settings-name-control">
+                        <input type="text" id="editNameInput" placeholder="Enter new name" />
+                        <button id="saveNameBtn">Save</button>
+                    </div>
+                </div>
+                <!-- Logout -->
+                <div class="settings-item settings-logout-item">
+                    <label for="logoutBtn">Account</label>
+                    <div class="settings-control">
+                        <button id="logoutBtn" class="logout-btn">Logout</button>
+                    </div>
+                </div>
+                <!-- Feedback -->
+                <div class="settings-item settings-feedback-item">
+                    <label for="feedbackBtn">Feedback</label>
+                    <div class="settings-control">
+                        <button id="feedbackBtn" class="feedback-btn">Message Us</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FEEDBACK MODAL ===== -->
+        <div id="feedbackModal" class="modal-overlay" style="display: none;">
+            <div class="modal-card feedback-modal-card">
+                <button id="closeFeedbackBtn" class="modal-close" aria-label="Close">&times;</button>
+                <h3 style="color:#FFD700; margin-bottom:0.5rem;"><i class="fas fa-comment-dots"></i> Send Feedback</h3>
+                <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1rem;">We’d love to hear your thoughts. Let us know how we can improve NaijaGenius.</p>
+                <div class="input-group feedback-textarea-group">
+                    <textarea id="feedbackMessage" placeholder="Type your message here..." rows="4"></textarea>
+                </div>
+                <div style="display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
+                    <button id="cancelFeedbackBtn" class="modal-btn-cancel">Cancel</button>
+                    <button id="sendFeedbackBtn" class="modal-btn-send">Send <i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-nav="home">
+            <i class="fas fa-house"></i>
+            <span class="nav-label">Home</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item" data-nav="play">
+            <i class="fas fa-chart-bar"></i>
+            <span class="nav-label">My Stats</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item" data-nav="shop">
+            <i class="fas fa-store"></i>
+            <span class="nav-label">Shop</span>
+            <span class="nav-dot"></span>
+        </button>
+        <button class="nav-item" data-nav="leaderboard">
+            <i class="fas fa-trophy"></i>
+            <span class="nav-label">Leaderboard</span>
+            <span class="nav-dot"></span>
+        </button>
+    </nav>
+
+    <!-- ===== DESKTOP SIDEBAR ===== -->
+    <aside class="desktop-sidebar" id="desktopSidebar">
+        <div class="sidebar-nav">
+            <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
+            <button class="sidebar-item" data-nav="play"><i class="fas fa-chart-bar"></i><span>My Stats</span></button>
+            <button class="sidebar-item" data-nav="shop"><i class="fas fa-store"></i><span>Shop</span></button>
+            <button class="sidebar-item" data-nav="leaderboard"><i class="fas fa-trophy"></i><span>Leaderboard</span></button>
+        </div>
+    </aside>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="/js/dashboard.js"></script>
+
+</body>
+</html>="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
