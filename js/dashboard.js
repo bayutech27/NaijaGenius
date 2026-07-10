@@ -21,7 +21,7 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
-import { playBackgroundMusic } from "./sound.js";
+import { enableBackgroundMusicOnInteraction } from "./sound.js";
 
 // ========== WEEK ID HELPER (ISO) ==========
 function getCurrentWeekId(date = new Date()) {
@@ -269,7 +269,6 @@ function renderLeaderboardItems(users, offset) {
     if (rank === 1) rankClass += " rank-1";
     else if (rank === 2) rankClass += " rank-2";
     else if (rank === 3) rankClass += " rank-3";
-    // Avatar removed – display name only
     html += `
       <div class="leaderboard-item">
           <span class="${rankClass}">${rank}</span>
@@ -614,11 +613,11 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
 
-    // LOAD LEADERBOARD + START BACKGROUND MUSIC
+    // LOAD LEADERBOARD + BACKGROUND MUSIC (autoplay‑safe)
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
-    playBackgroundMusic(); // start background music on dashboard load
+    enableBackgroundMusicOnInteraction(); // only plays after first user gesture
 
     // SETUP ANNOUNCEMENT LISTENER
     setupAnnouncementListener();
