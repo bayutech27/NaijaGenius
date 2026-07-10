@@ -38,11 +38,24 @@ export function setSoundEnabled(enabled) {
   try {
     localStorage.setItem(SOUND_ENABLED_KEY, soundEnabled);
   } catch (e) { /* ignore */ }
-  if (!soundEnabled) stopBackgroundMusic();
+  if (!soundEnabled) {
+    stopBackgroundMusic();
+  } else {
+    // If sound is being re‑enabled and music was previously requested, try to play
+    if (musicRequested) tryPlayMusic();
+  }
 }
 
 export function isSoundEnabled() {
   return soundEnabled;
+}
+
+export function setMasterVolume(level) {
+  const volume = Math.max(0, Math.min(1, level / 100));
+  Object.values(sounds).forEach(audio => {
+    audio.volume = volume;
+  });
+  bgMusic.volume = volume;
 }
 
 // Generic safe play (for SFX)
@@ -95,19 +108,6 @@ export function playBackgroundMusicImmediately() {
     }
   }
 }
-
-
-export function setMasterVolume(level) {
-  const volume = Math.max(0, Math.min(1, level / 100));
-  // Apply to all SFX
-  Object.values(sounds).forEach(audio => {
-    audio.volume = volume;
-  });
-  // Apply to background music
-  bgMusic.volume = volume;
-}
-
-
 
 /** Web‑safe version: waits for first user gesture, then plays */
 let gestureHappened = false;
