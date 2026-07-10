@@ -735,7 +735,7 @@ function applyCorrectStyle(btn) {
   btn.style.background  = '#3ED6B7';
   btn.style.color       = '#ffffff';
   btn.style.borderColor = '#3ED6B7';
-  btn.classList.add('correct');
+  // Do NOT add 'correct' class to avoid the green check icon (CSS)
   btn.classList.remove('wrong');
 }
 
@@ -1436,7 +1436,8 @@ async function endRound() {
 }
 
 // ========== COMMENT MODAL ==========
-let commentSoundTimeout = null; // used to delay the comment sound
+let commentModalTimeout = null;   // for delayed comment modal
+let commentSoundTimeout = null;   // for delayed comment sound
 
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
@@ -1453,92 +1454,99 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
-  // Clear any previous delayed comment sound
+  // Clear any existing delayed modals and sounds
   if (commentSoundTimeout) clearTimeout(commentSoundTimeout);
+  if (commentModalTimeout) clearTimeout(commentModalTimeout);
 
-  // Delay the comment sound by 2 seconds so it plays after the correct/wrong sound
+  // Remove any currently visible comment modal
+  const existingModal = document.getElementById('commentModal');
+  if (existingModal) existingModal.remove();
+
+  // Delay the comment sound by 2 seconds
   commentSoundTimeout = setTimeout(() => {
     playCommentSound();
     commentSoundTimeout = null;
   }, 2000);
 
-  ensureCommentModalAnimStyle();
+  // Delay the modal appearance by 2 seconds so it syncs with the sound
+  commentModalTimeout = setTimeout(() => {
+    ensureCommentModalAnimStyle();
 
-  const existing = document.getElementById('commentModal');
-  if (existing) existing.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'commentModal';
+    overlay.style.cssText = `
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:10002; padding:1rem; perspective:1000px;
+    `;
 
-  const overlay = document.createElement('div');
-  overlay.id = 'commentModal';
-  overlay.style.cssText = `
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
-    display:flex; align-items:center; justify-content:center;
-    z-index:10002; padding:1rem; perspective:1000px;
-  `;
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
+      backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 1.8rem 1.6rem;
+      max-width: 400px; width: 100%;
+      position: relative; text-align: center; color: #f0f3fa;
+      font-family: 'Poppins', sans-serif;
+      box-shadow:
+        0 24px 50px rgba(0,0,0,0.5),
+        0 6px 16px rgba(124,79,224,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      transform-style: preserve-3d;
+      animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    `;
 
-  const card = document.createElement('div');
-  card.style.cssText = `
-    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
-    backdrop-filter: blur(14px);
-    border-radius: 24px;
-    padding: 1.8rem 1.6rem;
-    max-width: 400px; width: 100%;
-    position: relative; text-align: center; color: #f0f3fa;
-    font-family: 'Poppins', sans-serif;
-    box-shadow:
-      0 24px 50px rgba(0,0,0,0.5),
-      0 6px 16px rgba(124,79,224,0.2),
-      inset 0 1px 0 rgba(255,255,255,0.08);
-    transform-style: preserve-3d;
-    animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  `;
+    const borderRing = document.createElement('div');
+    borderRing.style.cssText = `
+      position:absolute; inset:-2px; border-radius:24px; padding:2px;
+      background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events:none; opacity:0.85; z-index:0;
+    `;
+    card.appendChild(borderRing);
 
-  const borderRing = document.createElement('div');
-  borderRing.style.cssText = `
-    position:absolute; inset:-2px; border-radius:24px; padding:2px;
-    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events:none; opacity:0.85; z-index:0;
-  `;
-  card.appendChild(borderRing);
+    const inner = document.createElement('div');
+    inner.style.cssText = `position:relative; z-index:1;`;
+    card.appendChild(inner);
 
-  const inner = document.createElement('div');
-  inner.style.cssText = `position:relative; z-index:1;`;
-  card.appendChild(inner);
+    const icon = document.createElement('div');
+    icon.innerHTML = '<i class="fas fa-bolt"></i>';
+    icon.style.cssText = `
+      font-size:2.2rem; color:#FFD700; margin-bottom:0.7rem;
+      filter: drop-shadow(0 4px 10px rgba(255,215,0,0.4));
+    `;
+    inner.appendChild(icon);
 
-  const icon = document.createElement('div');
-  icon.innerHTML = '<i class="fas fa-bolt"></i>';
-  icon.style.cssText = `
-    font-size:2.2rem; color:#FFD700; margin-bottom:0.7rem;
-    filter: drop-shadow(0 4px 10px rgba(255,215,0,0.4));
-  `;
-  inner.appendChild(icon);
+    const textP = document.createElement('p');
+    textP.style.cssText = `
+      font-size:1.2rem; font-weight:600; color:#ffffff;
+      line-height:1.55; margin-bottom:1.5rem;
+    `;
+    textP.textContent = comment;
+    inner.appendChild(textP);
 
-  const textP = document.createElement('p');
-  textP.style.cssText = `
-    font-size:1.2rem; font-weight:600; color:#ffffff;
-    line-height:1.55; margin-bottom:1.5rem;
-  `;
-  textP.textContent = comment;
-  inner.appendChild(textP);
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i class="fas fa-check"></i> Got it';
+    btn.style.cssText = `
+      background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+      border:none; padding:0.65rem 2rem; border-radius:20px;
+      font-weight:700; font-size:0.9rem; color:#ffffff;
+      cursor:pointer; font-family:'Poppins',sans-serif;
+      display:inline-flex; align-items:center; gap:0.5rem;
+      box-shadow: 0 8px 20px rgba(62,123,255,0.35);
+    `;
+    btn.addEventListener('click', () => overlay.remove());
+    inner.appendChild(btn);
 
-  const btn = document.createElement('button');
-  btn.innerHTML = '<i class="fas fa-check"></i> Got it';
-  btn.style.cssText = `
-    background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
-    border:none; padding:0.65rem 2rem; border-radius:20px;
-    font-weight:700; font-size:0.9rem; color:#ffffff;
-    cursor:pointer; font-family:'Poppins',sans-serif;
-    display:inline-flex; align-items:center; gap:0.5rem;
-    box-shadow: 0 8px 20px rgba(62,123,255,0.35);
-  `;
-  btn.addEventListener('click', () => overlay.remove());
-  inner.appendChild(btn);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
 
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
+    commentModalTimeout = null;
+  }, 2000);
 }
 
 // ========== FIREWORKS ==========
