@@ -358,14 +358,17 @@ async function loadLeaderboard(filter = "all", reset = true) {
       const baseText = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
 
       if (filter === "weekly" && rank !== null) {
+        // Declare storedRank and storedPeriod outside the if so they're available later
+        let storedRank = null;
+        let storedPeriod = null;
+        let delta = null;
         try {
           const userRef = doc(db, "users", currentUserUid);
           const userSnap = await getDoc(userRef);
-          let delta = null;
           if (userSnap.exists()) {
             const data = userSnap.data();
-            const storedRank = data.lastSeenRank_weekly;   // <-- properly declared here
-            const storedPeriod = data.lastSeenRankPeriodId;
+            storedRank = data.lastSeenRank_weekly;
+            storedPeriod = data.lastSeenRankPeriodId;
             const currentWeek = getCurrentWeekId();
             if (storedPeriod === currentWeek && typeof storedRank === "number") {
               const change = storedRank - rank; // positive = moved up
@@ -388,7 +391,7 @@ async function loadLeaderboard(filter = "all", reset = true) {
             span.textContent = "New";
             rankDisplay.appendChild(span);
           }
-          // write back new rank only if changed
+          // write back new rank only if changed (now storedRank and storedPeriod are in scope)
           if (rank !== storedRank || storedPeriod !== currentWeek) {
             await updateDoc(userRef, {
               lastSeenRank_weekly: rank,
