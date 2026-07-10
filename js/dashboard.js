@@ -21,7 +21,11 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
-import { enableBackgroundMusicOnInteraction } from "./sound.js";
+import {
+  enableBackgroundMusicOnInteraction,
+  playBackgroundMusicImmediately,
+  isNativePlatform,
+} from "./sound.js";
 
 // ========== WEEK ID HELPER (ISO) ==========
 function getCurrentWeekId(date = new Date()) {
@@ -613,11 +617,16 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
 
-    // LOAD LEADERBOARD + BACKGROUND MUSIC (autoplay‑safe)
+    // LOAD LEADERBOARD + BACKGROUND MUSIC (platform‑aware)
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
-    enableBackgroundMusicOnInteraction(); // only plays after first user gesture
+
+    if (isNativePlatform()) {
+      playBackgroundMusicImmediately();   // native apps: play instantly
+    } else {
+      enableBackgroundMusicOnInteraction(); // web: wait for first gesture
+    }
 
     // SETUP ANNOUNCEMENT LISTENER
     setupAnnouncementListener();
