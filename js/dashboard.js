@@ -21,6 +21,7 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
+import { playBackgroundMusic } from "./sound.js";
 
 // ========== WEEK ID HELPER (ISO) ==========
 function getCurrentWeekId(date = new Date()) {
@@ -62,7 +63,6 @@ const headerCoinsValue = document.getElementById("headerCoinsValue");
 const headerLivesValue = document.getElementById("headerLivesValue");
 const shopCoinsDisplay = document.getElementById("shopCoinsDisplay");
 const levelNameEl = document.getElementById("levelName");
-const levelBadgeEl = document.getElementById("levelBadge");
 const activeChallengesContainer = document.getElementById("activeChallenges");
 
 // ========== DOM ELEMENTS (My Stats page) ==========
@@ -114,13 +114,6 @@ function getLevel(correctCount) {
 function updateLevel(correctCount) {
   const level = getLevel(correctCount);
   if (levelNameEl) levelNameEl.textContent = level.name;
-  if (levelBadgeEl) {
-    levelBadgeEl.src = `/assets/${level.badge}`;
-    levelBadgeEl.onerror = function () {
-      this.src =
-        "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 90,25 90,65 50,95 10,65 10,25' fill='%231A1D2E' stroke='%23FFD700' stroke-width='4'/></svg>";
-    };
-  }
 
   const xpBar = document.getElementById("xpBar");
   const xpText = document.getElementById("xpText");
@@ -452,6 +445,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     const userData = userSnap.data();
     console.log("✅ User data loaded:", userData);
+
     // GREETING
     const displayName = userData.displayName || userData.username || user.email || "Player";
     const greeting = getGreeting();
@@ -460,6 +454,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     const initials = displayName.slice(0, 2).toUpperCase();
     if (userInitialsSpan) userInitialsSpan.textContent = initials;
+
     // AVATAR
     if (userData.avatar) {
       userAvatarImg.src = userData.avatar;
@@ -469,6 +464,7 @@ onAuthStateChanged(auth, async (user) => {
       userAvatarImg.style.display = "none";
       userInitialsSpan.style.display = "flex";
     }
+
     // COINS & LIVES
     let coins = userData.coins || 0;
     let lives = userData.lives ?? 2;
@@ -485,11 +481,9 @@ onAuthStateChanged(auth, async (user) => {
 
     // ===== CHECK FOR WELCOME BONUS NOTIFICATION =====
     if (userData.hasReceivedBonus === true && userData.bonusNotified !== true) {
-        // Show a special toast for the bonus
         setTimeout(() => {
             showToast('🎉 Congratulations! You earned 1000 bonus coins for being one of our first 200 users!', 'success', 15000);
-        }, 1000); // slight delay to ensure dashboard has loaded
-        // Update the flag in Firestore so it doesn't appear again
+        }, 1000);
         await updateDoc(userRef, { bonusNotified: true });
     }
 
@@ -504,6 +498,7 @@ onAuthStateChanged(auth, async (user) => {
       if (cat.bestScore > best) best = cat.bestScore;
     });
     if (bestScoreValue) bestScoreValue.textContent = best;
+
     // UPDATE MY STATS PAGE
     if (correctAnswersStats) correctAnswersStats.textContent = totalCorrect;
     if (bestScoreStats) bestScoreStats.textContent = best;
@@ -513,13 +508,20 @@ onAuthStateChanged(auth, async (user) => {
       const level = getLevel(totalCorrect);
       levelStats.textContent = level.name;
     }
+
+    // Hide level badge image entirely (keep level name + XP bar)
+    const levelBadge = document.getElementById("levelBadge");
+    if (levelBadge) levelBadge.style.display = "none";
+
     // SHOP INIT
     renderShop(coins);
     setupAdButton(userRef, updateHeaderUI);
+
     // ACTIVE CHALLENGE SPACE
     if (activeChallengesContainer) {
       activeChallengesContainer.innerHTML = "";
     }
+
     // REAL‑TIME UPDATES
     onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -558,6 +560,7 @@ onAuthStateChanged(auth, async (user) => {
         }
       }
     });
+
     // AVATAR UPLOAD HANDLERS
     avatarFileInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
@@ -572,6 +575,7 @@ onAuthStateChanged(auth, async (user) => {
     userAvatarBtn.addEventListener("click", () => {
       avatarFileInput.click();
     });
+
     // SETTINGS
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
@@ -609,11 +613,14 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
     }
-    // LOAD LEADERBOARD
+
+    // LOAD LEADERBOARD + START BACKGROUND MUSIC
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
-    // SETUP ANNOUNCEMENT LISTENER (collection name: "announcement" – singular)
+    playBackgroundMusic(); // start background music on dashboard load
+
+    // SETUP ANNOUNCEMENT LISTENER
     setupAnnouncementListener();
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -639,7 +646,6 @@ function showAnnouncement(announcement) {
     </div>
   `;
   container.style.display = 'block';
-  // Attach close event listener
   const closeBtn = document.getElementById('announcementCloseBtn');
   if (closeBtn) {
     closeBtn.addEventListener('click', hideAnnouncement);
@@ -655,7 +661,6 @@ function hideAnnouncement() {
 
 function setupAnnouncementListener() {
   try {
-    // Collection name is "announcement" (singular)
     const announcementRef = doc(db, 'announcement', 'current');
     onSnapshot(announcementRef, (doc) => {
       if (doc.exists()) {
@@ -832,7 +837,6 @@ if (feedbackModal) {
   });
 }
 
-// ========== UPDATED FEEDBACK SEND HANDLER (with private email) ==========
 if (sendFeedbackBtn) {
   sendFeedbackBtn.addEventListener("click", async () => {
     const message = feedbackMessage.value.trim();
@@ -853,7 +857,6 @@ if (sendFeedbackBtn) {
       }
       const userData = userSnap.data();
 
-      // ---- FIX: fetch email from private subcollection ----
       let email = "";
       try {
         const privateRef = doc(db, "users", currentUserUid, "private", "info");
@@ -863,7 +866,6 @@ if (sendFeedbackBtn) {
         }
       } catch (privateErr) {
         console.warn("Could not fetch private email:", privateErr);
-        // Continue with empty email
       }
 
       const feedbackData = {
