@@ -56,6 +56,12 @@ function showToast(message, type = 'success', duration = 10000) {
     }, duration);
 }
 
+// ========== CAPITALISE HELPER ==========
+function capitaliseFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // ========== DOM ELEMENTS (Home page) ==========
 const totalGamesPlayed = document.getElementById("totalGamesPlayed");
 const correctAnswersEl = document.getElementById("correctAnswers");
@@ -321,7 +327,7 @@ async function loadLeaderboard(filter = "all", reset = true) {
     const hasMore = docs.length > LEADERBOARD_PAGE_SIZE;
     const users = docs.slice(0, LEADERBOARD_PAGE_SIZE).map((doc) => {
       const data = doc.data();
-      const name = data.displayName || data.username || "Anonymous";
+      const name = capitaliseFirst(data.displayName || data.username || "Anonymous");
       return {
         uid: doc.id,
         displayName: name,
@@ -358,7 +364,7 @@ async function loadLeaderboard(filter = "all", reset = true) {
           let delta = null;
           if (userSnap.exists()) {
             const data = userSnap.data();
-            const storedRank = data.lastSeenRank_weekly;
+            const storedRank = data.lastSeenRank_weekly;   // <-- properly declared here
             const storedPeriod = data.lastSeenRankPeriodId;
             const currentWeek = getCurrentWeekId();
             if (storedPeriod === currentWeek && typeof storedRank === "number") {
@@ -437,7 +443,7 @@ onAuthStateChanged(auth, async (user) => {
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
       console.warn("User profile not found in Firestore.");
-      const displayName = user.email || "Player";
+      const displayName = capitaliseFirst(user.email || "Player");
       const greeting = getGreeting();
       if (greetingText) {
         greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
@@ -449,8 +455,8 @@ onAuthStateChanged(auth, async (user) => {
     const userData = userSnap.data();
     console.log("✅ User data loaded:", userData);
 
-    // GREETING
-    const displayName = userData.displayName || userData.username || user.email || "Player";
+    // GREETING – capitalise first letter
+    const displayName = capitaliseFirst(userData.displayName || userData.username || user.email || "Player");
     const greeting = getGreeting();
     if (greetingText) {
       greetingText.innerHTML = `${greeting}, <span id="greetingName">${displayName}</span>`;
@@ -556,7 +562,7 @@ onAuthStateChanged(auth, async (user) => {
           userAvatarImg.style.display = "block";
           userInitialsSpan.style.display = "none";
         }
-        const newName = updated.displayName || updated.username || user.email || "Player";
+        const newName = capitaliseFirst(updated.displayName || updated.username || user.email || "Player");
         if (greetingText) {
           const currentGreeting = getGreeting();
           greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
@@ -583,7 +589,6 @@ onAuthStateChanged(auth, async (user) => {
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
     if (volumeSlider && volumeValue) {
-      // Apply initial volume (70 by default)
       setMasterVolume(parseInt(volumeSlider.value, 10));
       volumeSlider.addEventListener("input", () => {
         const newVolume = parseInt(volumeSlider.value, 10);
@@ -593,7 +598,6 @@ onAuthStateChanged(auth, async (user) => {
     }
     const soundToggle = document.getElementById("soundToggle");
     if (soundToggle) {
-      // Sync the toggle with the actual initial sound state
       soundToggle.checked = isSoundEnabled();
       soundToggle.addEventListener("change", () => {
         setSoundEnabled(soundToggle.checked);
@@ -614,7 +618,7 @@ onAuthStateChanged(auth, async (user) => {
           showToast("Name updated successfully!", "success");
           editNameInput.value = "";
           const currentGreeting = getGreeting();
-          greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${newName}</span>`;
+          greetingText.innerHTML = `${currentGreeting}, <span id="greetingName">${capitaliseFirst(newName)}</span>`;
           const initials = newName.slice(0, 2).toUpperCase();
           if (userInitialsSpan) userInitialsSpan.textContent = initials;
         } catch (err) {
