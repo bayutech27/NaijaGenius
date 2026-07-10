@@ -41,9 +41,11 @@ export function setSoundEnabled(enabled) {
   if (!soundEnabled) stopBackgroundMusic();
 }
 
-export function isSoundEnabled() { return soundEnabled; }
+export function isSoundEnabled() {
+  return soundEnabled;
+}
 
-// Generic safe play
+// Generic safe play (for SFX)
 function safePlay(audio, restart = false) {
   if (!soundEnabled) return;
   if (restart) audio.currentTime = 0;
@@ -63,7 +65,38 @@ export function playCorrectSound()   { safePlay(sounds.correct, true); }
 export function playWrongSound()     { safePlay(sounds.wrong, true); }
 export function playCommentSound()   { safePlay(sounds.comment, true); }
 
-// Background music – only after a real user gesture
+// ---------- Platform detection ----------
+let _isNativePlatform = false;
+try {
+  if (window.Capacitor?.isNativePlatform()) {
+    _isNativePlatform = true;
+  }
+} catch (e) {
+  // not Capacitor
+}
+
+export function isNativePlatform() {
+  return _isNativePlatform;
+}
+
+// ---------- Background music controls ----------
+
+/** Play background music immediately (no gesture wait) – safe for native apps */
+export function playBackgroundMusicImmediately() {
+  if (!soundEnabled) return;
+  if (bgMusic.paused) {
+    try {
+      const promise = bgMusic.play();
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch(e => console.warn('Background music failed:', e.message));
+      }
+    } catch (e) {
+      console.warn('Background music exception:', e.message);
+    }
+  }
+}
+
+/** Web‑safe version: waits for first user gesture, then plays */
 let gestureHappened = false;
 let musicRequested  = false;
 
@@ -94,8 +127,7 @@ document.addEventListener('keydown', () => {
 
 export function enableBackgroundMusicOnInteraction() {
   musicRequested = true;
-  if (gestureHappened) tryPlayMusic(); // rare case: gesture already fired
-  // otherwise it waits for the next click/touch/key
+  if (gestureHappened) tryPlayMusic();
 }
 
 export function stopBackgroundMusic() {
