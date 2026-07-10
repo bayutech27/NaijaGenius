@@ -22,6 +22,16 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/f
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
 
+// ========== WEEK ID HELPER (ISO) ==========
+function getCurrentWeekId(date = new Date()) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
 // ========== TOAST NOTIFICATIONS ==========
 function showToast(message, type = 'success', duration = 10000) {
     let container = document.getElementById('toastContainer');
@@ -319,7 +329,6 @@ async function loadLeaderboard(filter = "all", reset = true) {
       return {
         uid: doc.id,
         displayName: name,
-        // avatar removed
         correct: data[orderField] || 0,
         level: getLevel(data.totalCorrectAnswers || 0).name,
       };
@@ -339,10 +348,57 @@ async function loadLeaderboard(filter = "all", reset = true) {
       const list = document.getElementById("leaderboardItems");
       if (list) list.innerHTML = '<div class="loading-skeleton">No players found.</div>';
     }
+
+    // ===== RANK DISPLAY WITH MOVEMENT INDICATOR =====
     if (reset && currentUserUid) {
       const rank = await computeUserRank(currentUserUid, filter);
-      if (rankDisplay) {
-        rankDisplay.textContent = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
+      if (!rankDisplay) return;
+      const baseText = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
+
+      if (filter === "weekly" && rank !== null) {
+        try {
+          const userRef = doc(db, "users", currentUserUid);
+          const userSnap = await getDoc(userRef);
+          let delta = null;
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            const storedRank = data.lastSeenRank_weekly;
+            const storedPeriod = data.lastSeenRankPeriodId;
+            const currentWeek = getCurrentWeekId();
+            if (storedPeriod === currentWeek && typeof storedRank === "number") {
+              const change = storedRank - rank; // positive = moved up
+              if (change > 0) delta = { text: `▲${change}`, color: "#4caf50" };
+              else if (change < 0) delta = { text: `▼${Math.abs(change)}`, color: "#f44336" };
+              else delta = { text: "—", color: "#9e9e9e" };
+            }
+          }
+          // clear and rebuild
+          rankDisplay.innerHTML = "";
+          rankDisplay.appendChild(document.createTextNode(baseText + " "));
+          if (delta) {
+            const span = document.createElement("span");
+            span.style.cssText = `color:${delta.color};margin-left:0.25em;`;
+            span.textContent = delta.text;
+            rankDisplay.appendChild(span);
+          } else {
+            const span = document.createElement("span");
+            span.style.cssText = "color:#9e9e9e;margin-left:0.25em;";
+            span.textContent = "New";
+            rankDisplay.appendChild(span);
+          }
+          // write back new rank only if changed
+          if (rank !== storedRank || storedPeriod !== currentWeek) {
+            await updateDoc(userRef, {
+              lastSeenRank_weekly: rank,
+              lastSeenRankPeriodId: currentWeek
+            }).catch(e => console.warn("Failed to update last seen rank:", e));
+          }
+        } catch (err) {
+          console.warn("Rank movement error:", err);
+          rankDisplay.textContent = baseText;
+        }
+      } else {
+        rankDisplay.textContent = baseText;
       }
     }
   } catch (error) {
