@@ -19,6 +19,7 @@ import {
   playCorrectSound,
   playWrongSound,
   playCommentSound,
+  stopCountdownSound,
   enableBackgroundMusicOnInteraction,
   playBackgroundMusicImmediately,
   isNativePlatform
@@ -74,11 +75,11 @@ let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
 let displayedCoins = 0;
 
-// Lifeline usage tracking (kept for future use, but no challenge depends on it now)
+// Lifeline usage tracking
 let lifelineUsed = null;
 let isCorrectAfterLifeline = false;
 
-// Variables for delayed feedback (used only in non‑One‑Chance modes)
+// Variables for delayed feedback
 let pendingSelectedLetter = null;
 let pendingCorrectLetter = null;
 
@@ -444,7 +445,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     logGameStarted(questionType, category);
 
     showCountdown(() => {
-      // Start background music (platform‑aware)
       if (isNativePlatform()) {
         playBackgroundMusicImmediately();
       } else {
@@ -511,7 +511,6 @@ async function loadMixedQuestions() {
   logGameStarted('mixed', 'mixed');
 
   showCountdown(() => {
-    // Start background music (platform‑aware)
     if (isNativePlatform()) {
       playBackgroundMusicImmediately();
     } else {
@@ -694,6 +693,7 @@ function timerTick() {
   }
 
   if (timeLeft <= 0) {
+    stopCountdownSound(); // stop any lingering countdown beep
     playWrongSound();
     clearInterval(timerInterval);
     questionAnswered  = true;
@@ -952,6 +952,8 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
+    // Stop the countdown sound immediately when user clicks
+    stopCountdownSound();
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
 
@@ -1093,7 +1095,6 @@ lifelineFifty?.addEventListener('click', async () => {
     console.log('🆓 Used free fifty_fifty');
   }
 
-  // Log lifeline usage
   logLifelineUsed('fifty_fifty');
 
   const correct = currentQ.correctAnswer;
@@ -1136,7 +1137,6 @@ lifelineAsk?.addEventListener('click', async () => {
     console.log('🆓 Used free ask_crowd');
   }
 
-  // Log lifeline usage
   logLifelineUsed('ask_crowd');
 
   const correct = currentQ.correctAnswer;
@@ -1199,7 +1199,6 @@ lifelineCallFriend?.addEventListener('click', async () => {
     console.log('🆓 Used free callFriend');
   }
 
-  // Log lifeline usage
   logLifelineUsed('callFriend');
 
   const correctLetter = currentQ.correctAnswer;
@@ -1349,17 +1348,14 @@ async function endRound() {
   gameRoundActive = false;
   clearInterval(timerInterval);
 
-  // Show loader immediately
   showLoader('Saving your progress...');
 
   let newBest = false;
   let saveError = false;
 
-  // Log game completed
   logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
 
   try {
-    // --- Read previous best (and other data) ---
     let previousBest = 0;
     let existingWeeklyPeriodId = null;
     let existingWeeklyCorrectAnswers = 0;
@@ -1378,7 +1374,6 @@ async function endRound() {
       previousBest = 0;
     }
 
-    // Save regular_points
     const pointRef = collection(db, 'regular_points');
     await addDoc(pointRef, {
       uid:              currentUserUID,
@@ -1392,7 +1387,6 @@ async function endRound() {
       time:             serverTimestamp()
     });
 
-    // Update user document (first update) – includes weekly fields with conditional reset
     const userRef = doc(db, 'users', currentUserUID);
     const currentWeekId = getCurrentWeekId();
     const updateData = {
@@ -1411,8 +1405,7 @@ async function endRound() {
 
     await updateDoc(userRef, updateData);
 
-    // Now update categoryStats
-    const userSnap2 = await getDoc(userRef); // re-fetch to get latest
+    const userSnap2 = await getDoc(userRef);
     if (userSnap2.exists()) {
       const data     = userSnap2.data();
       const catStats = data.categoryStats || {};
@@ -1422,12 +1415,10 @@ async function endRound() {
       const currentBest = catStats[catKey].bestScore || 0;
       const newBestVal  = roundScore > currentBest ? roundScore : currentBest;
 
-      // Determine if new best (before updating)
       if (roundScore > previousBest) {
         newBest = true;
       }
 
-      // Now update
       await updateDoc(userRef, {
         [`categoryStats.${catKey}.played`]:    increment(1),
         [`categoryStats.${catKey}.bestScore`]: newBestVal
@@ -1440,12 +1431,13 @@ async function endRound() {
     saveError = true;
   } finally {
     hideLoader();
-    // Show the round-end modal (pass newBest flag)
     showRoundEndModal(newBest);
   }
 }
 
 // ========== COMMENT MODAL ==========
+let commentSoundTimeout = null; // used to delay the comment sound
+
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
   const style = document.createElement('style');
@@ -1461,7 +1453,15 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
-  playCommentSound();
+  // Clear any previous delayed comment sound
+  if (commentSoundTimeout) clearTimeout(commentSoundTimeout);
+
+  // Delay the comment sound by 2 seconds so it plays after the correct/wrong sound
+  commentSoundTimeout = setTimeout(() => {
+    playCommentSound();
+    commentSoundTimeout = null;
+  }, 2000);
+
   ensureCommentModalAnimStyle();
 
   const existing = document.getElementById('commentModal');
@@ -1757,7 +1757,6 @@ function showRoundEndModal(newBest = false) {
     badge.textContent = '🏆 New Best Score!';
     badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);`;
     badgeContainer.appendChild(badge);
-    // Trigger fireworks after a short delay
     setTimeout(() => showFireworks(), 300);
   }
   inner.appendChild(badgeContainer);
