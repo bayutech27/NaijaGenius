@@ -14,6 +14,7 @@ import {
   getEndOfRoundComment
 } from './comments.js';
 import { logGameStarted, logGameCompleted, logLifelineUsed } from './analytics.js';
+import { playCountdownSound, playCorrectSound, playWrongSound, playCommentSound } from './sound.js';
 
 console.log('🎮 games.js loaded');
 
@@ -663,7 +664,13 @@ function timerTick() {
     timerPath.style.strokeDashoffset = offset;
   }
 
+  // Countdown beep in last 5 seconds (not at 0)
+  if (timeLeft <= 5 && timeLeft > 0) {
+    playCountdownSound();
+  }
+
   if (timeLeft <= 0) {
+    playWrongSound();
     clearInterval(timerInterval);
     questionAnswered  = true;
     lifelinesDisabled = true;
@@ -944,6 +951,7 @@ function attachOptionListener() {
 
     if (isCorrect) {
       applyCorrectStyle(btn);
+      playCorrectSound();
       const comment = handleStreakUpdate(true);
       if (comment) showCommentModal(comment);
 
@@ -982,6 +990,7 @@ function attachOptionListener() {
       updateLifelineUI();
       nextBtn.disabled = false;
     } else {
+      playWrongSound();
       if (questionType === 'one_chance') {
         applyWrongStyle(btn);
         if (correctLetter && optionBtns[correctLetter]) {
@@ -1429,6 +1438,7 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
+  playCommentSound();
   ensureCommentModalAnimStyle();
 
   const existing = document.getElementById('commentModal');
