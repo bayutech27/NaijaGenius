@@ -38,11 +38,9 @@ export function setSoundEnabled(enabled) {
   try {
     localStorage.setItem(SOUND_ENABLED_KEY, soundEnabled);
   } catch (e) { /* ignore */ }
-
   if (!soundEnabled) {
     stopBackgroundMusic();
   } else {
-    // Sound has been re-enabled – start music appropriately
     if (_isNativePlatform) {
       playBackgroundMusicImmediately();
     } else {
@@ -82,6 +80,12 @@ export function playCountdownSound() { safePlay(sounds.countdown, true); }
 export function playCorrectSound()   { safePlay(sounds.correct, true); }
 export function playWrongSound()     { safePlay(sounds.wrong, true); }
 export function playCommentSound()   { safePlay(sounds.comment, true); }
+
+// NEW: Stop countdown sound immediately
+export function stopCountdownSound() {
+  sounds.countdown.pause();
+  sounds.countdown.currentTime = 0;
+}
 
 // ---------- Platform detection ----------
 let _isNativePlatform = false;
