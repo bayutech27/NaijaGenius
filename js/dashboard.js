@@ -261,9 +261,35 @@ async function computeUserRank(uid, filter) {
     const userScore = userSnap.data()[getScoreField(filter)] || 0;
     const q = query(collection(db, "users"), where(getScoreField(filter), ">", userScore));
     const snapshot = await getCountFromServer(q);
-    return snapshot.data().count + 1;
+    return { rank: snapshot.data().count + 1, score: userScore };
   } catch (err) {
     console.warn("Failed to compute rank:", err);
+    return null;
+  }
+}
+
+/**
+ * Fetch the immediate higher‑ranked user for a given filter and score.
+ * Returns null if the user is already #1.
+ */
+async function getNextHigherUser(filter, userScore) {
+  try {
+    const field = getScoreField(filter);
+    const q = query(
+      collection(db, "users"),
+      where(field, ">", userScore),
+      orderBy(field, "asc"),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    const docData = snap.docs[0].data();
+    return {
+      name: capitaliseFirst(docData.displayName || docData.username || "Anonymous"),
+      score: docData[field] || 0,
+    };
+  } catch (err) {
+    console.warn("Failed to fetch next higher user:", err);
     return null;
   }
 }
@@ -351,18 +377,30 @@ async function loadLeaderboard(filter = "all", reset = true) {
       if (list) list.innerHTML = '<div class="loading-skeleton">No players found.</div>';
     }
 
-    // ===== RANK DISPLAY WITH MOVEMENT INDICATOR =====
+    // ===== RANK DISPLAY WITH MOVEMENT INDICATOR + GAP TO NEXT =====
     if (reset && currentUserUid) {
-      const rank = await computeUserRank(currentUserUid, filter);
-      if (!rankDisplay) return;
+      const rankData = await computeUserRank(currentUserUid, filter);
+      if (!rankDisplay || !rankData) return;
+      const rank = rankData.rank;
+      const userScore = rankData.score;
       const baseText = rank !== null ? `🏆 Your Rank: #${rank}` : "🏆 Unranked";
+
+      // Build overtake message (for both weekly and all-time)
+      let overtakeHTML = "";
+      if (rank > 1) {
+        const nextUser = await getNextHigherUser(filter, userScore);
+        if (nextUser) {
+          const diff = nextUser.score - userScore;
+          overtakeHTML = `<br><span style="color:#C9D3EE;font-size:0.7rem;">You need ${diff} more correct ${diff === 1 ? "answer" : "answers"} to overtake ${nextUser.name} (#${rank - 1})</span>`;
+        }
+      }
 
       if (filter === "weekly" && rank !== null) {
         let storedRank = null;
         let storedPeriod = null;
         let delta = null;
         try {
-          const currentWeek = getCurrentWeekId();   // moved here – available for the whole block
+          const currentWeek = getCurrentWeekId();
           const userRef = doc(db, "users", currentUserUid);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
@@ -370,13 +408,13 @@ async function loadLeaderboard(filter = "all", reset = true) {
             storedRank = data.lastSeenRank_weekly;
             storedPeriod = data.lastSeenRankPeriodId;
             if (storedPeriod === currentWeek && typeof storedRank === "number") {
-              const change = storedRank - rank; // positive = moved up
+              const change = storedRank - rank;
               if (change > 0) delta = { text: `▲${change}`, color: "#4caf50" };
               else if (change < 0) delta = { text: `▼${Math.abs(change)}`, color: "#f44336" };
               else delta = { text: "—", color: "#9e9e9e" };
             }
           }
-          // clear and rebuild
+          // clear and rebuild (include overtake message)
           rankDisplay.innerHTML = "";
           rankDisplay.appendChild(document.createTextNode(baseText + " "));
           if (delta) {
@@ -390,6 +428,10 @@ async function loadLeaderboard(filter = "all", reset = true) {
             span.textContent = "New";
             rankDisplay.appendChild(span);
           }
+          // Append overtake info
+          if (overtakeHTML) {
+            rankDisplay.innerHTML += overtakeHTML;
+          }
           // write back new rank only if changed
           if (rank !== storedRank || storedPeriod !== currentWeek) {
             await updateDoc(userRef, {
@@ -400,9 +442,11 @@ async function loadLeaderboard(filter = "all", reset = true) {
         } catch (err) {
           console.warn("Rank movement error:", err);
           rankDisplay.textContent = baseText;
+          if (overtakeHTML) rankDisplay.innerHTML += overtakeHTML;
         }
       } else {
-        rankDisplay.textContent = baseText;
+        // All-time (or non-weekly) – no movement, just rank + overtake
+        rankDisplay.innerHTML = baseText + overtakeHTML;
       }
     }
   } catch (error) {
