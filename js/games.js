@@ -76,6 +76,16 @@ let pendingCorrectLetter = null;
 const MAX_SCORE_PER_QUESTION = 15;
 const TOTAL_QUESTIONS = 10;
 
+// ========== WEEK ID HELPER (ISO) ==========
+function getCurrentWeekId(date = new Date()) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
 // ========== DOM REFS ==========
 const $ = (id) => document.getElementById(id);
 const timerSeconds   = $('timerSeconds');
@@ -1318,6 +1328,8 @@ async function endRound() {
   try {
     // --- Read previous best (and other data) ---
     let previousBest = 0;
+    let existingWeeklyPeriodId = null;
+    let existingWeeklyCorrectAnswers = 0;
     try {
       const userRef = doc(db, 'users', currentUserUID);
       const userSnap = await getDoc(userRef);
@@ -1325,6 +1337,8 @@ async function endRound() {
         const data = userSnap.data();
         const catStats = data.categoryStats || {};
         previousBest = catStats[category]?.bestScore || 0;
+        existingWeeklyPeriodId = data.weeklyPeriodId || null;
+        existingWeeklyCorrectAnswers = data.weeklyCorrectAnswers || 0;
       }
     } catch (err) {
       console.warn('Could not read previous best:', err);
@@ -1345,14 +1359,24 @@ async function endRound() {
       time:             serverTimestamp()
     });
 
-    // Update user document (first update)
+    // Update user document (first update) – now includes weekly fields with conditional reset
     const userRef = doc(db, 'users', currentUserUID);
-    await updateDoc(userRef, {
+    const currentWeekId = getCurrentWeekId();
+    const updateData = {
       lifetimeRoundPlayed:  increment(1),
       totalScore:           increment(roundScore),
       totalCorrectAnswers:  increment(correctCount),
       coins:                increment(roundCoins)
-    });
+    };
+
+    if (existingWeeklyPeriodId === currentWeekId) {
+      updateData.weeklyCorrectAnswers = increment(correctCount);
+    } else {
+      updateData.weeklyCorrectAnswers = correctCount;
+      updateData.weeklyPeriodId = currentWeekId;
+    }
+
+    await updateDoc(userRef, updateData);
 
     // Now update categoryStats
     const userSnap2 = await getDoc(userRef); // re-fetch to get latest
