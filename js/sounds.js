@@ -53,7 +53,7 @@ function safePlay(audio, restart = false) {
 }
 
 export function playCountdownSound() {
-  safePlay(sounds.countdown, true); // restart cleanly on each tick
+  safePlay(sounds.countdown, true);
 }
 
 export function playCorrectSound() {
