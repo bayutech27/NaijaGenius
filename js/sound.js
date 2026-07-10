@@ -26,11 +26,8 @@ try {
   if (stored !== null) {
     soundEnabled = stored === 'true';
   }
-} catch (e) {
-  // ignore
-}
+} catch (e) { /* ignore */ }
 
-// If sound is disabled at load, stop music
 if (!soundEnabled) {
   bgMusic.pause();
   bgMusic.currentTime = 0;
@@ -40,24 +37,16 @@ export function setSoundEnabled(enabled) {
   soundEnabled = !!enabled;
   try {
     localStorage.setItem(SOUND_ENABLED_KEY, soundEnabled);
-  } catch (e) {
-    // ignore
-  }
-  if (!soundEnabled) {
-    stopBackgroundMusic();
-  }
+  } catch (e) { /* ignore */ }
+  if (!soundEnabled) stopBackgroundMusic();
 }
 
-export function isSoundEnabled() {
-  return soundEnabled;
-}
+export function isSoundEnabled() { return soundEnabled; }
 
 // Generic safe play
 function safePlay(audio, restart = false) {
   if (!soundEnabled) return;
-  if (restart) {
-    audio.currentTime = 0;
-  }
+  if (restart) audio.currentTime = 0;
   try {
     const promise = audio.play();
     if (promise && typeof promise.catch === 'function') {
@@ -69,28 +58,17 @@ function safePlay(audio, restart = false) {
 }
 
 // SFX exports
-export function playCountdownSound() {
-  safePlay(sounds.countdown, true);
-}
+export function playCountdownSound() { safePlay(sounds.countdown, true); }
+export function playCorrectSound()   { safePlay(sounds.correct, true); }
+export function playWrongSound()     { safePlay(sounds.wrong, true); }
+export function playCommentSound()   { safePlay(sounds.comment, true); }
 
-export function playCorrectSound() {
-  safePlay(sounds.correct, true);
-}
+// Background music – only after a real user gesture
+let gestureHappened = false;
+let musicRequested  = false;
 
-export function playWrongSound() {
-  safePlay(sounds.wrong, true);
-}
-
-export function playCommentSound() {
-  safePlay(sounds.comment, true);
-}
-
-// Background music controls – only play after a user gesture
-let gestureHappened = false;   // becomes true when user interacts
-let musicRequested = false;   // someone asked to start music
-
-function attemptPlay() {
-  if (!soundEnabled || !gestureHappened || bgMusic.paused === false) return;
+function tryPlayMusic() {
+  if (!soundEnabled || !gestureHappened || !musicRequested || !bgMusic.paused) return;
   try {
     const promise = bgMusic.play();
     if (promise && typeof promise.catch === 'function') {
@@ -101,25 +79,23 @@ function attemptPlay() {
   }
 }
 
-// Track user gestures
 document.addEventListener('click', () => {
   gestureHappened = true;
-  if (musicRequested) attemptPlay();
+  tryPlayMusic();
 }, { once: false });
 document.addEventListener('touchstart', () => {
   gestureHappened = true;
-  if (musicRequested) attemptPlay();
+  tryPlayMusic();
 }, { once: false });
 document.addEventListener('keydown', () => {
   gestureHappened = true;
-  if (musicRequested) attemptPlay();
+  tryPlayMusic();
 }, { once: false });
 
 export function enableBackgroundMusicOnInteraction() {
   musicRequested = true;
-  // If a gesture already happened (unlikely but safe), try now
-  if (gestureHappened) attemptPlay();
-  // Otherwise, the gesture listeners above will trigger attemptPlay()
+  if (gestureHappened) tryPlayMusic(); // rare case: gesture already fired
+  // otherwise it waits for the next click/touch/key
 }
 
 export function stopBackgroundMusic() {
