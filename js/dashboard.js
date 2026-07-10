@@ -25,6 +25,9 @@ import {
   enableBackgroundMusicOnInteraction,
   playBackgroundMusicImmediately,
   isNativePlatform,
+  setSoundEnabled,
+  isSoundEnabled,
+  setMasterVolume,
 } from "./sound.js";
 
 // ========== WEEK ID HELPER (ISO) ==========
@@ -579,20 +582,27 @@ onAuthStateChanged(auth, async (user) => {
       avatarFileInput.click();
     });
 
-    // SETTINGS
+    // SETTINGS – Sound & Volume wiring
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
     if (volumeSlider && volumeValue) {
+      // Apply initial volume (70 by default, but we set it from sound.js if available)
+      setMasterVolume(parseInt(volumeSlider.value, 10));
       volumeSlider.addEventListener("input", () => {
-        volumeValue.textContent = volumeSlider.value + "%";
+        const newVolume = parseInt(volumeSlider.value, 10);
+        volumeValue.textContent = newVolume + "%";
+        setMasterVolume(newVolume);
       });
     }
     const soundToggle = document.getElementById("soundToggle");
     if (soundToggle) {
+      // Sync the toggle with the actual initial sound state
+      soundToggle.checked = isSoundEnabled();
       soundToggle.addEventListener("change", () => {
-        console.log("Sound:", soundToggle.checked ? "ON" : "OFF");
+        setSoundEnabled(soundToggle.checked);
       });
     }
+
     const editNameInput = document.getElementById("editNameInput");
     const saveNameBtn = document.getElementById("saveNameBtn");
     if (editNameInput && saveNameBtn) {
@@ -623,9 +633,9 @@ onAuthStateChanged(auth, async (user) => {
     loadLeaderboard(currentFilter, true);
 
     if (isNativePlatform()) {
-      playBackgroundMusicImmediately();   // native apps: play instantly
+      playBackgroundMusicImmediately();
     } else {
-      enableBackgroundMusicOnInteraction(); // web: wait for first gesture
+      enableBackgroundMusicOnInteraction();
     }
 
     // SETUP ANNOUNCEMENT LISTENER
