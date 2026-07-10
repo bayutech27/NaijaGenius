@@ -38,11 +38,16 @@ export function setSoundEnabled(enabled) {
   try {
     localStorage.setItem(SOUND_ENABLED_KEY, soundEnabled);
   } catch (e) { /* ignore */ }
+
   if (!soundEnabled) {
     stopBackgroundMusic();
   } else {
-    // If sound is being re‑enabled and music was previously requested, try to play
-    if (musicRequested) tryPlayMusic();
+    // Sound has been re-enabled – start music appropriately
+    if (_isNativePlatform) {
+      playBackgroundMusicImmediately();
+    } else {
+      enableBackgroundMusicOnInteraction();
+    }
   }
 }
 
