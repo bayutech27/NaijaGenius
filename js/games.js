@@ -19,7 +19,9 @@ import {
   playCorrectSound,
   playWrongSound,
   playCommentSound,
-  enableBackgroundMusicOnInteraction
+  enableBackgroundMusicOnInteraction,
+  playBackgroundMusicImmediately,
+  isNativePlatform
 } from './sound.js';
 
 console.log('🎮 games.js loaded');
@@ -72,11 +74,11 @@ let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
 let displayedCoins = 0;
 
-// Lifeline usage tracking (kept for future use)
+// Lifeline usage tracking (kept for future use, but no challenge depends on it now)
 let lifelineUsed = null;
 let isCorrectAfterLifeline = false;
 
-// Variables for delayed feedback (used only in non-One-Chance modes)
+// Variables for delayed feedback (used only in non‑One‑Chance modes)
 let pendingSelectedLetter = null;
 let pendingCorrectLetter = null;
 
@@ -442,7 +444,12 @@ async function loadQuestionsFromJS(exportNameParam) {
     logGameStarted(questionType, category);
 
     showCountdown(() => {
-      enableBackgroundMusicOnInteraction();
+      // Start background music (platform‑aware)
+      if (isNativePlatform()) {
+        playBackgroundMusicImmediately();
+      } else {
+        enableBackgroundMusicOnInteraction();
+      }
       loadQuestion(0);
     });
 
@@ -504,7 +511,12 @@ async function loadMixedQuestions() {
   logGameStarted('mixed', 'mixed');
 
   showCountdown(() => {
-    enableBackgroundMusicOnInteraction();
+    // Start background music (platform‑aware)
+    if (isNativePlatform()) {
+      playBackgroundMusicImmediately();
+    } else {
+      enableBackgroundMusicOnInteraction();
+    }
     loadQuestion(0);
   });
 }
@@ -676,7 +688,7 @@ function timerTick() {
     timerPath.style.strokeDashoffset = offset;
   }
 
-  // Countdown beep in last 5 seconds
+  // Countdown beep in last 5 seconds (not at 0)
   if (timeLeft <= 5 && timeLeft > 0) {
     playCountdownSound();
   }
@@ -1330,7 +1342,7 @@ function hideLoader() {
   if (overlay) overlay.remove();
 }
 
-// ========== END ROUND – INCLUDES WEEKLY RESET ==========
+// ========== END ROUND – FIXED WITH AWAIT AND LOADER ==========
 async function endRound() {
   if (roundEnded) return;
   roundEnded    = true;
@@ -1347,7 +1359,7 @@ async function endRound() {
   logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
 
   try {
-    // --- Read previous best and weekly data ---
+    // --- Read previous best (and other data) ---
     let previousBest = 0;
     let existingWeeklyPeriodId = null;
     let existingWeeklyCorrectAnswers = 0;
@@ -1380,7 +1392,7 @@ async function endRound() {
       time:             serverTimestamp()
     });
 
-    // Update user document with weekly conditional reset
+    // Update user document (first update) – includes weekly fields with conditional reset
     const userRef = doc(db, 'users', currentUserUID);
     const currentWeekId = getCurrentWeekId();
     const updateData = {
@@ -1400,7 +1412,7 @@ async function endRound() {
     await updateDoc(userRef, updateData);
 
     // Now update categoryStats
-    const userSnap2 = await getDoc(userRef);
+    const userSnap2 = await getDoc(userRef); // re-fetch to get latest
     if (userSnap2.exists()) {
       const data     = userSnap2.data();
       const catStats = data.categoryStats || {};
@@ -1410,10 +1422,12 @@ async function endRound() {
       const currentBest = catStats[catKey].bestScore || 0;
       const newBestVal  = roundScore > currentBest ? roundScore : currentBest;
 
+      // Determine if new best (before updating)
       if (roundScore > previousBest) {
         newBest = true;
       }
 
+      // Now update
       await updateDoc(userRef, {
         [`categoryStats.${catKey}.played`]:    increment(1),
         [`categoryStats.${catKey}.bestScore`]: newBestVal
@@ -1426,6 +1440,7 @@ async function endRound() {
     saveError = true;
   } finally {
     hideLoader();
+    // Show the round-end modal (pass newBest flag)
     showRoundEndModal(newBest);
   }
 }
@@ -1742,6 +1757,7 @@ function showRoundEndModal(newBest = false) {
     badge.textContent = '🏆 New Best Score!';
     badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);`;
     badgeContainer.appendChild(badge);
+    // Trigger fireworks after a short delay
     setTimeout(() => showFireworks(), 300);
   }
   inner.appendChild(badgeContainer);
