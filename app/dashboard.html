@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY – restructured for perfect alignment ---- -->
+            <!-- ---- LEVEL DISPLAY – shield badge removed, text & bar left aligned ---- -->
             <div class="level-display fade-in-up">
                 <div class="avatar-container">
                     <div class="user-avatar" id="userAvatarBtn">
@@ -92,15 +92,10 @@
                 </div>
 
                 <div class="level-container">
-                    <div class="level-top-row">
-                        <div class="shield-badge">
-                            <img id="levelBadge" src="/assets/trivia-star.png" alt="Level Badge" class="level-badge-img" 
-                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,5 90,25 90,65 50,95 10,65 10,25%22 fill=%22%231A1D2E%22 stroke=%22%23FFD700%22 stroke-width=%224%22/></svg>'">
-                        </div>
-                        <div class="level-text">
-                            <span class="level-label" id="levelLabel">Current Level</span>
-                            <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
-                        </div>
+                    <!-- shield‑badge removed entirely -->
+                    <div class="level-text">
+                        <span class="level-label" id="levelLabel">Current Level</span>
+                        <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
                     </div>
                     <div class="xp-progress">
                         <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
@@ -387,9 +382,9 @@
             <div class="section-header">
                 <h2 class="section-title"><i class="fas fa-trophy" style="color:#FFD700;"></i> Global Leaderboard</h2>
                 <select id="leaderboardFilter" class="filter-select">
-    <option value="weekly">This Week</option>
-    <option value="all" selected>All Time</option>
-</select>
+                    <option value="weekly">This Week</option>
+                    <option value="all" selected>All Time</option>
+                </select>
             </div>
             <div class="leaderboard-full" id="fullLeaderboard">
                 <div class="loading-skeleton">Loading leaderboard…</div>
