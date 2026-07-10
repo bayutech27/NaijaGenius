@@ -14,7 +14,7 @@ const bgMusic = new Audio('/assets/sound/background.mp3');
 bgMusic.loop = true;
 bgMusic.volume = 0.3;
 
-// Set default volume for SFX
+// Default SFX volume
 Object.values(sounds).forEach(audio => {
   audio.volume = 0.6;
 });
@@ -30,7 +30,7 @@ try {
   // ignore
 }
 
-// If sound is disabled at load time, ensure background music doesn't play
+// Ensure bg music is paused if sound disabled at load
 if (!soundEnabled) {
   bgMusic.pause();
   bgMusic.currentTime = 0;
@@ -52,7 +52,7 @@ export function isSoundEnabled() {
   return soundEnabled;
 }
 
-// Safely play any audio
+// Generic safe play
 function safePlay(audio, restart = false) {
   if (!soundEnabled) return;
   if (restart) {
@@ -88,7 +88,6 @@ export function playCommentSound() {
 // Background music controls
 export function playBackgroundMusic() {
   if (!soundEnabled) return;
-  // Only start if not already playing (to avoid overlapping loops)
   if (bgMusic.paused) {
     try {
       const promise = bgMusic.play();
@@ -104,4 +103,33 @@ export function playBackgroundMusic() {
 export function stopBackgroundMusic() {
   bgMusic.pause();
   bgMusic.currentTime = 0;
+}
+
+// ---------- Autoplay-safe initialisation ----------
+let bgMusicInitialized = false;
+let userHasInteracted = false;
+
+// Track any user interaction
+document.addEventListener('click', () => { userHasInteracted = true; }, { once: false });
+document.addEventListener('touchstart', () => { userHasInteracted = true; }, { once: false });
+
+export function enableBackgroundMusicOnInteraction() {
+  if (bgMusicInitialized) return;
+  bgMusicInitialized = true;
+
+  if (userHasInteracted) {
+    // Interaction already happened – play immediately
+    playBackgroundMusic();
+  } else {
+    // Wait for the first click / touch / key press
+    const startMusic = () => {
+      playBackgroundMusic();
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('touchstart', startMusic);
+      document.removeEventListener('keydown', startMusic);
+    };
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('touchstart', startMusic, { once: true });
+    document.addEventListener('keydown', startMusic, { once: true });
+  }
 }
