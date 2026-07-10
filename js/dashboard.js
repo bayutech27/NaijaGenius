@@ -22,9 +22,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/f
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
 import {
-  enableBackgroundMusicOnInteraction,
-  playBackgroundMusicImmediately,
-  isNativePlatform,
   setSoundEnabled,
   isSoundEnabled,
   setMasterVolume,
@@ -582,11 +579,11 @@ onAuthStateChanged(auth, async (user) => {
       avatarFileInput.click();
     });
 
-    // SETTINGS – Sound & Volume wiring
+    // SETTINGS – Sound & Volume wiring (background music removed)
     const volumeSlider = document.getElementById("volumeSlider");
     const volumeValue = document.getElementById("volumeValue");
     if (volumeSlider && volumeValue) {
-      // Apply initial volume (70 by default, but we set it from sound.js if available)
+      // Apply initial volume (70 by default)
       setMasterVolume(parseInt(volumeSlider.value, 10));
       volumeSlider.addEventListener("input", () => {
         const newVolume = parseInt(volumeSlider.value, 10);
@@ -627,16 +624,10 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
 
-    // LOAD LEADERBOARD + BACKGROUND MUSIC (platform‑aware)
+    // LOAD LEADERBOARD (background music removed)
     ensureRankDisplay();
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
-
-    if (isNativePlatform()) {
-      playBackgroundMusicImmediately();
-    } else {
-      enableBackgroundMusicOnInteraction();
-    }
 
     // SETUP ANNOUNCEMENT LISTENER
     setupAnnouncementListener();
