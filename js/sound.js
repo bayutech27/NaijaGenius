@@ -96,6 +96,19 @@ export function playBackgroundMusicImmediately() {
   }
 }
 
+
+export function setMasterVolume(level) {
+  const volume = Math.max(0, Math.min(1, level / 100));
+  // Apply to all SFX
+  Object.values(sounds).forEach(audio => {
+    audio.volume = volume;
+  });
+  // Apply to background music
+  bgMusic.volume = volume;
+}
+
+
+
 /** Web‑safe version: waits for first user gesture, then plays */
 let gestureHappened = false;
 let musicRequested  = false;
