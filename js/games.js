@@ -14,6 +14,7 @@ import {
   getEndOfRoundComment
 } from './comments.js';
 import { logGameStarted, logGameCompleted, logLifelineUsed } from './analytics.js';
+import { shareToWhatsApp, SHARE_BASE_URL } from './share.js';
 import {
   playCountdownSound,
   playCorrectSound,
@@ -1873,6 +1874,21 @@ function showRoundEndModal(newBest = false) {
   btnContainer.appendChild(dashBtn);
 
   inner.appendChild(btnContainer);
+
+  // WhatsApp share button (full width row)
+  const shareBtn = document.createElement('button');
+  shareBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Share My Score';
+  shareBtn.className = 'whatsapp-share-btn';
+  shareBtn.style.cssText = `width:100%; margin-top:0.7rem;`;
+  shareBtn.addEventListener('click', () => {
+    const message =
+      `🇳🇬 I just scored ${roundScore}/${maxPossible} on NaijaGenius (${formatCategoryName(category)})! 🔥\n` +
+      `Think you sabi Naija pass me? Prove it 👇\n` +
+      `${SHARE_BASE_URL}`;
+    shareToWhatsApp(message);
+  });
+  inner.appendChild(shareBtn);
+
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 }
