@@ -124,6 +124,12 @@
                 </div>
             </div>
 
+            <!-- WhatsApp share button for Home page -->
+            <button id="shareHomeBtn" class="whatsapp-share-btn whatsapp-share-card">
+                <i class="fab fa-whatsapp whatsapp-share-icon"></i>
+                <span>Challenge Friends on WhatsApp</span>
+            </button>
+
             <!-- ===== ANNOUNCEMENT CONTAINER ===== -->
             <div id="announcementContainer" style="display:none;"></div>
 
@@ -385,6 +391,9 @@
                     <option value="all" selected>All Time</option>
                 </select>
             </div>
+            <button id="shareLeaderboardBtn" class="whatsapp-share-btn whatsapp-share-btn-compact">
+                <i class="fab fa-whatsapp"></i> Challenge Friends
+            </button>
             <div class="leaderboard-full" id="fullLeaderboard">
                 <div class="loading-skeleton">Loading leaderboard…</div>
             </div>
@@ -427,14 +436,14 @@
                         <button id="saveNameBtn">Save</button>
                     </div>
                 </div>
-                <!-- Feedback (moved above logout) -->
+                <!-- Feedback -->
                 <div class="settings-item settings-feedback-item">
                     <label for="feedbackBtn">Feedback</label>
                     <div class="settings-control">
                         <button id="feedbackBtn" class="feedback-btn">Message Us</button>
                     </div>
                 </div>
-                <!-- Logout (now at the bottom) -->
+                <!-- Logout -->
                 <div class="settings-item settings-logout-item">
                     <label for="logoutBtn">Account</label>
                     <div class="settings-control">
