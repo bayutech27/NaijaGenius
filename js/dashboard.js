@@ -21,6 +21,7 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { renderShop, setupAdButton } from "./shop.js";
 import { logNavigation, logLevelUp } from "./analytics.js";
+import { shareToWhatsApp, SHARE_BASE_URL } from './share.js';
 import {
   setSoundEnabled,
   isSoundEnabled,
@@ -676,6 +677,8 @@ onAuthStateChanged(auth, async (user) => {
 
     // LOAD LEADERBOARD (background music removed)
     ensureRankDisplay();
+    setupLeaderboardShareButton();
+    setupHomeShareButton(getLevel(totalCorrect).name, best);
     currentFilter = leaderboardFilter ? leaderboardFilter.value : "all";
     loadLeaderboard(currentFilter, true);
 
@@ -945,5 +948,36 @@ if (sendFeedbackBtn) {
       sendFeedbackBtn.disabled = false;
       sendFeedbackBtn.innerHTML = 'Send <i class="fas fa-paper-plane"></i>';
     }
+  });
+}
+
+// ========== HOME PAGE WHATSAPP SHARE ==========
+function setupHomeShareButton(levelName, bestScore) {
+  const btn = document.getElementById('shareHomeBtn');
+  if (!btn) return;
+  const freshBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(freshBtn, btn);
+  freshBtn.addEventListener('click', () => {
+    const message =
+      `🇳🇬 I'm a ${levelName} on NaijaGenius with a best score of ${bestScore}! 🏆\n` +
+      `You dey rate your Naija knowledge? Come prove am 💪\n` +
+      `${SHARE_BASE_URL}`;
+    const waWindow = shareToWhatsApp(message);
+    if (!waWindow) alert("Share via WhatsApp:\n\n" + message);
+  });
+}
+
+// ========== LEADERBOARD WHATSAPP SHARE ==========
+function setupLeaderboardShareButton() {
+  const btn = document.getElementById('shareLeaderboardBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const rankData = await computeUserRank(currentUserUid, currentFilter);
+    const periodLabel = currentFilter === 'weekly' ? 'this week' : 'of all time';
+    const rankText = rankData?.rank
+      ? `🏆 I'm ranked #${rankData.rank} on NaijaGenius ${periodLabel}!\nNaija trivia champion or not, we go soon see 😏\n${SHARE_BASE_URL}`
+      : `🇳🇬 I'm playing NaijaGenius — come test your Naija knowledge against me!\n${SHARE_BASE_URL}`;
+    const waWindow = shareToWhatsApp(rankText);
+    if (!waWindow) alert("Share via WhatsApp:\n\n" + rankText);
   });
 }
