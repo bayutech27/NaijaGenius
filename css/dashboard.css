@@ -358,7 +358,7 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – no shield, left aligned text + progress bar
+   LEVEL DISPLAY – perfectly aligned, spacious layout
    ============================================================ */
 .level-display {
     display: flex;
@@ -426,7 +426,7 @@ body {
     justify-content: center;
 }
 
-/* Level container (right) – left aligned with even spacing, no shield */
+/* Level container (right) – left‑aligned with even spacing */
 .level-container {
     flex: 1;
     display: flex;
@@ -438,11 +438,31 @@ body {
     gap: 0.5rem;                  /* consistent vertical rhythm */
 }
 
-.level-text {
+.level-top-row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.2rem;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+/* ---- SHIELD BADGE – image fills entire shield ---- */
+.shield-badge {
+    flex-shrink: 0;
+    width: 85px;
+    height: 95px;
+    background: transparent;      /* no background, just the border and image */
+    clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2.5px solid #FFD700;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 18px rgba(255,215,0,0.3);
+}
+.shield-badge .level-badge-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;             /* fills the entire shield shape */
+    display: block;
 }
 
 .level-label {
@@ -463,11 +483,11 @@ body {
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
-    margin: 0;
+    margin: 0;                     /* perfectly aligned left, no forced shift */
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- PROGRESS BAR – left aligned with breathing room ----- */
+/* ----- PROGRESS BAR – left-aligned with breathing room ----- */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -479,6 +499,7 @@ body {
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     margin-top: 0.5rem;
+    margin-right: 0;
     overflow: hidden;
 }
 
@@ -1025,6 +1046,76 @@ body {
     font-size: 0.55rem;
     color: rgba(255,255,255,0.85);
     margin-top: 0.2rem;
+}
+
+/* ===== WHATSAPP SHARE BUTTONS ===== */
+.whatsapp-share-btn {
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.92), rgba(20, 16, 42, 0.96));
+    border: none;
+    border-radius: 40px;
+    padding: 0.75rem 1.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow:
+        inset 0 4px 12px rgba(0, 0, 0, 0.4),
+        0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.whatsapp-share-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 40px;
+    padding: 2px;
+    background: linear-gradient(150deg, #25D366 0%, #7C4FE0 55%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.85;
+}
+.whatsapp-share-btn:hover {
+    transform: scale(1.03);
+    box-shadow:
+        inset 0 4px 12px rgba(0, 0, 0, 0.4),
+        0 6px 18px rgba(37, 211, 102, 0.25);
+}
+.whatsapp-share-btn i.fa-whatsapp {
+    color: #25D366;
+    font-size: 1.15rem;
+    animation: whatsappPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes whatsappPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(37, 211, 102, 0)); }
+    50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.6)); }
+}
+
+.whatsapp-share-btn-compact {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+}
+
+.whatsapp-share-card {
+    width: 100%;
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+.whatsapp-share-icon {
+    font-size: 1.5rem;
 }
 
 /* ----- MY STATS SECTION ----- */
@@ -1918,7 +2009,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- MOBILE ADJUSTMENTS – no shield references ----- */
+/* ----- MOBILE ADJUSTMENTS (level container updated) ----- */
 @media (max-width: 600px) {
     .main-content {
         padding-top: 72px;
@@ -1971,7 +2062,10 @@ body {
         font-size: 0.55rem;
         aspect-ratio: 1 / 1;
     }
-    /* shield-badge removed completely – no style needed */
+    .shield-badge {
+        width: 60px;
+        height: 68px;
+    }
     .level-label {
         font-size: 0.7rem;
         padding: 0.1rem 0.5rem;
@@ -2215,6 +2309,10 @@ body {
         height: 16px;
         font-size: 0.45rem;
         aspect-ratio: 1 / 1;
+    }
+    .shield-badge {
+        width: 48px;
+        height: 54px;
     }
     .level-label {
         font-size: 0.6rem;
