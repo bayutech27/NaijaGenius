@@ -694,7 +694,7 @@ function timerTick() {
   }
 
   if (timeLeft <= 0) {
-    stopCountdownSound(); // stop any lingering countdown beep
+    stopCountdownSound();
     playWrongSound();
     clearInterval(timerInterval);
     questionAnswered  = true;
@@ -736,7 +736,6 @@ function applyCorrectStyle(btn) {
   btn.style.background  = '#3ED6B7';
   btn.style.color       = '#ffffff';
   btn.style.borderColor = '#3ED6B7';
-  // Do NOT add 'correct' class to avoid the green check icon (CSS)
   btn.classList.remove('wrong');
 }
 
@@ -953,7 +952,6 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
-    // Stop the countdown sound immediately when user clicks
     stopCountdownSound();
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
@@ -1437,8 +1435,8 @@ async function endRound() {
 }
 
 // ========== COMMENT MODAL ==========
-let commentModalTimeout = null;   // for delayed comment modal
-let commentSoundTimeout = null;   // for delayed comment sound
+let commentModalTimeout = null;
+let commentSoundTimeout = null;
 
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
@@ -1455,21 +1453,17 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
-  // Clear any existing delayed modals and sounds
   if (commentSoundTimeout) clearTimeout(commentSoundTimeout);
   if (commentModalTimeout) clearTimeout(commentModalTimeout);
 
-  // Remove any currently visible comment modal
   const existingModal = document.getElementById('commentModal');
   if (existingModal) existingModal.remove();
 
-  // Delay the comment sound by 2 seconds
   commentSoundTimeout = setTimeout(() => {
     playCommentSound();
     commentSoundTimeout = null;
   }, 2000);
 
-  // Delay the modal appearance by 2 seconds so it syncs with the sound
   commentModalTimeout = setTimeout(() => {
     ensureCommentModalAnimStyle();
 
@@ -1875,7 +1869,61 @@ function showRoundEndModal(newBest = false) {
 
   inner.appendChild(btnContainer);
 
-  // WhatsApp share button (full width row)
+  // ---------- WHATSAPP SHARE BUTTON (injected CSS) ----------
+  if (!document.getElementById('whatsapp-share-styles')) {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'whatsapp-share-styles';
+    styleEl.textContent = `
+      .whatsapp-share-btn {
+          background: linear-gradient(160deg, rgba(48, 38, 84, 0.92), rgba(20, 16, 42, 0.96));
+          border: none;
+          border-radius: 40px;
+          padding: 0.75rem 1.4rem;
+          font-family: 'Poppins', sans-serif;
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: #FFFFFF;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.6rem;
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.3);
+      }
+      .whatsapp-share-btn::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 40px;
+          padding: 2px;
+          background: linear-gradient(150deg, #25D366 0%, #7C4FE0 55%, #3E63E8 100%);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+          opacity: 0.85;
+      }
+      .whatsapp-share-btn:hover {
+          transform: scale(1.03);
+          box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), 0 6px 18px rgba(37, 211, 102, 0.25);
+      }
+      .whatsapp-share-btn i.fa-whatsapp {
+          color: #25D366;
+          font-size: 1.15rem;
+          animation: whatsappPulse 2.4s ease-in-out infinite;
+      }
+      @keyframes whatsappPulse {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(37, 211, 102, 0)); }
+          50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.6)); }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
   const shareBtn = document.createElement('button');
   shareBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Share My Score';
   shareBtn.className = 'whatsapp-share-btn';
@@ -1885,7 +1933,8 @@ function showRoundEndModal(newBest = false) {
       `🇳🇬 I just scored ${roundScore}/${maxPossible} on NaijaGenius (${formatCategoryName(category)})! 🔥\n` +
       `Think you sabi Naija pass me? Prove it 👇\n` +
       `${SHARE_BASE_URL}`;
-    shareToWhatsApp(message);
+    const waWindow = shareToWhatsApp(message);
+    if (!waWindow) alert("Share via WhatsApp:\n\n" + message);
   });
   inner.appendChild(shareBtn);
 
