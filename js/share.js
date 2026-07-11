@@ -1,7 +1,7 @@
 // ========== share.js — Central WhatsApp Share Utility ==========
 import { isNativePlatform } from './sound.js';
 
-export const SHARE_BASE_URL = 'https://naijagenius.vercel.app?v=2';
+export const SHARE_BASE_URL = 'https://naijagenius.vercel.app';
 
 export function shareToWhatsApp(message) {
   const encoded = encodeURIComponent(message);
