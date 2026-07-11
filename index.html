@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Play Store redirect (once app is approved, flip PLAY_STORE_LIVE to true) -->
+    <script>
+      const PLAY_STORE_LIVE = false; // ⚠️ SWITCH TO true THE DAY YOUR APP IS APPROVED
+      const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME'; // ⚠️ UPDATE with your real package name
+      if (PLAY_STORE_LIVE && /Android/i.test(navigator.userAgent)) {
+        window.location.href = PLAY_STORE_URL;
+      }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>NaijaGenius • Login</title>
+
+    <!-- Open Graph tags (WhatsApp/Facebook link preview) -->
+    <meta property="og:title" content="NaijaGenius — Test Your Naija Knowledge" />
+    <meta property="og:description" content="Afrobeats, Nollywood, Naija slang, football and more. Think you sabi Naija well well? Prove it." />
+    <meta property="og:image" content="https://naijagenius.vercel.app/assets/og-thumbnail.jpg" />
+    <meta property="og:url" content="https://naijagenius.vercel.app" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/css/auth.css">
