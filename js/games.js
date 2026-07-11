@@ -20,10 +20,7 @@ import {
   playCorrectSound,
   playWrongSound,
   playCommentSound,
-  stopCountdownSound,
-  enableBackgroundMusicOnInteraction,
-  playBackgroundMusicImmediately,
-  isNativePlatform
+  stopCountdownSound
 } from './sound.js';
 
 console.log('🎮 games.js loaded');
@@ -446,11 +443,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     logGameStarted(questionType, category);
 
     showCountdown(() => {
-      if (isNativePlatform()) {
-        playBackgroundMusicImmediately();
-      } else {
-        enableBackgroundMusicOnInteraction();
-      }
       loadQuestion(0);
     });
 
@@ -512,11 +504,6 @@ async function loadMixedQuestions() {
   logGameStarted('mixed', 'mixed');
 
   showCountdown(() => {
-    if (isNativePlatform()) {
-      playBackgroundMusicImmediately();
-    } else {
-      enableBackgroundMusicOnInteraction();
-    }
     loadQuestion(0);
   });
 }
@@ -694,7 +681,7 @@ function timerTick() {
   }
 
   if (timeLeft <= 0) {
-    stopCountdownSound();
+    stopCountdownSound(); // stop any lingering countdown beep
     playWrongSound();
     clearInterval(timerInterval);
     questionAnswered  = true;
@@ -736,6 +723,7 @@ function applyCorrectStyle(btn) {
   btn.style.background  = '#3ED6B7';
   btn.style.color       = '#ffffff';
   btn.style.borderColor = '#3ED6B7';
+  // Do NOT add 'correct' class to avoid the green check icon (CSS)
   btn.classList.remove('wrong');
 }
 
@@ -952,6 +940,7 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
+    // Stop the countdown sound immediately when user clicks
     stopCountdownSound();
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
@@ -1435,8 +1424,8 @@ async function endRound() {
 }
 
 // ========== COMMENT MODAL ==========
-let commentModalTimeout = null;
-let commentSoundTimeout = null;
+let commentModalTimeout = null;   // for delayed comment modal
+let commentSoundTimeout = null;   // for delayed comment sound
 
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
@@ -1453,17 +1442,21 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
+  // Clear any existing delayed modals and sounds
   if (commentSoundTimeout) clearTimeout(commentSoundTimeout);
   if (commentModalTimeout) clearTimeout(commentModalTimeout);
 
+  // Remove any currently visible comment modal
   const existingModal = document.getElementById('commentModal');
   if (existingModal) existingModal.remove();
 
+  // Delay the comment sound by 2 seconds
   commentSoundTimeout = setTimeout(() => {
     playCommentSound();
     commentSoundTimeout = null;
   }, 2000);
 
+  // Delay the modal appearance by 2 seconds so it syncs with the sound
   commentModalTimeout = setTimeout(() => {
     ensureCommentModalAnimStyle();
 
