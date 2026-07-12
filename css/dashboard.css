@@ -27,10 +27,11 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Lighter background for more vivid containers */
     background:
-        radial-gradient(circle at 6% 0%, rgba(120, 160, 255, 0.16), transparent 32%),
-        radial-gradient(circle at 94% 0%, rgba(255, 150, 200, 0.12), transparent 32%),
-        linear-gradient(180deg, #120B2E 0%, #1A1030 22%, #2A1035 50%, #3D1420 78%, #4A1A18 100%);
+        radial-gradient(circle at 6% 0%, rgba(120, 160, 255, 0.18), transparent 32%),
+        radial-gradient(circle at 94% 0%, rgba(255, 150, 200, 0.14), transparent 32%),
+        linear-gradient(180deg, #1E1A3A 0%, #2A2040 22%, #3A2545 50%, #4D2A30 78%, #5A2A28 100%);
     background-attachment: fixed;
 }
 
@@ -358,7 +359,7 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – perfectly aligned, spacious layout
+   LEVEL DISPLAY – perfectly aligned single column
    ============================================================ */
 .level-display {
     display: flex;
@@ -426,43 +427,23 @@ body {
     justify-content: center;
 }
 
-/* Level container (right) – left‑aligned with even spacing */
+/* Level container (right) – single column, evenly spaced */
 .level-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;      /* all children aligned left */
+    align-items: flex-start;
     justify-content: center;
     min-width: 0;
     text-align: left;
-    gap: 0.5rem;                  /* consistent vertical rhythm */
+    gap: 0.6rem;                  /* consistent vertical rhythm */
 }
 
-.level-top-row {
+.level-text {
     display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 0.2rem;
-}
-
-/* ---- SHIELD BADGE – image fills entire shield ---- */
-.shield-badge {
-    flex-shrink: 0;
-    width: 85px;
-    height: 95px;
-    background: transparent;      /* no background, just the border and image */
-    clip-path: polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2.5px solid #FFD700;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 0 18px rgba(255,215,0,0.3);
-}
-.shield-badge .level-badge-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;             /* fills the entire shield shape */
-    display: block;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;                  /* small gap between label and name */
 }
 
 .level-label {
@@ -483,11 +464,11 @@ body {
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.2;
-    margin: 0;                     /* perfectly aligned left, no forced shift */
+    margin: 0;
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- PROGRESS BAR – left-aligned with breathing room ----- */
+/* ----- PROGRESS BAR – left aligned with breathing room ----- */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -498,8 +479,7 @@ body {
     border-radius: 20px;
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-    margin-top: 0.5rem;
-    margin-right: 0;
+    margin-top: 0.3rem;           /* spacing above bar */
     overflow: hidden;
 }
 
