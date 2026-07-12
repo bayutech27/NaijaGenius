@@ -27,7 +27,6 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Lighter background to keep containers vivid */
     background:
         radial-gradient(circle at 6% 0%, rgba(120, 160, 255, 0.18), transparent 32%),
         radial-gradient(circle at 94% 0%, rgba(255, 150, 200, 0.14), transparent 32%),
@@ -451,6 +450,30 @@ body {
     display: none;
     align-items: center;
     justify-content: center;
+}
+
+/* Camera icon on avatar circle */
+.avatar-camera-icon {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: rgba(0,0,0,0.55);
+    color: #FFFFFF;
+    border-radius: 50%;
+    padding: 0.35rem;
+    font-size: 0.85rem;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.avatar-camera-icon:hover {
+    background: rgba(0,0,0,0.75);
+    transform: scale(1.1);
 }
 
 .level-container {
@@ -2026,6 +2049,12 @@ body {
         height: 90px;
         font-size: 1.2rem;
     }
+    .avatar-camera-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 0.7rem;
+        padding: 0.25rem;
+    }
     .avatar-edit-btn {
         width: 20px;
         height: 20px;
@@ -2273,6 +2302,12 @@ body {
         width: 72px;
         height: 72px;
         font-size: 1rem;
+    }
+    .avatar-camera-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+        padding: 0.2rem;
     }
     .avatar-edit-btn {
         width: 16px;
