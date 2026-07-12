@@ -1,5 +1,5 @@
 /* =================================================
-   NAIJAGENIUS DASHBOARD – themed to match games.html/css
+   NAIJAGENIUS DASHBOARD – styled to match games.html/css
    ============================================================ */
 
 /* ----- RESET & BASE ----- */
@@ -27,7 +27,7 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Lighter background for more vivid containers */
+    /* Lighter background to keep containers vivid */
     background:
         radial-gradient(circle at 6% 0%, rgba(120, 160, 255, 0.18), transparent 32%),
         radial-gradient(circle at 94% 0%, rgba(255, 150, 200, 0.14), transparent 32%),
@@ -65,7 +65,55 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-/* Shared "platter" inset treatment */
+/* ============================================================
+   UNIVERSAL CARD STYLE – exactly like game result/comment modals
+   ============================================================ */
+.level-display,
+.stats-row,
+.challenges-3d-container,
+.stat-detail,
+.shop-item,
+.leaderboard-item,
+.lane-card,
+.settings-item,
+.ad-life-container,
+.mode-btn {
+    background: linear-gradient(160deg, rgba(48, 38, 84, 0.92), rgba(20, 16, 42, 0.96));
+    backdrop-filter: blur(14px);
+    border: none;
+    position: relative;
+    box-shadow:
+        inset 0 4px 12px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Border ring for ALL cards – purple‑gold gradient, identical to game modals */
+.level-display::before,
+.stats-row::before,
+.challenges-3d-container::before,
+.stat-detail::before,
+.shop-item::before,
+.leaderboard-item::before,
+.lane-card::before,
+.settings-item::before,
+.ad-life-container::before,
+.mode-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.85;
+    z-index: 0;
+}
+
+/* Remove previous border overrides (the shared “platter” box-shadow is now part of the base style) */
 .level-display,
 .stats-row,
 .mode-btn,
@@ -223,7 +271,6 @@ body {
 }
 .page-section.active-section { display: block; }
 
-/* ----- Push down non‑home sections by 3rem ----- */
 #playSection.active-section,
 #shopSection.active-section,
 #leaderboardSection.active-section,
@@ -231,7 +278,6 @@ body {
     margin-top: 3rem;
 }
 
-/* ----- Push down "Pick Your Lane" section by 3rem ----- */
 #laneSection .lane-top-row {
     margin-top: 3rem;
 }
@@ -246,8 +292,7 @@ body {
 }
 
 /* ============================================================
-   HOME PAGE – all heights reduced by 30%
-   then mode cards increased by 25%
+   HOME PAGE
    ============================================================ */
 
 /* ----- GREETING ----- */
@@ -359,38 +404,19 @@ body {
 }
 
 /* ============================================================
-   LEVEL DISPLAY – perfectly aligned single column
+   LEVEL DISPLAY – single column layout
    ============================================================ */
 .level-display {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 3rem;                   /* generous space between avatar and level info */
+    gap: 3rem;
     margin-bottom: 2.058rem;
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    backdrop-filter: blur(8px);
     border-radius: 21.56px;
     padding: 1.2rem 1.5rem;
-    border: none;
-    position: relative;
     min-height: 120px;
 }
-.level-display::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 21.56px;
-    padding: 2px;
-    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.7;
-}
 
-/* Avatar container (left) */
 .avatar-container {
     display: flex;
     flex-direction: column;
@@ -427,7 +453,6 @@ body {
     justify-content: center;
 }
 
-/* Level container (right) – single column, evenly spaced */
 .level-container {
     flex: 1;
     display: flex;
@@ -436,14 +461,14 @@ body {
     justify-content: center;
     min-width: 0;
     text-align: left;
-    gap: 0.6rem;                  /* consistent vertical rhythm */
+    gap: 0.6rem;
 }
 
 .level-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.3rem;                  /* small gap between label and name */
+    gap: 0.3rem;
 }
 
 .level-label {
@@ -468,7 +493,6 @@ body {
 }
 .level-star { font-size: 0.9rem; }
 
-/* ----- PROGRESS BAR – left aligned with breathing room ----- */
 .xp-progress {
     display: flex;
     align-items: center;
@@ -479,7 +503,7 @@ body {
     border-radius: 20px;
     height: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-    margin-top: 0.3rem;           /* spacing above bar */
+    margin-top: 0.3rem;
     overflow: hidden;
 }
 
@@ -508,7 +532,6 @@ body {
 .stats-row {
     display: flex;
     align-items: stretch;
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border-radius: 17.64px;
     padding: 0.784rem 1.372rem;
     margin-bottom: 1.666rem;
@@ -571,36 +594,15 @@ body {
 
 /* ===== TIPS FOR EARNING COINS ===== */
 .challenges-3d-container {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    backdrop-filter: blur(8px);
     border-radius: 21.56px;
     padding: 0.8rem 1rem 0.5rem;
-    border: none;
-    position: relative;
     margin-bottom: 2rem;
-    box-shadow:
-        inset 0 4px 12px rgba(0, 0, 0, 0.4),
-        0 2px 8px rgba(0, 0, 0, 0.25);
     perspective: 900px;
     transform: rotateX(0.5deg) rotateY(0.5deg);
     transition: transform 0.25s ease;
 }
 .challenges-3d-container:hover {
     transform: rotateX(0) rotateY(0) scale(1.01);
-}
-.challenges-3d-container::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 21.56px;
-    padding: 2px;
-    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.7;
 }
 
 .challenges-title {
@@ -708,7 +710,7 @@ body {
     color: #3E7BFF;
 }
 
-/* ----- CHOOSE A MODE (redesigned) ----- */
+/* ----- CHOOSE A MODE (already uses .mode-btn with universal card style) ----- */
 .mode-section {
     margin-top: 0;
 }
@@ -746,7 +748,6 @@ body {
 }
 
 .mode-btn {
-    border: none;
     border-radius: 19.6px;
     padding: 1.0976rem 0.4116rem;
     display: flex;
@@ -760,9 +761,7 @@ body {
     text-decoration: none;
     color: #FFFFFF;
     min-height: 274.4px;
-    position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .mode-btn::after {
@@ -933,8 +932,6 @@ body {
     margin-top: 1rem;
 }
 .shop-item {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border: 1px solid rgba(255, 215, 0, 0.15);
     border-radius: 16px;
     padding: 0.7rem 0.4rem;
     text-align: center;
@@ -988,6 +985,7 @@ body {
 .shop-buy-btn:not(:disabled):hover {
     transform: scale(1.03);
 }
+
 .ad-life-container {
     margin-top: 1.8rem;
     text-align: center;
@@ -1114,8 +1112,6 @@ body {
     margin-top: 0.8rem;
 }
 .stat-detail {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 0.8rem 0.6rem;
     text-align: center;
@@ -1163,8 +1159,6 @@ body {
     width: 100%;
 }
 .leaderboard-item {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 0.8rem 1rem;
     display: flex;
@@ -1255,8 +1249,6 @@ body {
     gap: 0.8rem;
 }
 .lane-card {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
-    border: 1px solid rgba(255, 215, 0, 0.15);
     border-radius: 16px;
     padding: 1rem 0.6rem;
     display: flex;
@@ -1323,7 +1315,7 @@ body {
 }
 
 /* ============================================================
-   SETTINGS SECTION – overflow fixes for mobile (320px–768px)
+   SETTINGS SECTION
    ============================================================ */
 .settings-container {
     display: flex;
@@ -1335,10 +1327,8 @@ body {
 }
 
 .settings-item {
-    background: linear-gradient(160deg, rgba(48, 38, 84, 0.85), rgba(20, 16, 42, 0.92));
     border-radius: 16px;
     padding: 0.7rem 0.8rem;
-    border: 1px solid rgba(255, 215, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: space-between;
