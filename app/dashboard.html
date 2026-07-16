@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A0A0F" />
+    <meta name="theme-color" content="#0A0A14" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>NaijaGenius • Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇬</text></svg>" />
 
-    <!-- Preconnect hints for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
 </head>
@@ -23,23 +22,32 @@
     <!-- ===== HEADER ===== -->
     <header class="app-header">
         <div class="header-container">
+            <!-- Compact brand badge -->
+            <div class="header-brand">
+                <span class="brand-flag">🇳🇬</span>
+                <span class="brand-text">Naija<span class="brand-accent">Genius</span></span>
+            </div>
+
             <div class="header-actions">
                 <div class="stat-badge-group">
                     <span class="stat-badge" id="headerCoins">
-                        <i class="fas fa-coins" style="color:#FFD700;"></i>
+                        <i class="fas fa-coins stat-badge-icon coins-icon"></i>
                         <span class="stat-label-text">Coins</span>
-                        <span id="headerCoinsValue">Loading...</span>
+                        <span id="headerCoinsValue" class="stat-value-text">
+                            <span class="shimmer-bar shimmer-bar--sm"></span>
+                        </span>
                         <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
                     </span>
-                    <span class="header-divider"></span>
                     <span class="stat-badge" id="headerLives">
-                        <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+                        <i class="fas fa-heart stat-badge-icon lives-icon"></i>
                         <span class="stat-label-text">Lives</span>
-                        <span id="headerLivesValue">Loading...</span>
+                        <span id="headerLivesValue" class="stat-value-text">
+                            <span class="shimmer-bar shimmer-bar--sm"></span>
+                        </span>
                         <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
                     </span>
                 </div>
-                <button class="icon-btn settings-btn" id="settingsBtn">
+                <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Settings">
                     <i class="fas fa-cog"></i>
                 </button>
             </div>
@@ -50,92 +58,76 @@
     <main class="main-content" id="mainContent">
 
         <!-- ============================================================
+        FULL‑VIEWPORT SKELETAL LOADER
+        ============================================================ -->
+        <div id="skeletonHome" class="skeleton-home" style="display: none;">
+            <div class="skeleton-greeting">
+                <div class="skeleton-block" style="width: 55%; height: 1.3rem; margin-bottom: 0.5rem;"></div>
+                <div class="skeleton-block" style="width: 35%; height: 1rem;"></div>
+            </div>
+            <div class="skeleton-level">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-level-text">
+                    <div class="skeleton-block" style="width: 80px; height: 0.7rem;"></div>
+                    <div class="skeleton-block" style="width: 120px; height: 1.4rem; margin-top: 0.4rem;"></div>
+                    <div class="skeleton-block" style="width: 100%; height: 8px; margin-top: 0.6rem;"></div>
+                </div>
+            </div>
+            <div class="skeleton-modes">
+                <div class="skeleton-mode"></div>
+                <div class="skeleton-mode"></div>
+                <div class="skeleton-mode"></div>
+            </div>
+            <div class="skeleton-stats">
+                <div class="skeleton-stat"></div>
+                <div class="skeleton-stat"></div>
+            </div>
+            <div class="skeleton-challenges">
+                <div class="skeleton-block" style="width: 40%; height: 1rem; margin-bottom: 0.8rem;"></div>
+                <div class="skeleton-block" style="width: 100%; height: 2.4rem; margin-bottom: 0.3rem;"></div>
+                <div class="skeleton-block" style="width: 100%; height: 2.4rem; margin-bottom: 0.3rem;"></div>
+                <div class="skeleton-block" style="width: 100%; height: 2.4rem; margin-bottom: 0.3rem;"></div>
+                <div class="skeleton-block" style="width: 100%; height: 2.4rem;"></div>
+            </div>
+            <div class="skeleton-block" style="width: 100%; height: 56px; margin-top: 1.5rem;"></div>
+        </div>
+
+        <!-- ============================================================
         HOME SECTION
         ============================================================ -->
         <section id="homeSection" class="page-section active-section">
 
-            <!-- SKELETAL LOADER FOR HOME -->
-            <div id="skeletonHome" class="skeleton-home" style="display: none;">
-                <!-- Greeting skeleton -->
-                <div class="skeleton-greeting">
-                    <div class="skeleton-block" style="width: 60%; height: 1.2rem; margin-bottom: 0.5rem;"></div>
-                    <div class="skeleton-block" style="width: 40%; height: 1rem;"></div>
-                </div>
-                <!-- Level display skeleton -->
-                <div class="skeleton-level">
-                    <div class="skeleton-avatar"></div>
-                    <div class="skeleton-level-text">
-                        <div class="skeleton-block" style="width: 80px; height: 0.7rem;"></div>
-                        <div class="skeleton-block" style="width: 120px; height: 1.4rem; margin-top: 0.3rem;"></div>
-                        <div class="skeleton-block" style="width: 100%; height: 8px; margin-top: 0.5rem;"></div>
-                    </div>
-                </div>
-                <!-- Stats row skeleton -->
-                <div class="skeleton-stats">
-                    <div class="skeleton-stat"></div>
-                    <div class="skeleton-stat"></div>
-                </div>
-                <!-- Challenges skeleton (tips) -->
-                <div class="skeleton-challenges">
-                    <div class="skeleton-block" style="width: 50%; height: 1rem; margin-bottom: 0.8rem;"></div>
-                    <div class="skeleton-block" style="width: 100%; height: 2.5rem; margin-bottom: 0.4rem;"></div>
-                    <div class="skeleton-block" style="width: 100%; height: 2.5rem; margin-bottom: 0.4rem;"></div>
-                    <div class="skeleton-block" style="width: 100%; height: 2.5rem; margin-bottom: 0.4rem;"></div>
-                    <div class="skeleton-block" style="width: 100%; height: 2.5rem;"></div>
-                </div>
-                <!-- Mode buttons skeleton -->
-                <div class="skeleton-modes">
-                    <div class="skeleton-mode"></div>
-                    <div class="skeleton-mode"></div>
-                    <div class="skeleton-mode"></div>
-                </div>
-                <!-- Ad container skeleton -->
-                <div class="skeleton-block" style="width: 100%; height: 60px; margin-top: 1.5rem;"></div>
-            </div>
-
-            <!-- ---- GREETING ---- -->
-            <div class="greeting-wrapper fade-in-up">
+            <!-- ---- COMPACT GREETING + LEVEL STRIP ---- -->
+            <div class="greeting-strip fade-in-up">
                 <div class="greeting-copy">
-                    <p class="greeting-text" id="greetingText"> <span id="greetingName"></span></p>
+                    <p class="greeting-text" id="greetingText"><span id="greetingName"></span></p>
                     <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
                 </div>
                 <div class="hero-logo-wrap" id="heroLogoWrap">
                     <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius" loading="lazy"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div class="hero-logo-fallback">
-                        <span class="hero-flag" aria-hidden="true">🇳🇬</span>
-                        <span class="hero-bulb" aria-hidden="true">💡</span>
-                        <span class="hero-logo-text sparkle-text">
-                            <span class="naija-white">Naija</span><br /><em class="genius-mint">Genius</em>
-                            <span class="sparkle-container" aria-hidden="true">
-                                <span class="sparkle sparkle-1">✨</span>
-                                <span class="sparkle sparkle-2">🎆</span>
-                                <span class="sparkle sparkle-3">✨</span>
-                                <span class="sparkle sparkle-4">🎇</span>
-                                <span class="sparkle sparkle-5">✨</span>
-                            </span>
-                        </span>
+                        <span class="hero-flag">🇳🇬</span>
+                        <span class="hero-bulb">💡</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ---- LEVEL DISPLAY – shield badge removed, text & bar left aligned ---- -->
+            <!-- ---- LEVEL & AVATAR ---- -->
             <div class="level-display fade-in-up">
                 <div class="avatar-container">
                     <div class="user-avatar" id="userAvatarBtn">
                         <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar" loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                         <span id="userInitials" class="avatar-fallback"></span>
-                        <!-- Camera icon to indicate photo upload -->
                         <i class="fas fa-camera avatar-camera-icon"></i>
                     </div>
                     <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
                 </div>
-
                 <div class="level-container">
                     <div class="level-text">
                         <span class="level-label" id="levelLabel">Current Level</span>
-                        <span class="level-name" id="levelName">Loading...<span class="level-star" aria-hidden="true"></span></span>
+                        <span class="level-name" id="levelName">Loading...</span>
                     </div>
                     <div class="xp-progress">
                         <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
@@ -144,121 +136,91 @@
                 </div>
             </div>
 
+            <!-- ===== CHOOSE A MODE — PRIMARY ACTION, MOVED TO TOP ===== -->
+            <div class="mode-section">
+                <h2 class="section-title mode-title">
+                    <span class="title-line"></span>
+                    <i class="fas fa-play-circle"></i>
+                    <span class="mode-title-text">Choose a Mode</span>
+                    <span class="title-line"></span>
+                </h2>
+                <div class="mode-grid">
+                    <button class="mode-card mode-card--red" id="jollofMixBtn">
+                        <div class="mode-card-icon">🔥</div>
+                        <div class="mode-card-info">
+                            <span class="mode-card-name">Jollof Mix</span>
+                            <span class="mode-card-sub">10 Mixed Questions</span>
+                        </div>
+                    </button>
+                    <button class="mode-card mode-card--blue" id="chooseLaneBtn">
+                        <div class="mode-card-icon">🛣️</div>
+                        <div class="mode-card-info">
+                            <span class="mode-card-name">Pick Your Lane</span>
+                            <span class="mode-card-sub">10 Categories</span>
+                        </div>
+                    </button>
+                    <button class="mode-card mode-card--green" id="oneChanceBtn">
+                        <div class="mode-card-icon">⚡</div>
+                        <div class="mode-card-info">
+                            <span class="mode-card-name">One Chance</span>
+                            <span class="mode-card-sub">One miss, game over</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
             <!-- ---- STATS ROW ---- -->
             <div class="stats-row">
-                <div class="stat-card fade-in-up" style="animation-delay: 0.05s">
-                    <i class="fas fa-arrow-trend-up stat-icon"></i>
+                <div class="stat-card fade-in-up">
+                    <i class="fas fa-check-circle stat-card-icon stat-card-icon--blue"></i>
                     <div class="stat-info">
-                        <span class="stat-label" id="correctAnswersLabel">Answers</span>
-                        <span class="stat-value" id="correctAnswers">Loading...</span>
-                        <span class="stat-caption">Total Correct</span>
+                        <span class="stat-label">Total Correct</span>
+                        <span class="stat-value" id="correctAnswers">---</span>
                     </div>
                 </div>
-                <div class="stats-divider" aria-hidden="true"></div>
-                <div class="stat-card fade-in-up" style="animation-delay: 0.15s">
-                    <i class="fas fa-trophy stat-icon"></i>
+                <div class="stat-card fade-in-up" style="animation-delay: 0.1s">
+                    <i class="fas fa-trophy stat-card-icon stat-card-icon--gold"></i>
                     <div class="stat-info">
-                        <span class="stat-label" id="bestScoreLabel">Best Score</span>
-                        <span class="stat-value" id="bestScoreValue">Loading...</span>
-                        <span class="stat-caption">Your Highest</span>
+                        <span class="stat-label">Best Score</span>
+                        <span class="stat-value" id="bestScoreValue">---</span>
                     </div>
                 </div>
             </div>
 
-            <!-- WhatsApp share button for Home page -->
-            <button id="shareHomeBtn" class="whatsapp-share-btn whatsapp-share-card">
-                <i class="fab fa-whatsapp whatsapp-share-icon"></i>
+            <!-- WhatsApp share -->
+            <button id="shareHomeBtn" class="whatsapp-share-btn">
+                <i class="fab fa-whatsapp"></i>
                 <span>Challenge Friends</span>
             </button>
 
-            <!-- ===== ANNOUNCEMENT CONTAINER ===== -->
+            <!-- Announcement -->
             <div id="announcementContainer" style="display:none;"></div>
 
             <!-- ===== TIPS FOR EARNING COINS ===== -->
-            <div class="challenges-3d-container">
-                <h3 class="challenges-title"><i class="fas fa-tasks"></i> Tips for Earning Coins</h3>
-                <div class="challenges-grid">
-                    <div class="challenge-item">
-                        <div class="challenge-icon"><i class="fas fa-fire"></i></div>
-                        <div class="challenge-info">
-                            <span class="challenge-condition">2 correct in a row</span>
-                            <span class="challenge-reward"><i class="fas fa-coins"></i> 5 coins</span>
-                        </div>
-                        <i class="fas fa-arrow-right challenge-arrow"></i>
+            <div class="tips-section">
+                <h3 class="tips-title"><i class="fas fa-lightbulb"></i> How to Earn Coins</h3>
+                <div class="tips-grid">
+                    <div class="tip-item">
+                        <span class="tip-streak">2× streak</span>
+                        <span class="tip-reward"><i class="fas fa-coins"></i> +5</span>
                     </div>
-                    <div class="challenge-item">
-                        <div class="challenge-icon"><i class="fas fa-bolt"></i></div>
-                        <div class="challenge-info">
-                            <span class="challenge-condition">3–4 correct in a row</span>
-                            <span class="challenge-reward"><i class="fas fa-coins"></i> 10 coins</span>
-                        </div>
-                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    <div class="tip-item">
+                        <span class="tip-streak">3–4× streak</span>
+                        <span class="tip-reward"><i class="fas fa-coins"></i> +10</span>
                     </div>
-                    <div class="challenge-item">
-                        <div class="challenge-icon"><i class="fas fa-star"></i></div>
-                        <div class="challenge-info">
-                            <span class="challenge-condition">5 correct in a row</span>
-                            <span class="challenge-reward"><i class="fas fa-coins"></i> 20 coins</span>
-                        </div>
-                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    <div class="tip-item">
+                        <span class="tip-streak">5× streak</span>
+                        <span class="tip-reward"><i class="fas fa-coins"></i> +20</span>
                     </div>
-                    <div class="challenge-item">
-                        <div class="challenge-icon"><i class="fas fa-crown"></i></div>
-                        <div class="challenge-info">
-                            <span class="challenge-condition">6+ correct in a row</span>
-                            <span class="challenge-reward"><i class="fas fa-coins"></i> 30 coins</span>
-                        </div>
-                        <i class="fas fa-arrow-right challenge-arrow"></i>
+                    <div class="tip-item">
+                        <span class="tip-streak">6+× streak</span>
+                        <span class="tip-reward"><i class="fas fa-coins"></i> +30</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ---- CHOOSE A MODE ---- -->
-            <div class="mode-section">
-                <h2 class="section-title mode-title">
-                    <span class="title-line" aria-hidden="true"></span>
-                    <i class="fas fa-crown"></i>
-                    <span class="mode-title-text">Choose a Mode</span>
-                    <span class="title-line" aria-hidden="true"></span>
-                </h2>
-                <div class="mode-grid">
-                    <button class="mode-btn mode-btn-red" id="jollofMixBtn">
-                        <div class="mode-details">
-                            <span class="mode-name">Jollof Mix</span>
-                        </div>
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-fire mode-icon animate-icon"></i>
-                        </div>
-                        <span class="mode-questions">10 Mixed Questions</span>
-                        <i class="fas fa-arrow-right mode-arrow"></i>
-                    </button>
-                    <button class="mode-btn mode-btn-blue" id="chooseLaneBtn">
-                        <div class="mode-details">
-                            <span class="mode-name">Pick Your Lane</span>
-                        </div>
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-road mode-icon animate-icon"></i>
-                        </div>
-                        <span class="mode-questions">10 Categories</span>
-                        <i class="fas fa-arrow-right mode-arrow"></i>
-                    </button>
-                    <button class="mode-btn mode-btn-green" id="oneChanceBtn">
-                        <div class="mode-details">
-                            <span class="mode-name">One Chance</span>
-                        </div>
-                        <div class="mode-icon-wrap">
-                            <i class="fas fa-bolt mode-icon animate-icon"></i>
-                        </div>
-                        <span class="mode-questions">One miss, game over</span>
-                        <i class="fas fa-arrow-right mode-arrow"></i>
-                    </button>
-                </div>
-            </div>
-
-  <!-- ===== ADMOB CONTAINER (bottom of home) ===== -->
-            <div class="ad-container" id="adContainer">
-                <!-- AdMob banner will be placed here -->
-            </div>
+            <!-- Ad container -->
+            <div class="ad-container" id="adContainer"></div>
         </section>
 
         <!-- ============================================================
@@ -274,87 +236,56 @@
                     <p class="page-subtitle">Pick a category that suits your vibe</p>
                 </div>
             </div>
-
             <div class="lane-grid">
                 <div class="lane-card" data-category="afrobeats" data-export="afrobeats">
-                    <div class="lane-icon">🎵</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Afrobeats</div>
-                        <div class="lane-desc">From Fela to Burna Boy</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🎵</span>
+                    <span class="lane-name">Afrobeats</span>
+                    <span class="lane-desc">Fela to Burna Boy</span>
                 </div>
                 <div class="lane-card" data-category="nollywood" data-export="nollywood">
-                    <div class="lane-icon">🎬</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Nollywood</div>
-                        <div class="lane-desc">Movies, actors, iconic lines</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🎬</span>
+                    <span class="lane-name">Nollywood</span>
+                    <span class="lane-desc">Movies &amp; iconic lines</span>
                 </div>
                 <div class="lane-card" data-category="lagos_slang" data-export="lagosSlang">
-                    <div class="lane-icon">🗣️</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Lagos Slang</div>
-                        <div class="lane-desc">Street language &amp; pidgin</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🗣️</span>
+                    <span class="lane-name">Lagos Slang</span>
+                    <span class="lane-desc">Street language &amp; pidgin</span>
                 </div>
                 <div class="lane-card" data-category="super_eagles" data-export="superEagles">
-                    <div class="lane-icon">⚽</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Super Eagles</div>
-                        <div class="lane-desc">History, players, World Cup</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">⚽</span>
+                    <span class="lane-name">Super Eagles</span>
+                    <span class="lane-desc">History &amp; players</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_proverbs" data-export="nigeriaProverbs">
-                    <div class="lane-icon">📖</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija Proverbs</div>
-                        <div class="lane-desc">Yoruba, Igbo, Hausa wisdom</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">📖</span>
+                    <span class="lane-name">Naija Proverbs</span>
+                    <span class="lane-desc">Yoruba, Igbo, Hausa</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_history" data-export="nigeriaHistory">
-                    <div class="lane-icon">🏛️</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija History</div>
-                        <div class="lane-desc">Independence &amp; key events</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🏛️</span>
+                    <span class="lane-name">Naija History</span>
+                    <span class="lane-desc">Independence &amp; events</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_food" data-export="nigeriaFood">
-                    <div class="lane-icon">🍲</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija Food</div>
-                        <div class="lane-desc">Dishes, ingredients, street food</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🍲</span>
+                    <span class="lane-name">Naija Food</span>
+                    <span class="lane-desc">Dishes &amp; street food</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_geography" data-export="nigeriaGeography">
-                    <div class="lane-icon">🌍</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija Geography</div>
-                        <div class="lane-desc">States, capitals, rivers</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🌍</span>
+                    <span class="lane-name">Naija Geography</span>
+                    <span class="lane-desc">States &amp; capitals</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_culture" data-export="nigeriaCulture">
-                    <div class="lane-icon">🎭</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija Culture</div>
-                        <div class="lane-desc">Festivals &amp; traditions</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🎭</span>
+                    <span class="lane-name">Naija Culture</span>
+                    <span class="lane-desc">Festivals &amp; traditions</span>
                 </div>
                 <div class="lane-card" data-category="nigeria_sports" data-export="nigeriaSports">
-                    <div class="lane-icon">🏏</div>
-                    <div class="lane-info">
-                        <div class="lane-name">Naija Sports</div>
-                        <div class="lane-desc">Athletes, teams, and sporting glory</div>
-                    </div>
-                    <i class="fas fa-arrow-right lane-arrow"></i>
+                    <span class="lane-icon">🏏</span>
+                    <span class="lane-name">Naija Sports</span>
+                    <span class="lane-desc">Athletes &amp; glory</span>
                 </div>
             </div>
         </section>
@@ -364,7 +295,7 @@
         ============================================================ -->
         <section id="playSection" class="page-section">
             <div class="stats-full">
-                <h2 class="section-title">My Stats</h2>
+                <h2 class="section-title section-title--page">My Stats</h2>
                 <div class="stats-grid">
                     <div class="stat-detail">
                         <i class="fas fa-gamepad stat-detail-icon"></i>
@@ -405,16 +336,15 @@
         ============================================================ -->
         <section id="shopSection" class="page-section">
             <div class="section-header">
-                <h2 class="section-title"><i class="fas fa-store"></i> Shop</h2>
+                <h2 class="section-title section-title--page"><i class="fas fa-store"></i> Shop</h2>
                 <span class="shop-coins-display">Coins: <strong id="shopCoinsDisplay">0</strong></span>
             </div>
             <div class="shop-grid" id="shopGrid">
                 <!-- Rendered by shop.js -->
             </div>
             <div class="ad-life-container">
-                <i class="fas fa-video ad-life-icon" aria-hidden="true"></i>
                 <button id="watchAdBtn" class="ad-life-btn">
-                    <i class="fas fa-video"></i> Watch Ad for <i class="fas fa-coins" style="color:#FFD700;"></i> +200 Coins
+                    <i class="fas fa-play"></i> Watch Ad for <i class="fas fa-coins"></i> +200 Coins
                 </button>
                 <p class="ad-life-note">Watch a short video to earn 200 coins.</p>
             </div>
@@ -425,13 +355,13 @@
         ============================================================ -->
         <section id="leaderboardSection" class="page-section">
             <div class="section-header">
-                <h2 class="section-title"><i class="fas fa-trophy" style="color:#FFD700;"></i> Global Leaderboard</h2>
+                <h2 class="section-title section-title--page"><i class="fas fa-trophy"></i> Global Leaderboard</h2>
                 <select id="leaderboardFilter" class="filter-select">
                     <option value="weekly">This Week</option>
                     <option value="all" selected>All Time</option>
                 </select>
             </div>
-            <button id="shareLeaderboardBtn" class="whatsapp-share-btn whatsapp-share-btn-compact">
+            <button id="shareLeaderboardBtn" class="whatsapp-share-btn whatsapp-share-btn--compact">
                 <i class="fab fa-whatsapp"></i> Challenge Friends
             </button>
             <div class="leaderboard-full" id="fullLeaderboard">
@@ -444,13 +374,12 @@
         ============================================================ -->
         <section id="settingsSection" class="page-section">
             <div class="section-header">
-                <h2 class="section-title"><i class="fas fa-cog"></i> Settings</h2>
+                <h2 class="section-title section-title--page"><i class="fas fa-cog"></i> Settings</h2>
                 <button class="back-arrow-btn settings-close-btn" id="settingsCloseBtn" aria-label="Close settings">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="settings-container">
-                <!-- Volume -->
                 <div class="settings-item">
                     <label for="volumeSlider">Volume</label>
                     <div class="settings-control">
@@ -458,7 +387,6 @@
                         <span id="volumeValue">70%</span>
                     </div>
                 </div>
-                <!-- Sound toggle -->
                 <div class="settings-item">
                     <label for="soundToggle">Sound</label>
                     <div class="settings-control">
@@ -468,7 +396,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Edit Name -->
                 <div class="settings-item">
                     <label for="editNameInput">Edit Name</label>
                     <div class="settings-control settings-name-control">
@@ -476,18 +403,16 @@
                         <button id="saveNameBtn">Save</button>
                     </div>
                 </div>
-                <!-- Feedback -->
-                <div class="settings-item settings-feedback-item">
+                <div class="settings-item">
                     <label for="feedbackBtn">Feedback</label>
                     <div class="settings-control">
-                        <button id="feedbackBtn" class="feedback-btn">Message Us</button>
+                        <button id="feedbackBtn" class="btn-feedback">Message Us</button>
                     </div>
                 </div>
-                <!-- Logout -->
-                <div class="settings-item settings-logout-item">
+                <div class="settings-item">
                     <label for="logoutBtn">Account</label>
                     <div class="settings-control">
-                        <button id="logoutBtn" class="logout-btn">Logout</button>
+                        <button id="logoutBtn" class="btn-logout">Logout</button>
                     </div>
                 </div>
             </div>
@@ -497,12 +422,12 @@
         <div id="feedbackModal" class="modal-overlay" style="display: none;">
             <div class="modal-card feedback-modal-card">
                 <button id="closeFeedbackBtn" class="modal-close" aria-label="Close">&times;</button>
-                <h3 style="color:#FFD700; margin-bottom:0.5rem;"><i class="fas fa-comment-dots"></i> Send Feedback</h3>
-                <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1rem;">We’d love to hear your thoughts. Let us know how we can improve NaijaGenius.</p>
-                <div class="input-group feedback-textarea-group">
+                <h3><i class="fas fa-comment-dots"></i> Send Feedback</h3>
+                <p class="modal-subtitle">We'd love to hear your thoughts.</p>
+                <div class="feedback-textarea-group">
                     <textarea id="feedbackMessage" placeholder="Type your message here..." rows="4"></textarea>
                 </div>
-                <div style="display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
+                <div class="modal-actions">
                     <button id="cancelFeedbackBtn" class="modal-btn-cancel">Cancel</button>
                     <button id="sendFeedbackBtn" class="modal-btn-send">Send <i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -516,27 +441,24 @@
         <button class="nav-item active" data-nav="home">
             <i class="fas fa-house"></i>
             <span class="nav-label">Home</span>
-            <span class="nav-dot"></span>
         </button>
         <button class="nav-item" data-nav="play">
             <i class="fas fa-chart-bar"></i>
             <span class="nav-label">My Stats</span>
-            <span class="nav-dot"></span>
         </button>
         <button class="nav-item" data-nav="shop">
             <i class="fas fa-store"></i>
             <span class="nav-label">Shop</span>
-            <span class="nav-dot"></span>
         </button>
         <button class="nav-item" data-nav="leaderboard">
             <i class="fas fa-trophy"></i>
             <span class="nav-label">Leaderboard</span>
-            <span class="nav-dot"></span>
         </button>
     </nav>
 
     <!-- ===== DESKTOP SIDEBAR ===== -->
     <aside class="desktop-sidebar" id="desktopSidebar">
+        <div class="sidebar-brand">🇳🇬 NaijaGenius</div>
         <div class="sidebar-nav">
             <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
             <button class="sidebar-item" data-nav="play"><i class="fas fa-chart-bar"></i><span>My Stats</span></button>
