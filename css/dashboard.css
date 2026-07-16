@@ -503,7 +503,7 @@ body {
     width: 100%;
 }
 
-/* Base mode card */
+/* Base mode card – aspect-ratio portrait, no fixed min-height */
 .mode-card {
     border: none;
     border-radius: var(--radius-xl);
@@ -515,7 +515,8 @@ body {
     gap: var(--space-2);
     cursor: pointer;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    min-height: 588px;                        /* 196px × 3 */
+    aspect-ratio: 3 / 4;
+    max-height: 300px;
     color: #fff;
     box-shadow: var(--shadow-md);
     font-family: var(--font-body);
@@ -564,8 +565,19 @@ body {
 .mode-card-icon { display: none; }
 
 .mode-card-info { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
-.mode-card-name { font-weight: 800; font-size: var(--font-size-sm); letter-spacing: -0.01em; color: #fff; }
-.mode-card-sub { font-size: 0.6rem; font-weight: 500; color: rgba(255,255,255,0.85); }
+.mode-card-name {
+    font-weight: 800;
+    font-size: var(--font-size-sm);
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+.mode-card-sub {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
 
 /* ============================================================
    WHATSAPP SHARE, TIPS, AD
@@ -1278,7 +1290,7 @@ body {
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
     .shop-grid { grid-template-columns: repeat(3, 1fr); }
     .mode-grid { gap: var(--space-4); }
-    .mode-card { min-height: 588px; }   /* desktop */
+    .mode-card { /* aspect-ratio + max-height inherited from base */ }
 }
 
 /* ============================================================
@@ -1333,6 +1345,7 @@ body {
     text-align: center;
     white-space: pre-wrap;
     line-height: 1.5;
+    font-weight: 600;
 }
 
 .announcement-close {
@@ -1366,9 +1379,8 @@ body {
         height: 42px;
     }
 
-    /* Mode card height increased 3× from current mobile base (154 → 462) */
+    /* Mode card – inherit aspect-ratio, keep padding adjustments */
     .mode-card {
-        min-height: 462px;
         padding: var(--space-3) var(--space-2);
     }
     .mode-card-name {
@@ -1433,14 +1445,13 @@ body {
 
 @media (max-width: 480px) {
     .mode-card {
-        min-height: 420px;   /* 140px × 3 */
         padding: var(--space-2) var(--space-1);
     }
     .mode-card-name {
-        font-size: 0.65rem;
+        font-size: 0.68rem;
     }
     .mode-card-sub {
-        font-size: 0.5rem;
+        font-size: 0.55rem;
     }
 
     .greeting-text {
@@ -1455,6 +1466,27 @@ body {
     }
     .profile-stat-value {
         font-size: 0.9rem;
+    }
+}
+
+/* ============================================================
+   LARGE SCREEN ENHANCEMENTS (≥1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+    .main-content {
+        max-width: 760px;
+    }
+    .mode-grid {
+        gap: var(--space-5);
+    }
+    .lane-grid {
+        gap: var(--space-4);
+    }
+    .stats-grid {
+        gap: var(--space-4);
+    }
+    .shop-grid {
+        gap: var(--space-4);
     }
 }
 
