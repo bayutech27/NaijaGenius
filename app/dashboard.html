@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#EDEDF2" />
+    <meta name="theme-color" content="#0A1A12" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>NaijaGenius • Dashboard</title>
@@ -16,6 +16,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
+
+    <!-- Set dark theme as default if no preference saved -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('naijagenius-theme');
+            if (saved === null) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else if (saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 </head>
 <body>
 
@@ -120,7 +132,7 @@
                 </div>
                 <div class="profile-stats">
                     <div class="profile-stat">
-                        <i class="fas fa-check-circle profile-stat-icon profile-stat-icon--purple"></i>
+                        <i class="fas fa-check-circle profile-stat-icon profile-stat-icon--green"></i>
                         <div class="profile-stat-info">
                             <span class="profile-stat-label">Total Correct</span>
                             <span class="profile-stat-value" id="correctAnswers">---</span>
@@ -149,7 +161,6 @@
                     <button class="mode-card" id="jollofMixBtn">
                         <div class="mode-card-overlay"></div>
                         <div class="mode-card-content">
-                            <div class="mode-card-icon">🔥</div>
                             <div class="mode-card-info">
                                 <span class="mode-card-name">Jollof Mix</span>
                                 <span class="mode-card-sub">10 Mixed Questions</span>
@@ -159,7 +170,6 @@
                     <button class="mode-card" id="chooseLaneBtn">
                         <div class="mode-card-overlay"></div>
                         <div class="mode-card-content">
-                            <div class="mode-card-icon">🛣️</div>
                             <div class="mode-card-info">
                                 <span class="mode-card-name">Pick Your Lane</span>
                                 <span class="mode-card-sub">10 Categories</span>
@@ -169,7 +179,6 @@
                     <button class="mode-card" id="oneChanceBtn">
                         <div class="mode-card-overlay"></div>
                         <div class="mode-card-content">
-                            <div class="mode-card-icon">⚡</div>
                             <div class="mode-card-info">
                                 <span class="mode-card-name">One Chance</span>
                                 <span class="mode-card-sub">One miss, game over</span>
