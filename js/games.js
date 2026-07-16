@@ -1,4 +1,5 @@
-// games.js – Light Theme Modals, 1s comment delay, 2s one-chance delay
+// games.js – Dark Purple UI, 1s comment delay, 2s one‑chance delay,
+// Sound sync with dashboard
 import { auth, db } from '/js/firebase.config.js';
 import {
   doc, getDoc, updateDoc, addDoc, collection,
@@ -20,7 +21,9 @@ import {
   playCorrectSound,
   playWrongSound,
   playCommentSound,
-  stopCountdownSound
+  stopCountdownSound,
+  setSoundEnabled,
+  setMasterVolume
 } from './sound.js';
 
 console.log('🎮 games.js loaded');
@@ -73,11 +76,8 @@ let livesRemaining = 0;
 let freeLifelines = { fifty_fifty: true, ask_crowd: true, callFriend: true };
 let displayedCoins = 0;
 
-// Lifeline usage tracking
 let lifelineUsed = null;
 let isCorrectAfterLifeline = false;
-
-// Variables for delayed feedback
 let pendingSelectedLetter = null;
 let pendingCorrectLetter = null;
 
@@ -282,6 +282,9 @@ async function importQuestionBank(mapping) {
 onAuthStateChanged(auth, async (user) => {
   console.log('🔐 Auth state changed (games):', user ? `User: ${user.uid}` : 'No user');
 
+  // Apply dashboard sound settings immediately
+  applySoundSettingsFromDashboard();
+
   if (!user) {
     showErrorOnScreen('Please log in to play.');
     setTimeout(() => window.location.href = '/login.html', 3000);
@@ -326,6 +329,19 @@ onAuthStateChanged(auth, async (user) => {
     setTimeout(() => window.location.href = '/app/dashboard.html', 3000);
   }
 });
+
+// ========== SOUND SYNC ==========
+function applySoundSettingsFromDashboard() {
+  const storedVolume = localStorage.getItem('naijagenius_volume');
+  const storedSound  = localStorage.getItem('naijagenius_sound_enabled');
+
+  if (storedVolume !== null) {
+    setMasterVolume(parseInt(storedVolume, 10));
+  }
+  if (storedSound !== null) {
+    setSoundEnabled(storedSound === 'true');
+  }
+}
 
 // ========== LOAD LIFELINES ==========
 async function loadLifelines() {
@@ -1006,7 +1022,7 @@ function attachOptionListener() {
         const comment = handleStreakUpdate(false);
         if (comment) showCommentModal(comment);
 
-        // Wait 2 seconds so user can see the correct answer, then end round
+        // Wait 2 seconds so user sees the correct answer, then end round
         setTimeout(() => {
           endRound();
         }, 2000);
