@@ -65,11 +65,21 @@ body {
 }
 
 /* ============================================================
-   SKELETAL LOADER (home page)
+   FULL-PAGE SKELETAL LOADER (overlays main-content)
    ============================================================ */
 .skeleton-home {
-    padding: 0 0 1rem 0;
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;  /* matches body gradient for seamless feel */
+    z-index: 10;
+    padding: 1.5rem 1rem 5rem;  /* top/bottom padding so content doesn't hit edges */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .skeleton-block,
@@ -83,7 +93,7 @@ body {
 }
 
 .skeleton-greeting {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 
 .skeleton-greeting .skeleton-block {
@@ -94,8 +104,6 @@ body {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem 0;
 }
 
 .skeleton-avatar {
@@ -116,7 +124,6 @@ body {
 .skeleton-stats {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1.5rem;
 }
 
 .skeleton-stat {
@@ -126,14 +133,15 @@ body {
 }
 
 .skeleton-challenges {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .skeleton-modes {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.8rem;
-    margin-bottom: 1.5rem;
 }
 
 .skeleton-mode {
@@ -144,6 +152,11 @@ body {
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+}
+
+/* Make main-content relative so absolute skeleton works */
+.main-content {
+    position: relative;
 }
 
 /* ============================================================
