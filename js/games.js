@@ -600,9 +600,13 @@ function loadQuestion(index) {
   oneChanceMissed = false;
   nextBtn.disabled  = true;
 
-  nextBtn.innerHTML = (index === TOTAL_QUESTIONS - 1)
-    ? '<i class="fas fa-flag-checkered"></i> Finish'
-    : '<i class="fas fa-forward"></i> Next';
+  const isLast = (index === TOTAL_QUESTIONS - 1);
+  nextBtn.innerHTML = isLast
+    ? '<i class="fas fa-flag-checkered"></i><span class="next-btn-label">Finish</span>'
+    : '<i class="fas fa-forward"></i><span class="next-btn-label">Next</span>';
+
+  // Toggle finish class for red color
+  nextBtn.classList.toggle('next-btn--finish', isLast);
 
   if (!currentQuestions || index >= currentQuestions.length) {
     endRound();
@@ -1808,15 +1812,15 @@ async function endRound() {
   }
 }
 
-// ========== LOADER ==========
-function showLoader(message = 'Wait a moment. Calculating your score...') {
+// ========== LOADER (white text & spinner) ==========
+function showLoader(message = 'Calculating your score...') {
   if (document.getElementById('scoreLoader')) return;
 
   const overlay = document.createElement('div');
   overlay.id = 'scoreLoader';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     z-index:10000; font-family:'Poppins',sans-serif;
   `;
@@ -1824,8 +1828,8 @@ function showLoader(message = 'Wait a moment. Calculating your score...') {
   const spinner = document.createElement('div');
   spinner.style.cssText = `
     width:60px; height:60px;
-    border:6px solid rgba(109,40,217,0.2);
-    border-top-color:#6D28D9;
+    border:6px solid rgba(255,255,255,0.2);
+    border-top-color:#FFFFFF;
     border-radius:50%;
     animation:spin 1s linear infinite;
   `;
@@ -1837,7 +1841,7 @@ function showLoader(message = 'Wait a moment. Calculating your score...') {
   const text = document.createElement('p');
   text.textContent = message;
   text.style.cssText = `
-    color:#2D1B4E; font-size:1.1rem; font-weight:500;
+    color:#FFFFFF; font-size:1.1rem; font-weight:500;
     margin-top:1.5rem; text-align:center; max-width:300px;
   `;
 
