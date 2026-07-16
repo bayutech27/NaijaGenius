@@ -1,5 +1,6 @@
 /* ============================================================
    NAIJAGENIUS GAME – Deep Purple BG, Light Purple Containers
+   (Crowd bar restored to original blue‑gold design)
    ============================================================ */
 
 :root {
@@ -266,29 +267,41 @@ body {
 .option-btn.wrong .option-letter { background: var(--accent-red); }
 .option-btn.disabled { opacity: 0.5; pointer-events: none; }
 
-/* Crowd bar */
+/* ========== ORIGINAL CROWD BAR (restored) ========== */
 .option-crowd {
     display: none;
-    position: absolute; inset: 0;
-    align-items: center; padding: 0 1.2rem;
-    z-index: 1; pointer-events: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    padding: 0 1.2rem;
+    z-index: 1;
+    pointer-events: none;
 }
+
 .option-crowd .crowd-bar-bg {
-    position: absolute; inset: 0;
-    border-radius: inherit; overflow: hidden;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
 }
+
 .option-crowd .crowd-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, rgba(109,40,217,0.3), rgba(245,158,11,0.3));
+    background: linear-gradient(90deg, rgba(110, 140, 255, 0.55), rgba(255, 215, 0, 0.45));
     transition: width 0.5s ease;
 }
+
 .option-crowd .crowd-percent {
-    position: relative; margin-left: auto;
-    font-size: 0.72rem; font-weight: 700;
-    color: var(--text-primary);
-    background: rgba(255,255,255,0.9);
+    position: relative;
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.4);
     padding: 0.2rem 0.55rem;
     border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 /* ========== LIFELINES + NEXT ========== */
