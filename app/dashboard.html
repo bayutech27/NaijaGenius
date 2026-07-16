@@ -22,35 +22,28 @@
     <!-- ===== HEADER ===== -->
     <header class="app-header">
         <div class="header-container">
-            <!-- Compact brand badge -->
-            <div class="header-brand">
-                <span class="brand-flag">🇳🇬</span>
-                <span class="brand-text">Naija<span class="brand-accent">Genius</span></span>
-            </div>
-
-            <div class="header-actions">
-                <div class="stat-badge-group">
-                    <span class="stat-badge" id="headerCoins">
-                        <i class="fas fa-coins stat-badge-icon coins-icon"></i>
-                        <span class="stat-label-text">Coins</span>
-                        <span id="headerCoinsValue" class="stat-value-text">
-                            <span class="shimmer-bar shimmer-bar--sm"></span>
-                        </span>
-                        <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins"><i class="fas fa-plus"></i></button>
+            <!-- Coins & Lives moved to left, no "+" buttons -->
+            <div class="stat-badge-group">
+                <span class="stat-badge" id="headerCoins">
+                    <i class="fas fa-coins stat-badge-icon coins-icon"></i>
+                    <span class="stat-label-text">Coins</span>
+                    <span id="headerCoinsValue" class="stat-value-text">
+                        <span class="shimmer-bar shimmer-bar--sm"></span>
                     </span>
-                    <span class="stat-badge" id="headerLives">
-                        <i class="fas fa-heart stat-badge-icon lives-icon"></i>
-                        <span class="stat-label-text">Lives</span>
-                        <span id="headerLivesValue" class="stat-value-text">
-                            <span class="shimmer-bar shimmer-bar--sm"></span>
-                        </span>
-                        <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives"><i class="fas fa-plus"></i></button>
+                    <button class="stat-add-btn" id="addCoinsBtn" aria-label="Add coins" style="display:none;"><i class="fas fa-plus"></i></button>
+                </span>
+                <span class="stat-badge" id="headerLives">
+                    <i class="fas fa-heart stat-badge-icon lives-icon"></i>
+                    <span class="stat-label-text">Lives</span>
+                    <span id="headerLivesValue" class="stat-value-text">
+                        <span class="shimmer-bar shimmer-bar--sm"></span>
                     </span>
-                </div>
-                <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
+                    <button class="stat-add-btn" id="addLivesBtn" aria-label="Add lives" style="display:none;"><i class="fas fa-plus"></i></button>
+                </span>
             </div>
+            <button class="icon-btn settings-btn" id="settingsBtn" aria-label="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
     </header>
 
@@ -107,8 +100,7 @@
                     <img class="hero-logo-img" id="heroLogoImg" src="/assets/naija-genius-hero.png" alt="Naija Genius" loading="lazy"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div class="hero-logo-fallback">
-                        <span class="hero-flag">🇳🇬</span>
-                        <span class="hero-bulb">💡</span>
+                        <!-- Flag and bulb removed; fallback text only -->
                     </div>
                 </div>
             </div>
@@ -136,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- ===== CHOOSE A MODE — PRIMARY ACTION, MOVED TO TOP ===== -->
+            <!-- ===== CHOOSE A MODE — PRIMARY ACTION ===== -->
             <div class="mode-section">
                 <h2 class="section-title mode-title">
                     <span class="title-line"></span>
@@ -458,7 +450,7 @@
 
     <!-- ===== DESKTOP SIDEBAR ===== -->
     <aside class="desktop-sidebar" id="desktopSidebar">
-        <div class="sidebar-brand">🇳🇬 NaijaGenius</div>
+        <div class="sidebar-brand">NaijaGenius</div>
         <div class="sidebar-nav">
             <button class="sidebar-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></button>
             <button class="sidebar-item" data-nav="play"><i class="fas fa-chart-bar"></i><span>My Stats</span></button>
