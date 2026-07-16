@@ -404,7 +404,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     font-family: var(--font-display);
-    white-space: nowrap;  /* prevent level name wrapping */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -515,7 +515,7 @@ body {
     gap: var(--space-2);
     cursor: pointer;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    min-height: 140px;
+    min-height: 196px;                        /* 140px × 1.4 */
     color: #fff;
     box-shadow: var(--shadow-md);
     font-family: var(--font-body);
@@ -560,7 +560,9 @@ body {
 
 .mode-card:active { transform: scale(0.96); }
 
-.mode-card-icon { font-size: 2.4rem; line-height: 1; }
+/* Hide the icons completely */
+.mode-card-icon { display: none; }
+
 .mode-card-info { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
 .mode-card-name { font-weight: 800; font-size: var(--font-size-sm); letter-spacing: -0.01em; color: #fff; }
 .mode-card-sub { font-size: 0.6rem; font-weight: 500; color: rgba(255,255,255,0.85); }
@@ -1276,7 +1278,7 @@ body {
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
     .shop-grid { grid-template-columns: repeat(3, 1fr); }
     .mode-grid { gap: var(--space-4); }
-    .mode-card { min-height: 150px; }
+    .mode-card { min-height: 196px; }
 }
 
 /* ============================================================
@@ -1350,27 +1352,24 @@ body {
         font-size: 0.8rem;
     }
     .stat-badge-icon {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
     .stat-label-text {
-        font-size: 0.7rem;
-    }
-    .stat-value-text {
         font-size: 0.75rem;
     }
+    .stat-value-text {
+        font-size: 0.8rem;
+    }
     .icon-btn {
-        font-size: 1.4rem;
-        width: 40px;
-        height: 40px;
+        font-size: 1.5rem;
+        width: 42px;
+        height: 42px;
     }
 
-    /* Reduce mode card height */
+    /* Reduce mode card height (but still increased by 40% from original base) */
     .mode-card {
-        min-height: 110px;
+        min-height: 154px;   /* 110px × 1.4 */
         padding: var(--space-3) var(--space-2);
-    }
-    .mode-card-icon {
-        font-size: 1.8rem;
     }
     .mode-card-name {
         font-size: 0.7rem;
@@ -1434,11 +1433,8 @@ body {
 
 @media (max-width: 480px) {
     .mode-card {
-        min-height: 100px;
+        min-height: 140px;   /* 100px × 1.4 */
         padding: var(--space-2) var(--space-1);
-    }
-    .mode-card-icon {
-        font-size: 1.6rem;
     }
     .mode-card-name {
         font-size: 0.65rem;
