@@ -1,6 +1,6 @@
 /* ============================================================
    NAIJAGENIUS GAME – Deep Purple BG, Light Purple Containers
-   (Crowd bar restored to original blue‑gold design)
+   (Crowd bar fixed – option-btn relative again)
    ============================================================ */
 
 :root {
@@ -228,6 +228,8 @@ body {
     font-family: var(--font-body);
     font-size: 0.95rem; font-weight: 500;
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    position: relative;      /* ← required for absolute crowd bar */
+    overflow: hidden;        /* ← keeps crowd bar inside */
 }
 
 .option-btn:hover {
@@ -267,7 +269,7 @@ body {
 .option-btn.wrong .option-letter { background: var(--accent-red); }
 .option-btn.disabled { opacity: 0.5; pointer-events: none; }
 
-/* ========== ORIGINAL CROWD BAR (restored) ========== */
+/* ========== CROWD BAR (Ask Crowd – original design, stays inside option) ========== */
 .option-crowd {
     display: none;
     position: absolute;
