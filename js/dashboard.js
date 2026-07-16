@@ -95,7 +95,9 @@ let isDataReady = false;
 
 function showHomeSkeleton() {
   if (skeletonHome) {
-    skeletonHome.style.display = 'flex';
+    skeletonHome.style.display = 'block';
+    // Hide the real home content until skeleton is removed (optional but keeps it tidy)
+    // We don't need to hide anything else; skeleton sits on top.
   }
 }
 
@@ -509,11 +511,8 @@ onAuthStateChanged(auth, async (user) => {
       }
       const initials = displayName.slice(0, 2).toUpperCase();
       if (userInitialsSpan) userInitialsSpan.textContent = initials;
-      // Data ready (even if minimal), hide skeleton after a tiny delay so user sees it
-      setTimeout(() => {
-        isDataReady = true;
-        hideHomeSkeleton();
-      }, 300);
+      isDataReady = true;
+      hideHomeSkeleton();
       return;
     }
     const userData = userSnap.data();
@@ -634,11 +633,9 @@ onAuthStateChanged(auth, async (user) => {
       }
     });
 
-    // Mark data as ready and hide skeleton after a guaranteed minimum 300ms
-    setTimeout(() => {
-      isDataReady = true;
-      hideHomeSkeleton();
-    }, 300);
+    // Mark data as ready and hide the skeleton
+    isDataReady = true;
+    hideHomeSkeleton();
 
     // AVATAR UPLOAD HANDLERS
     avatarFileInput.addEventListener("change", async (e) => {
@@ -711,10 +708,8 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
     if (greetingName) greetingName.textContent = "Player";
-    setTimeout(() => {
-      isDataReady = true;
-      hideHomeSkeleton();
-    }, 300);
+    isDataReady = true;
+    hideHomeSkeleton();
   }
 });
 
@@ -879,11 +874,10 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
       // Show skeleton when navigating to home
       if (target === "home") {
         showHomeSkeleton();
+        // If data is already loaded, hide skeleton after a short delay
         if (isDataReady) {
-          // Data already loaded, hide after a short pause so the skeleton is seen
-          setTimeout(hideHomeSkeleton, 350);
+          setTimeout(hideHomeSkeleton, 300);
         }
-        // If data not ready, skeleton stays until hideHomeSkeleton is called in onAuthStateChanged
       }
     }
   });
@@ -1019,5 +1013,5 @@ function setupLeaderboardShareButton() {
   });
 }
 
-// Show skeleton immediately when the script runs (before any data)
+// Show skeleton on initial load (before auth data arrives)
 showHomeSkeleton();
