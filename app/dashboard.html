@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A0A14" />
+    <meta name="theme-color" content="#F5F5F5" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>NaijaGenius • Dashboard</title>
@@ -22,7 +22,6 @@
     <!-- ===== HEADER ===== -->
     <header class="app-header">
         <div class="header-container">
-            <!-- Coins & Lives on left, no brand -->
             <div class="stat-badge-group">
                 <span class="stat-badge" id="headerCoins">
                     <i class="fas fa-coins stat-badge-icon coins-icon"></i>
@@ -58,22 +57,22 @@
                 <div class="skeleton-block" style="width: 55%; height: 1.3rem; margin-bottom: 0.5rem;"></div>
                 <div class="skeleton-block" style="width: 35%; height: 1rem;"></div>
             </div>
-            <div class="skeleton-level">
+            <div class="skeleton-profile">
                 <div class="skeleton-avatar"></div>
-                <div class="skeleton-level-text">
+                <div class="skeleton-level-text" style="flex:1;">
                     <div class="skeleton-block" style="width: 80px; height: 0.7rem;"></div>
                     <div class="skeleton-block" style="width: 120px; height: 1.4rem; margin-top: 0.4rem;"></div>
                     <div class="skeleton-block" style="width: 100%; height: 8px; margin-top: 0.6rem;"></div>
+                    <div style="display:flex; gap:1rem; margin-top:0.6rem;">
+                        <div class="skeleton-stat" style="flex:1; height:40px;"></div>
+                        <div class="skeleton-stat" style="flex:1; height:40px;"></div>
+                    </div>
                 </div>
             </div>
             <div class="skeleton-modes">
                 <div class="skeleton-mode"></div>
                 <div class="skeleton-mode"></div>
                 <div class="skeleton-mode"></div>
-            </div>
-            <div class="skeleton-stats">
-                <div class="skeleton-stat"></div>
-                <div class="skeleton-stat"></div>
             </div>
             <div class="skeleton-challenges">
                 <div class="skeleton-block" style="width: 40%; height: 1rem; margin-bottom: 0.8rem;"></div>
@@ -90,39 +89,55 @@
         ============================================================ -->
         <section id="homeSection" class="page-section active-section">
 
-            <!-- ---- GREETING ONLY (hero image removed) ---- -->
+            <!-- ---- GREETING ---- -->
             <div class="greeting-strip fade-in-up">
-                <div class="greeting-copy">
-                    <p class="greeting-text" id="greetingText"><span id="greetingName"></span></p>
-                    <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
-                </div>
-                <!-- Hero logo wrap removed entirely -->
+                <p class="greeting-text" id="greetingText"><span id="greetingName"></span></p>
+                <p class="greeting-sub" id="greetingSub">Ready to test your Naija knowledge?</p>
             </div>
 
-            <!-- ---- LEVEL & AVATAR ---- -->
-            <div class="level-display fade-in-up">
-                <div class="avatar-container">
-                    <div class="user-avatar" id="userAvatarBtn">
-                        <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar" loading="lazy"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <span id="userInitials" class="avatar-fallback"></span>
-                        <i class="fas fa-camera avatar-camera-icon"></i>
+            <!-- ---- PROFILE CARD (Level + Avatar + Stats merged) ---- -->
+            <div class="profile-card fade-in-up">
+                <div class="profile-row">
+                    <div class="avatar-container">
+                        <div class="user-avatar" id="userAvatarBtn">
+                            <img class="avatar-img" id="userAvatarImg" src="/assets/avatar-default.png" alt="Avatar" loading="lazy"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <span id="userInitials" class="avatar-fallback"></span>
+                            <i class="fas fa-camera avatar-camera-icon"></i>
+                        </div>
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
                     </div>
-                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
+                    <div class="level-container">
+                        <div class="level-text">
+                            <span class="level-label" id="levelLabel">Current Level</span>
+                            <span class="level-name" id="levelName">Loading...</span>
+                        </div>
+                        <div class="xp-progress">
+                            <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
+                            <span class="xp-text" id="xpText">0/0</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="level-container">
-                    <div class="level-text">
-                        <span class="level-label" id="levelLabel">Current Level</span>
-                        <span class="level-name" id="levelName">Loading...</span>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <i class="fas fa-check-circle profile-stat-icon profile-stat-icon--purple"></i>
+                        <div class="profile-stat-info">
+                            <span class="profile-stat-label">Total Correct</span>
+                            <span class="profile-stat-value" id="correctAnswers">---</span>
+                        </div>
                     </div>
-                    <div class="xp-progress">
-                        <div class="xp-bar" id="xpBar" style="width: 0%;"></div>
-                        <span class="xp-text" id="xpText">0/0</span>
+                    <div class="profile-stat-divider"></div>
+                    <div class="profile-stat">
+                        <i class="fas fa-trophy profile-stat-icon profile-stat-icon--gold"></i>
+                        <div class="profile-stat-info">
+                            <span class="profile-stat-label">Best Score</span>
+                            <span class="profile-stat-value" id="bestScoreValue">---</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== CHOOSE A MODE — PRIMARY ACTION ===== -->
+            <!-- ===== CHOOSE A MODE ===== -->
             <div class="mode-section">
                 <h2 class="section-title mode-title">
                     <span class="title-line"></span>
@@ -152,24 +167,6 @@
                             <span class="mode-card-sub">One miss, game over</span>
                         </div>
                     </button>
-                </div>
-            </div>
-
-            <!-- ---- STATS ROW ---- -->
-            <div class="stats-row">
-                <div class="stat-card fade-in-up">
-                    <i class="fas fa-check-circle stat-card-icon stat-card-icon--blue"></i>
-                    <div class="stat-info">
-                        <span class="stat-label">Total Correct</span>
-                        <span class="stat-value" id="correctAnswers">---</span>
-                    </div>
-                </div>
-                <div class="stat-card fade-in-up" style="animation-delay: 0.1s">
-                    <i class="fas fa-trophy stat-card-icon stat-card-icon--gold"></i>
-                    <div class="stat-info">
-                        <span class="stat-label">Best Score</span>
-                        <span class="stat-value" id="bestScoreValue">---</span>
-                    </div>
                 </div>
             </div>
 
@@ -379,6 +376,16 @@
                         <div class="toggle-switch">
                             <input type="checkbox" id="soundToggle" checked />
                             <label for="soundToggle" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <!-- NEW: Light/Dark Mode Toggle -->
+                <div class="settings-item">
+                    <label for="themeToggle">Light/Dark Mode</label>
+                    <div class="settings-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="themeToggle" />
+                            <label for="themeToggle" class="toggle-label"></label>
                         </div>
                     </div>
                 </div>
