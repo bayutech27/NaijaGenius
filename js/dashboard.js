@@ -95,9 +95,7 @@ let isDataReady = false;
 
 function showHomeSkeleton() {
   if (skeletonHome) {
-    skeletonHome.style.display = 'block';
-    // Hide the real home content until skeleton is removed (optional but keeps it tidy)
-    // We don't need to hide anything else; skeleton sits on top.
+    skeletonHome.style.display = 'flex';  // use flex to allow internal layout
   }
 }
 
