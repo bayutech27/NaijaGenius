@@ -85,8 +85,9 @@ body {
     color: #2D1B4E;
 }
 
+/* Genius now purple */
 .genius {
-    color: var(--accent-gold);
+    color: var(--accent-purple);
 }
 
 .tagline {
