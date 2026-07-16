@@ -28,17 +28,6 @@
     --text-secondary: #A0A0A0;
     --text-muted: #6B7280;
 
-    /* Light‑mode overrides */
-    --light-bg-page: #F3F4F6;
-    --light-bg-card: #FFFFFF;
-    --light-bg-card-hover: #F0F0F5;
-    --light-bg-header: rgba(243,244,246,0.92);
-    --light-bg-nav: #FFFFFF;
-    --light-bg-skeleton: rgba(0,0,0,0.04);
-    --light-text-primary: #0A1A12;
-    --light-text-secondary: #4A5A50;
-    --light-text-muted: #6B7280;
-
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.2);
@@ -393,7 +382,7 @@ body {
 #lifelineAskCrowd    { background: linear-gradient(160deg, var(--color-orange), #C2410C); }
 #lifelineCallFriend  { background: linear-gradient(160deg, var(--color-blue), #1D4ED8); }
 #nextBtn {
-    background: linear-gradient(160deg, var(--color-primary), #065F2C); /* green */
+    background: linear-gradient(160deg, var(--color-primary), #065F2C);
 }
 
 .next-btn--finish {
@@ -464,71 +453,6 @@ body {
     to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ========== MODAL OVERRIDES (JS-generated inline styles) ========== */
-/* Round end modal */
-#roundEndModal > div {
-    background: var(--bg-card) !important;
-    border: 1px solid rgba(11,138,61,0.3) !important;
-}
-#roundEndModal h2,
-#roundEndModal p,
-#roundEndModal div {
-    color: var(--text-primary) !important;
-}
-#roundEndModal button {
-    background: var(--color-primary) !important;
-    color: #fff !important;
-    border: none !important;
-}
-
-/* Comment modal */
-#commentModal > div {
-    background: var(--bg-card) !important;
-    border: 1px solid rgba(11,138,61,0.3) !important;
-}
-#commentModal p {
-    color: var(--text-primary) !important;
-}
-#commentModal button {
-    background: var(--color-primary) !important;
-    color: #fff !important;
-}
-
-/* Call friend modal */
-#callFriendModal > div {
-    background: var(--bg-card) !important;
-    border: 1px solid rgba(11,138,61,0.3) !important;
-}
-#callFriendModal p {
-    color: var(--text-primary) !important;
-}
-#callFriendModal button {
-    background: var(--color-primary) !important;
-    color: #fff !important;
-}
-
-/* Replay modal */
-#replayModal > div {
-    background: var(--bg-card) !important;
-    border: 1px solid rgba(11,138,61,0.3) !important;
-}
-#replayModal h3,
-#replayModal p {
-    color: var(--text-primary) !important;
-}
-#replayModal button {
-    background: var(--color-primary) !important;
-    color: #fff !important;
-}
-
-/* Score loader */
-#scoreLoader p {
-    color: var(--text-primary) !important;
-}
-#scoreLoader > div:first-child {
-    border-top-color: var(--color-primary) !important;
-}
-
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .game-container { padding: 122px 0.8rem 80px; gap: 1.2rem; }
@@ -569,18 +493,18 @@ body {
 }
 
 /* ============================================================
-   LIGHT‑MODE OVERRIDES (matches dashboard behavior)
+   LIGHT‑MODE OVERRIDES
    ============================================================ */
 :root:not([data-theme="dark"]) {
-    --bg-page: var(--light-bg-page);
-    --bg-card: var(--light-bg-card);
-    --bg-card-hover: var(--light-bg-card-hover);
-    --bg-header: var(--light-bg-header);
-    --bg-nav: var(--light-bg-nav);
-    --bg-skeleton: var(--light-bg-skeleton);
-    --text-primary: var(--light-text-primary);
-    --text-secondary: var(--light-text-secondary);
-    --text-muted: var(--light-text-muted);
+    --bg-page: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F0F0F5;
+    --bg-header: rgba(243,244,246,0.92);
+    --bg-nav: #FFFFFF;
+    --bg-skeleton: rgba(0,0,0,0.04);
+    --text-primary: #0A1A12;
+    --text-secondary: #4A5A50;
+    --text-muted: #6B7280;
 }
 
 :root:not([data-theme="dark"]) .app-header {
@@ -597,12 +521,9 @@ body {
 :root:not([data-theme="dark"]) .option-btn:hover {
     border-color: var(--color-primary);
 }
-:root:not([data-theme="dark"]) .option-btn .option-letter {
-    background: var(--color-primary);
-}
 
 :root:not([data-theme="dark"]) .question-box {
-    background: var(--light-bg-card);
+    background: var(--bg-card);
     border-color: rgba(11,138,61,0.2);
 }
 
