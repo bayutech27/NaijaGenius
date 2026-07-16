@@ -848,7 +848,7 @@ body {
     color: var(--accent-purple) !important;
 }
 [data-theme="dark"] #userRankDisplay span {
-    color: #C9D3EE !important;   /* keep readable in dark mode */
+    color: #C9D3EE !important;
 }
 
 /* Light mode: level & score purple; dark mode: level white, score gold */
@@ -950,12 +950,13 @@ body {
     background: var(--bg-card-hover);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-full);
-    padding: var(--space-1) var(--space-3);
+    padding: var(--space-1) var(--space-2);   /* reduced horizontal padding */
     color: var(--text-primary);
     font-family: var(--font-body);
     font-size: var(--font-size-xs);
     outline: none;
-    width: 100px;
+    width: 140px;            /* increased width */
+    height: 36px;            /* added height */
 }
 .settings-name-control input:focus { border-color: var(--accent-gold); }
 .settings-name-control button {
@@ -967,6 +968,20 @@ body {
     font-size: var(--font-size-xs);
     color: #fff;
     cursor: pointer;
+}
+
+/* ── SETTINGS CLOSE BUTTON (X icon) – no background, theme colors ── */
+.back-arrow-btn.settings-close-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--accent-purple);          /* purple in light mode */
+    font-size: 1.4rem;                    /* slightly bigger */
+    width: auto;
+    height: auto;
+}
+[data-theme="dark"] .back-arrow-btn.settings-close-btn {
+    color: var(--accent-gold);            /* gold in dark mode */
 }
 
 .btn-feedback {
