@@ -1,4 +1,4 @@
-// ========== IMPORTS ==========
+// games.js – Light Theme Modals, 1s comment delay, 2s one-chance delay
 import { auth, db } from '/js/firebase.config.js';
 import {
   doc, getDoc, updateDoc, addDoc, collection,
@@ -304,7 +304,6 @@ onAuthStateChanged(auth, async (user) => {
     console.log('✅ User data loaded:', currentUserData);
     livesRemaining = currentUserData.lives ?? 2;
 
-    // ===== COINS (Firestore users/{uid}.coins → header badge) =====
     displayedCoins = currentUserData.coins || 0;
     if (gameCoinsValue) gameCoinsValue.textContent = displayedCoins.toLocaleString();
 
@@ -328,7 +327,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ========== LOAD LIFELINES (from Firestore + free 1) ==========
+// ========== LOAD LIFELINES ==========
 async function loadLifelines() {
   try {
     if (!currentUserUID) throw new Error('User not authenticated');
@@ -439,7 +438,6 @@ async function loadQuestionsFromJS(exportNameParam) {
     lifelineUsed = null;
     isCorrectAfterLifeline = false;
 
-    // Log game started
     logGameStarted(questionType, category);
 
     showCountdown(() => {
@@ -500,7 +498,6 @@ async function loadMixedQuestions() {
   lifelineUsed = null;
   isCorrectAfterLifeline = false;
 
-  // Log game started (mixed)
   logGameStarted('mixed', 'mixed');
 
   showCountdown(() => {
@@ -675,13 +672,12 @@ function timerTick() {
     timerPath.style.strokeDashoffset = offset;
   }
 
-  // Countdown beep in last 5 seconds (not at 0)
   if (timeLeft <= 5 && timeLeft > 0) {
     playCountdownSound();
   }
 
   if (timeLeft <= 0) {
-    stopCountdownSound(); // stop any lingering countdown beep
+    stopCountdownSound();
     playWrongSound();
     clearInterval(timerInterval);
     questionAnswered  = true;
@@ -720,17 +716,16 @@ function timerTick() {
 
 // ========== APPLY ANSWER HIGHLIGHT STYLES ==========
 function applyCorrectStyle(btn) {
-  btn.style.background  = '#3ED6B7';
-  btn.style.color       = '#ffffff';
-  btn.style.borderColor = '#3ED6B7';
-  // Do NOT add 'correct' class to avoid the green check icon (CSS)
+  btn.style.background  = '#D1FAE5';
+  btn.style.color       = '#065F46';
+  btn.style.borderColor = '#10B981';
   btn.classList.remove('wrong');
 }
 
 function applyWrongStyle(btn) {
-  btn.style.background  = '#ff4444';
-  btn.style.color       = '#ffffff';
-  btn.style.borderColor = '#ff4444';
+  btn.style.background  = '#FEE2E2';
+  btn.style.color       = '#991B1B';
+  btn.style.borderColor = '#EF4444';
   btn.classList.add('wrong');
   btn.classList.remove('correct');
 }
@@ -788,18 +783,18 @@ function showReplayModal(onYes, onNo) {
   overlay.id = 'replayModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.85); backdrop-filter:blur(6px);
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
     z-index:10004; padding:1rem;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background:rgba(20,25,40,0.95);
-    border:1px solid rgba(62,214,183,0.4);
-    border-radius:2rem; padding:2rem 1.5rem;
+    background:#FFFFFF; border-radius:2rem; padding:2rem 1.5rem;
     max-width:400px; width:100%;
     text-align:center; font-family:'Poppins',sans-serif;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border: 1px solid rgba(109,40,217,0.2);
   `;
 
   const livesLeft = livesRemaining > 0 ? livesRemaining : 0;
@@ -807,35 +802,34 @@ function showReplayModal(onYes, onNo) {
 
   card.innerHTML = `
     <div style="font-size:3rem; margin-bottom:0.5rem;">
-      <i class="fas fa-heart" style="color:#ff6b6b;"></i>
+      <i class="fas fa-heart" style="color:#EF4444;"></i>
     </div>
-    <h3 style="color:#f0f3fa; font-size:1.3rem; margin-bottom:0.3rem;">Oops! Wrong Answer</h3>
-    <p style="color:#a0b3d9; font-size:1rem; margin-bottom:1rem;">
-      You have <strong style="color:#ff6b6b;">${livesLeft}</strong> life${livesLeft !== 1 ? 's' : ''} remaining.
+    <h3 style="color:#2D1B4E; font-size:1.3rem; margin-bottom:0.3rem;">Oops! Wrong Answer</h3>
+    <p style="color:#5A4A7A; font-size:1rem; margin-bottom:1rem;">
+      You have <strong style="color:#EF4444;">${livesLeft}</strong> life${livesLeft !== 1 ? 's' : ''} remaining.
     </p>
     ${canReplay ? `
-      <p style="color:#a0b3d9; font-size:0.9rem; margin-bottom:1.5rem;">
+      <p style="color:#5A4A7A; font-size:0.9rem; margin-bottom:1.5rem;">
         Would you like to use one life to replay this question?
       </p>
     ` : `
-      <p style="color:#ff6b6b; font-size:0.9rem; margin-bottom:1.5rem;">
+      <p style="color:#EF4444; font-size:0.9rem; margin-bottom:1.5rem;">
         No lives left! You'll have to continue.
       </p>
     `}
     <div style="display:flex; gap:0.8rem; justify-content:center;">
       <button id="replayYesBtn" ${!canReplay ? 'disabled' : ''} style="
-        background:${canReplay ? 'linear-gradient(135deg,#3ED6B7,#259c84)' : '#4a4a5a'};
+        background:${canReplay ? '#6D28D9' : '#d4d4d8'};
         border:none; border-radius:40px; padding:0.6rem 1.8rem;
-        font-weight:700; font-size:1rem; color:${canReplay ? '#0a0f1e' : '#888'};
+        font-weight:700; font-size:1rem; color:#fff;
         cursor:${canReplay ? 'pointer' : 'not-allowed'};
         font-family:'Poppins',sans-serif;
         transition: transform 0.2s;
       ">${canReplay ? 'Yes, Replay' : 'No Lives'}</button>
       <button id="replayNoBtn" style="
-        background:rgba(255,255,255,0.1);
-        border:1.5px solid #a0b3d9;
+        background:#FFFFFF; border:1.5px solid #6D28D9;
         border-radius:40px; padding:0.6rem 1.8rem;
-        font-weight:700; font-size:1rem; color:#f0f3fa;
+        font-weight:700; font-size:1rem; color:#2D1B4E;
         cursor:pointer; font-family:'Poppins',sans-serif;
       ">No, Continue</button>
     </div>
@@ -940,7 +934,6 @@ function attachOptionListener() {
     if (questionAnswered) return;
     if (!gameRoundActive) return;
 
-    // Stop the countdown sound immediately when user clicks
     stopCountdownSound();
     clearInterval(timerInterval);
     const pointsEarned = Math.max(0, timeLeft);
@@ -1012,7 +1005,11 @@ function attachOptionListener() {
         }
         const comment = handleStreakUpdate(false);
         if (comment) showCommentModal(comment);
-        endRound();
+
+        // Wait 2 seconds so user can see the correct answer, then end round
+        setTimeout(() => {
+          endRound();
+        }, 2000);
         return;
       }
 
@@ -1196,8 +1193,6 @@ lifelineCallFriend?.addEventListener('click', async () => {
 
 // ========== CALL FRIEND MODAL ==========
 function showCallFriendModal(correctLetter) {
-  ensureCommentModalAnimStyle();
-
   const existing = document.getElementById('callFriendModal');
   if (existing) existing.remove();
 
@@ -1205,78 +1200,58 @@ function showCallFriendModal(correctLetter) {
   overlay.id = 'callFriendModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
+    background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);
     display:flex; align-items:center; justify-content:center;
-    z-index:10003; padding:1rem; perspective:1000px;
+    z-index:10003; padding:1rem;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
-    backdrop-filter: blur(14px);
-    border-radius: 24px;
+    background:#FFFFFF; border-radius:24px;
     padding: 1.8rem 1.6rem;
     max-width: 400px; width: 100%;
-    position: relative; text-align: center; color: #f0f3fa;
+    position: relative; text-align: center; color: #2D1B4E;
     font-family: 'Poppins', sans-serif;
-    box-shadow:
-      0 24px 50px rgba(0,0,0,0.5),
-      0 6px 16px rgba(124,79,224,0.2),
-      inset 0 1px 0 rgba(255,255,255,0.08);
-    transform-style: preserve-3d;
-    animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border: 1px solid rgba(109,40,217,0.2);
   `;
-
-  const borderRing = document.createElement('div');
-  borderRing.style.cssText = `
-    position:absolute; inset:-2px; border-radius:24px; padding:2px;
-    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events:none; opacity:0.85; z-index:0;
-  `;
-  card.appendChild(borderRing);
 
   const inner = document.createElement('div');
-  inner.style.cssText = `position:relative; z-index:1;`;
-  card.appendChild(inner);
 
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
     position:absolute; top:0.6rem; right:1rem;
-    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
-    width:34px; height:34px; border-radius:50%;
-    font-size:1.4rem; line-height:1;
-    color:#e4e8f5; cursor:pointer; font-family:'Poppins',sans-serif;
-    z-index:2;
+    background:none; border:none;
+    font-size:1.6rem; line-height:1;
+    color:#6D28D9; cursor:pointer;
+    font-family:'Poppins',sans-serif;
   `;
   card.appendChild(closeBtn);
 
   const icon = document.createElement('div');
   icon.innerHTML = '<i class="fas fa-phone-volume"></i>';
   icon.style.cssText = `
-    font-size:2.4rem; color:#8B5CF6; margin-bottom:0.6rem;
-    filter: drop-shadow(0 4px 10px rgba(139,92,246,0.4));
+    font-size:2.4rem; color:#6D28D9; margin-bottom:0.6rem;
   `;
   inner.appendChild(icon);
 
   const msg = document.createElement('p');
-  msg.style.cssText = `font-size:1.05rem; color:#c9d3ee; font-weight:500; margin:0.4rem 0 0.7rem;`;
+  msg.style.cssText = `font-size:1.05rem; color:#5A4A7A; font-weight:500; margin:0.4rem 0 0.7rem;`;
   msg.textContent = 'Your friend says:';
   inner.appendChild(msg);
 
   const answer = document.createElement('p');
   answer.style.cssText = `
     font-family:'Orbitron',monospace; font-size:2.1rem; font-weight:800;
-    background: linear-gradient(135deg, #FFD700, #FF9A3E);
+    background: linear-gradient(135deg, #6D28D9, #F59E0B);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     margin:0.2rem 0 0.9rem; letter-spacing:0.04em;
   `;
   answer.textContent = `The correct answer is ${correctLetter}!`;
   inner.appendChild(answer);
 
+  card.appendChild(inner);
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 
@@ -1286,146 +1261,9 @@ function showCallFriendModal(correctLetter) {
   });
 }
 
-// ========== LOADER ==========
-function showLoader(message = 'Wait a moment. Calculating your score...') {
-  if (document.getElementById('scoreLoader')) return;
-
-  const overlay = document.createElement('div');
-  overlay.id = 'scoreLoader';
-  overlay.style.cssText = `
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    z-index:10000; font-family:'Poppins',sans-serif;
-  `;
-
-  const spinner = document.createElement('div');
-  spinner.style.cssText = `
-    width:60px; height:60px;
-    border:6px solid rgba(255,255,255,0.1);
-    border-top-color:#3ED6B7;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-  `;
-
-  const spinStyle = document.createElement('style');
-  spinStyle.textContent = `@keyframes spin { to { transform:rotate(360deg); } }`;
-  document.head.appendChild(spinStyle);
-
-  const text = document.createElement('p');
-  text.textContent = message;
-  text.style.cssText = `
-    color:#f0f3fa; font-size:1.1rem; font-weight:500;
-    margin-top:1.5rem; text-align:center; max-width:300px;
-  `;
-
-  overlay.appendChild(spinner);
-  overlay.appendChild(text);
-  document.body.appendChild(overlay);
-}
-
-function hideLoader() {
-  const overlay = document.getElementById('scoreLoader');
-  if (overlay) overlay.remove();
-}
-
-// ========== END ROUND – FIXED WITH AWAIT AND LOADER ==========
-async function endRound() {
-  if (roundEnded) return;
-  roundEnded    = true;
-  gameRoundActive = false;
-  clearInterval(timerInterval);
-
-  showLoader('Saving your progress...');
-
-  let newBest = false;
-  let saveError = false;
-
-  logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
-
-  try {
-    let previousBest = 0;
-    let existingWeeklyPeriodId = null;
-    let existingWeeklyCorrectAnswers = 0;
-    try {
-      const userRef = doc(db, 'users', currentUserUID);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        const catStats = data.categoryStats || {};
-        previousBest = catStats[category]?.bestScore || 0;
-        existingWeeklyPeriodId = data.weeklyPeriodId || null;
-        existingWeeklyCorrectAnswers = data.weeklyCorrectAnswers || 0;
-      }
-    } catch (err) {
-      console.warn('Could not read previous best:', err);
-      previousBest = 0;
-    }
-
-    const pointRef = collection(db, 'regular_points');
-    await addDoc(pointRef, {
-      uid:              currentUserUID,
-      gameType:         questionType,
-      category:         category,
-      point:            roundScore,
-      correctAnswers:   correctCount,
-      totalQuestions:   TOTAL_QUESTIONS,
-      questionsReached: currentQuestionIndex + 1,
-      coinsEarned:      roundCoins,
-      time:             serverTimestamp()
-    });
-
-    const userRef = doc(db, 'users', currentUserUID);
-    const currentWeekId = getCurrentWeekId();
-    const updateData = {
-      lifetimeRoundPlayed:  increment(1),
-      totalScore:           increment(roundScore),
-      totalCorrectAnswers:  increment(correctCount),
-      coins:                increment(roundCoins)
-    };
-
-    if (existingWeeklyPeriodId === currentWeekId) {
-      updateData.weeklyCorrectAnswers = increment(correctCount);
-    } else {
-      updateData.weeklyCorrectAnswers = correctCount;
-      updateData.weeklyPeriodId = currentWeekId;
-    }
-
-    await updateDoc(userRef, updateData);
-
-    const userSnap2 = await getDoc(userRef);
-    if (userSnap2.exists()) {
-      const data     = userSnap2.data();
-      const catStats = data.categoryStats || {};
-      const catKey   = category;
-      if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
-
-      const currentBest = catStats[catKey].bestScore || 0;
-      const newBestVal  = roundScore > currentBest ? roundScore : currentBest;
-
-      if (roundScore > previousBest) {
-        newBest = true;
-      }
-
-      await updateDoc(userRef, {
-        [`categoryStats.${catKey}.played`]:    increment(1),
-        [`categoryStats.${catKey}.bestScore`]: newBestVal
-      });
-    }
-
-  } catch (err) {
-    console.error('Error saving round data:', err);
-    showToast('Some data could not be saved, but your round is complete.', 'warning', 8000);
-    saveError = true;
-  } finally {
-    hideLoader();
-    showRoundEndModal(newBest);
-  }
-}
-
-// ========== COMMENT MODAL ==========
-let commentModalTimeout = null;   // for delayed comment modal
-let commentSoundTimeout = null;   // for delayed comment sound
+// ========== COMMENT MODAL (1 second delay) ==========
+let commentModalTimeout = null;
+let commentSoundTimeout = null;
 
 function ensureCommentModalAnimStyle() {
   if (document.getElementById('commentModalAnimStyle')) return;
@@ -1442,21 +1280,18 @@ function ensureCommentModalAnimStyle() {
 }
 
 function showCommentModal(comment) {
-  // Clear any existing delayed modals and sounds
   if (commentSoundTimeout) clearTimeout(commentSoundTimeout);
   if (commentModalTimeout) clearTimeout(commentModalTimeout);
 
-  // Remove any currently visible comment modal
   const existingModal = document.getElementById('commentModal');
   if (existingModal) existingModal.remove();
 
-  // Delay the comment sound by 2 seconds
+  // Reduced to 1 second
   commentSoundTimeout = setTimeout(() => {
     playCommentSound();
     commentSoundTimeout = null;
-  }, 2000);
+  }, 1000);
 
-  // Delay the modal appearance by 2 seconds so it syncs with the sound
   commentModalTimeout = setTimeout(() => {
     ensureCommentModalAnimStyle();
 
@@ -1464,54 +1299,34 @@ function showCommentModal(comment) {
     overlay.id = 'commentModal';
     overlay.style.cssText = `
       position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(6,4,16,0.8); backdrop-filter:blur(6px);
+      background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);
       display:flex; align-items:center; justify-content:center;
-      z-index:10002; padding:1rem; perspective:1000px;
+      z-index:10002; padding:1rem;
     `;
 
     const card = document.createElement('div');
     card.style.cssText = `
-      background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
-      backdrop-filter: blur(14px);
-      border-radius: 24px;
+      background:#FFFFFF; border-radius:24px;
       padding: 1.8rem 1.6rem;
       max-width: 400px; width: 100%;
-      position: relative; text-align: center; color: #f0f3fa;
+      position: relative; text-align: center;
       font-family: 'Poppins', sans-serif;
-      box-shadow:
-        0 24px 50px rgba(0,0,0,0.5),
-        0 6px 16px rgba(124,79,224,0.2),
-        inset 0 1px 0 rgba(255,255,255,0.08);
-      transform-style: preserve-3d;
-      animation: commentPopIn3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border: 1px solid rgba(109,40,217,0.2);
     `;
-
-    const borderRing = document.createElement('div');
-    borderRing.style.cssText = `
-      position:absolute; inset:-2px; border-radius:24px; padding:2px;
-      background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-      pointer-events:none; opacity:0.85; z-index:0;
-    `;
-    card.appendChild(borderRing);
 
     const inner = document.createElement('div');
-    inner.style.cssText = `position:relative; z-index:1;`;
-    card.appendChild(inner);
 
     const icon = document.createElement('div');
     icon.innerHTML = '<i class="fas fa-bolt"></i>';
     icon.style.cssText = `
-      font-size:2.2rem; color:#FFD700; margin-bottom:0.7rem;
-      filter: drop-shadow(0 4px 10px rgba(255,215,0,0.4));
+      font-size:2.2rem; color:#F59E0B; margin-bottom:0.7rem;
     `;
     inner.appendChild(icon);
 
     const textP = document.createElement('p');
     textP.style.cssText = `
-      font-size:1.2rem; font-weight:600; color:#ffffff;
+      font-size:1.2rem; font-weight:600; color:#2D1B4E;
       line-height:1.55; margin-bottom:1.5rem;
     `;
     textP.textContent = comment;
@@ -1520,21 +1335,22 @@ function showCommentModal(comment) {
     const btn = document.createElement('button');
     btn.innerHTML = '<i class="fas fa-check"></i> Got it';
     btn.style.cssText = `
-      background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+      background: #6D28D9;
       border:none; padding:0.65rem 2rem; border-radius:20px;
       font-weight:700; font-size:0.9rem; color:#ffffff;
       cursor:pointer; font-family:'Poppins',sans-serif;
       display:inline-flex; align-items:center; gap:0.5rem;
-      box-shadow: 0 8px 20px rgba(62,123,255,0.35);
+      box-shadow: 0 4px 12px rgba(109,40,217,0.3);
     `;
     btn.addEventListener('click', () => overlay.remove());
     inner.appendChild(btn);
 
+    card.appendChild(inner);
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 
     commentModalTimeout = null;
-  }, 2000);
+  }, 1000);
 }
 
 // ========== FIREWORKS ==========
@@ -1694,52 +1510,33 @@ function showRoundEndModal(newBest = false) {
   overlay.id = 'roundEndModal';
   overlay.style.cssText = `
     position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(6,4,16,0.85); backdrop-filter:blur(8px);
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    z-index:9999; padding:1rem; perspective:1200px;
+    z-index:9999; padding:1rem;
   `;
 
   const card = document.createElement('div');
   card.style.cssText = `
-    background: linear-gradient(160deg, rgba(48,38,84,0.92), rgba(20,16,42,0.96));
-    backdrop-filter: blur(14px);
-    border-radius: 28px;
+    background:#FFFFFF; border-radius:28px;
     padding: 2rem 1.6rem;
     max-width: 440px; width: 100%;
-    position: relative; text-align: center; color: #f0f3fa;
+    position: relative; text-align: center;
     font-family: 'Poppins', sans-serif;
-    box-shadow:
-      0 30px 60px rgba(0,0,0,0.55),
-      0 8px 20px rgba(255,154,62,0.15),
-      inset 0 1px 0 rgba(255,255,255,0.08);
-    transform-style: preserve-3d;
-    animation: roundEndPopIn3D 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    border: 1px solid rgba(109,40,217,0.2);
   `;
-
-  const borderRing = document.createElement('div');
-  borderRing.style.cssText = `
-    position:absolute; inset:-2px; border-radius:28px; padding:2px;
-    background: linear-gradient(150deg, #FF9A3E 0%, #7C4FE0 45%, #3E63E8 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events:none; opacity:0.85; z-index:0;
-  `;
-  card.appendChild(borderRing);
 
   const inner = document.createElement('div');
   inner.style.cssText = `position:relative; z-index:1;`;
-  card.appendChild(inner);
 
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
     position:absolute; top:0.6rem; right:1rem;
-    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
-    width:34px; height:34px; border-radius:50%;
-    font-size:1.4rem; line-height:1;
-    color:#e4e8f5; cursor:pointer; font-family:'Poppins',sans-serif;
-    z-index:2;
+    background:none; border:none;
+    font-size:1.6rem; line-height:1;
+    color:#6D28D9; cursor:pointer;
+    font-family:'Poppins',sans-serif;
   `;
   closeBtn.addEventListener('click', () => {
     window.location.href = '/app/dashboard.html#play';
@@ -1751,7 +1548,7 @@ function showRoundEndModal(newBest = false) {
   if (newBest) {
     const badge = document.createElement('div');
     badge.textContent = '🏆 New Best Score!';
-    badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#0A0A0F; background:linear-gradient(135deg,#FFD700,#FF9A3E); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(255,176,32,0.4);`;
+    badge.style.cssText = `font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:#FFFFFF; background:linear-gradient(135deg,#6D28D9,#F59E0B); border-radius:40px; padding:0.45rem 1.3rem; display:inline-block; margin-bottom:0.8rem; box-shadow:0 6px 20px rgba(109,40,217,0.3);`;
     badgeContainer.appendChild(badge);
     setTimeout(() => showFireworks(), 300);
   }
@@ -1759,16 +1556,16 @@ function showRoundEndModal(newBest = false) {
 
   const title = document.createElement('h2');
   title.textContent = 'Round Complete!';
-  title.style.cssText = `font-family:'Orbitron',monospace; font-size:1.5rem; font-weight:800; color:#ffffff; margin:0.3rem 0 0.9rem; text-shadow:0 2px 8px rgba(0,0,0,0.4);`;
+  title.style.cssText = `font-family:'Orbitron',monospace; font-size:1.5rem; font-weight:800; color:#2D1B4E; margin:0.3rem 0 0.9rem;`;
   inner.appendChild(title);
 
   const maxPossible = TOTAL_QUESTIONS * MAX_SCORE_PER_QUESTION;
   const scoreDiv    = document.createElement('div');
   scoreDiv.style.cssText = `
     font-family:'Orbitron',monospace; font-size:3rem; font-weight:800;
-    background: linear-gradient(135deg, #FFB020, #FF6B6B);
+    background: linear-gradient(135deg, #6D28D9, #F59E0B);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    margin:0.4rem 0; text-shadow: 0 6px 18px rgba(255,107,107,0.25);
+    margin:0.4rem 0;
   `;
   scoreDiv.textContent = `${roundScore} / ${maxPossible}`;
   inner.appendChild(scoreDiv);
@@ -1779,7 +1576,7 @@ function showRoundEndModal(newBest = false) {
     attempted = Math.min(currentQuestionIndex + 1, TOTAL_QUESTIONS);
     correctOutOfText = `${correctCount} of ${attempted} correct`;
     const reachedDiv = document.createElement('div');
-    reachedDiv.style.cssText = `font-size:0.9rem; color:#a9b3d6; margin-bottom:0.4rem;`;
+    reachedDiv.style.cssText = `font-size:0.9rem; color:#5A4A7A; margin-bottom:0.4rem;`;
     reachedDiv.textContent = `You reached question ${attempted} of ${TOTAL_QUESTIONS}`;
     inner.appendChild(reachedDiv);
   } else {
@@ -1788,9 +1585,8 @@ function showRoundEndModal(newBest = false) {
 
   const correctDiv = document.createElement('div');
   correctDiv.style.cssText = `
-    display:inline-block; font-size:0.85rem; font-weight:700; color:#ffffff;
-    background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px; padding:0.3rem 0.9rem; margin-bottom:0.9rem;
+    display:inline-block; font-size:0.85rem; font-weight:700; color:#FFFFFF;
+    background: #6D28D9; border-radius:20px; padding:0.3rem 0.9rem; margin-bottom:0.9rem;
   `;
   correctDiv.textContent = correctOutOfText;
   inner.appendChild(correctDiv);
@@ -1798,7 +1594,7 @@ function showRoundEndModal(newBest = false) {
   const endComment = getEndOfRoundComment(roundScore);
   const msgP       = document.createElement('p');
   msgP.textContent = endComment;
-  msgP.style.cssText = `font-size:1.02rem; color:#e4e8f5; margin:0.6rem 0 1.5rem; font-weight:500; line-height:1.4;`;
+  msgP.style.cssText = `font-size:1.02rem; color:#5A4A7A; margin:0.6rem 0 1.5rem; font-weight:500; line-height:1.4;`;
   inner.appendChild(msgP);
 
   const btnContainer = document.createElement('div');
@@ -1807,12 +1603,12 @@ function showRoundEndModal(newBest = false) {
   const playAgainBtn = document.createElement('button');
   playAgainBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Play Again';
   playAgainBtn.style.cssText = `
-    background: linear-gradient(160deg, #3E7BFF 0%, #1A4FA0 100%);
+    background: #6D28D9;
     border:none; padding:0.75rem 1.6rem; border-radius:20px;
     font-weight:700; font-size:0.9rem; color:#ffffff;
     cursor:pointer; font-family:'Poppins',sans-serif;
     display:flex; align-items:center; gap:0.5rem; justify-content:center;
-    box-shadow: 0 8px 20px rgba(62,123,255,0.35);
+    box-shadow: 0 4px 12px rgba(109,40,217,0.3);
     flex:1; min-width:150px;
   `;
   playAgainBtn.addEventListener('click', () => {
@@ -1847,10 +1643,10 @@ function showRoundEndModal(newBest = false) {
   const dashBtn = document.createElement('button');
   dashBtn.innerHTML = '<i class="fas fa-house"></i> Dashboard';
   dashBtn.style.cssText = `
-    background: rgba(255,255,255,0.06);
-    border:1.5px solid rgba(255,255,255,0.15);
+    background: #FFFFFF;
+    border:1.5px solid #6D28D9;
     padding:0.75rem 1.6rem; border-radius:20px;
-    font-weight:700; font-size:0.9rem; color:#ffffff;
+    font-weight:700; font-size:0.9rem; color:#2D1B4E;
     cursor:pointer; font-family:'Poppins',sans-serif;
     display:flex; align-items:center; gap:0.5rem; justify-content:center;
     flex:1; min-width:150px;
@@ -1862,57 +1658,23 @@ function showRoundEndModal(newBest = false) {
 
   inner.appendChild(btnContainer);
 
-  // ---------- WHATSAPP SHARE BUTTON (injected CSS) ----------
+  // WHATSAPP SHARE BUTTON
   if (!document.getElementById('whatsapp-share-styles')) {
     const styleEl = document.createElement('style');
     styleEl.id = 'whatsapp-share-styles';
     styleEl.textContent = `
       .whatsapp-share-btn {
-          background: linear-gradient(160deg, rgba(48, 38, 84, 0.92), rgba(20, 16, 42, 0.96));
-          border: none;
-          border-radius: 40px;
-          padding: 0.75rem 1.4rem;
-          font-family: 'Poppins', sans-serif;
-          font-weight: 700;
-          font-size: 0.9rem;
-          color: #FFFFFF;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.6rem;
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.3);
+          background: #25D366; border: none;
+          border-radius: 40px; padding: 0.75rem 1.4rem;
+          font-family: 'Poppins', sans-serif; font-weight: 700;
+          font-size: 0.9rem; color: #FFFFFF;
+          cursor: pointer; display: flex; align-items: center;
+          justify-content: center; gap: 0.6rem;
+          box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+          transition: transform 0.2s ease;
       }
-      .whatsapp-share-btn::before {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          border-radius: 40px;
-          padding: 2px;
-          background: linear-gradient(150deg, #25D366 0%, #7C4FE0 55%, #3E63E8 100%);
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          pointer-events: none;
-          opacity: 0.85;
-      }
-      .whatsapp-share-btn:hover {
-          transform: scale(1.03);
-          box-shadow: inset 0 4px 12px rgba(0,0,0,0.4), 0 6px 18px rgba(37, 211, 102, 0.25);
-      }
-      .whatsapp-share-btn i.fa-whatsapp {
-          color: #25D366;
-          font-size: 1.15rem;
-          animation: whatsappPulse 2.4s ease-in-out infinite;
-      }
-      @keyframes whatsappPulse {
-          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(37, 211, 102, 0)); }
-          50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.6)); }
-      }
+      .whatsapp-share-btn:hover { transform: scale(1.03); }
+      .whatsapp-share-btn i.fa-whatsapp { color: #fff; font-size: 1.15rem; }
     `;
     document.head.appendChild(styleEl);
   }
@@ -1931,6 +1693,144 @@ function showRoundEndModal(newBest = false) {
   });
   inner.appendChild(shareBtn);
 
+  card.appendChild(inner);
   overlay.appendChild(card);
   document.body.appendChild(overlay);
+}
+
+// ========== END ROUND ==========
+async function endRound() {
+  if (roundEnded) return;
+  roundEnded    = true;
+  gameRoundActive = false;
+  clearInterval(timerInterval);
+
+  showLoader('Saving your progress...');
+
+  let newBest = false;
+  let saveError = false;
+
+  logGameCompleted(questionType, roundScore, correctCount, TOTAL_QUESTIONS, roundCoins);
+
+  try {
+    let previousBest = 0;
+    let existingWeeklyPeriodId = null;
+    let existingWeeklyCorrectAnswers = 0;
+    try {
+      const userRef = doc(db, 'users', currentUserUID);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        const catStats = data.categoryStats || {};
+        previousBest = catStats[category]?.bestScore || 0;
+        existingWeeklyPeriodId = data.weeklyPeriodId || null;
+        existingWeeklyCorrectAnswers = data.weeklyCorrectAnswers || 0;
+      }
+    } catch (err) {
+      console.warn('Could not read previous best:', err);
+      previousBest = 0;
+    }
+
+    const pointRef = collection(db, 'regular_points');
+    await addDoc(pointRef, {
+      uid:              currentUserUID,
+      gameType:         questionType,
+      category:         category,
+      point:            roundScore,
+      correctAnswers:   correctCount,
+      totalQuestions:   TOTAL_QUESTIONS,
+      questionsReached: currentQuestionIndex + 1,
+      coinsEarned:      roundCoins,
+      time:             serverTimestamp()
+    });
+
+    const userRef = doc(db, 'users', currentUserUID);
+    const currentWeekId = getCurrentWeekId();
+    const updateData = {
+      lifetimeRoundPlayed:  increment(1),
+      totalScore:           increment(roundScore),
+      totalCorrectAnswers:  increment(correctCount),
+      coins:                increment(roundCoins)
+    };
+
+    if (existingWeeklyPeriodId === currentWeekId) {
+      updateData.weeklyCorrectAnswers = increment(correctCount);
+    } else {
+      updateData.weeklyCorrectAnswers = correctCount;
+      updateData.weeklyPeriodId = currentWeekId;
+    }
+
+    await updateDoc(userRef, updateData);
+
+    const userSnap2 = await getDoc(userRef);
+    if (userSnap2.exists()) {
+      const data     = userSnap2.data();
+      const catStats = data.categoryStats || {};
+      const catKey   = category;
+      if (!catStats[catKey]) catStats[catKey] = { played: 0, bestScore: 0 };
+
+      const currentBest = catStats[catKey].bestScore || 0;
+      const newBestVal  = roundScore > currentBest ? roundScore : currentBest;
+
+      if (roundScore > previousBest) {
+        newBest = true;
+      }
+
+      await updateDoc(userRef, {
+        [`categoryStats.${catKey}.played`]:    increment(1),
+        [`categoryStats.${catKey}.bestScore`]: newBestVal
+      });
+    }
+
+  } catch (err) {
+    console.error('Error saving round data:', err);
+    showToast('Some data could not be saved, but your round is complete.', 'warning', 8000);
+    saveError = true;
+  } finally {
+    hideLoader();
+    showRoundEndModal(newBest);
+  }
+}
+
+// ========== LOADER ==========
+function showLoader(message = 'Wait a moment. Calculating your score...') {
+  if (document.getElementById('scoreLoader')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'scoreLoader';
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:10000; font-family:'Poppins',sans-serif;
+  `;
+
+  const spinner = document.createElement('div');
+  spinner.style.cssText = `
+    width:60px; height:60px;
+    border:6px solid rgba(109,40,217,0.2);
+    border-top-color:#6D28D9;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+  `;
+
+  const spinStyle = document.createElement('style');
+  spinStyle.textContent = `@keyframes spin { to { transform:rotate(360deg); } }`;
+  document.head.appendChild(spinStyle);
+
+  const text = document.createElement('p');
+  text.textContent = message;
+  text.style.cssText = `
+    color:#2D1B4E; font-size:1.1rem; font-weight:500;
+    margin-top:1.5rem; text-align:center; max-width:300px;
+  `;
+
+  overlay.appendChild(spinner);
+  overlay.appendChild(text);
+  document.body.appendChild(overlay);
+}
+
+function hideLoader() {
+  const overlay = document.getElementById('scoreLoader');
+  if (overlay) overlay.remove();
 }
