@@ -24,7 +24,7 @@
     --accent-red: #EF4444;
 
     --border-subtle: rgba(0,0,0,0.06);
-    --border-card: rgba(109, 40, 217, 0.35);   /* purple outline for cards */
+    --border-card: rgba(109, 40, 217, 0.35);
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
     --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
@@ -59,7 +59,7 @@
     --text-muted: #8E8EA0;
 
     --border-subtle: rgba(255,255,255,0.06);
-    --border-card: rgba(245, 158, 11, 0.35);  /* keep gold outline in dark mode */
+    --border-card: rgba(245, 158, 11, 0.35);
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
     --shadow-lg: 0 8px 30px rgba(0,0,0,0.6);
@@ -179,22 +179,26 @@ body {
     color: var(--text-primary);
 }
 
-.stat-add-btn { display: none; }   /* hidden but kept in DOM */
+.stat-add-btn { display: none; }
 
-/* ── GEAR ICON NOW PURPLE ── */
+/* ── GEAR ICON – NO BACKGROUND, PURPLE (light) / GOLD (dark) ── */
 .icon-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    color: var(--accent-purple);
-    font-size: 1.1rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--accent-purple);        /* purple in light mode */
+    font-size: 1.25rem;
     cursor: pointer;
     width: 38px; height: 38px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    transition: border-color var(--transition-fast);
-    box-shadow: var(--shadow-sm);
+    transition: color var(--transition-fast), transform var(--transition-fast);
 }
-.icon-btn:active { border-color: var(--accent-purple); }
+.icon-btn:active { transform: scale(0.92); }
+
+[data-theme="dark"] .icon-btn {
+    color: var(--accent-gold);          /* gold in dark mode */
+}
 
 /* ============================================================
    MAIN LAYOUT
@@ -305,9 +309,9 @@ body {
 .tips-section,
 .shop-item {
     background: var(--bg-card);
-    border: none;                           /* no border */
+    border: none;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);           /* slightly deeper shadow for depth */
+    box-shadow: var(--shadow-md);
 }
 
 /* ── PROFILE CARD – subtle left-edge purple accent ── */
@@ -825,7 +829,7 @@ body {
 .rank-2 { background: linear-gradient(135deg, #C0C0C0, #9CA3AF); color: #0A0A0F; }
 .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); color: #fff; }
 
-/* Overtake message in deep purple */
+/* ── Overtake message container + inner span ── */
 #userRankDisplay {
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -837,6 +841,14 @@ body {
     max-width: 100%;
     display: inline-block;
     line-height: 1.4;
+}
+
+/* Override the inline gray color on the overtake span inside rank display */
+#userRankDisplay span {
+    color: var(--accent-purple) !important;
+}
+[data-theme="dark"] #userRankDisplay span {
+    color: #C9D3EE !important;   /* keep readable in dark mode */
 }
 
 /* Light mode: level & score purple; dark mode: level white, score gold */
