@@ -1,11 +1,10 @@
 /* ============================================================
    NAIJAGENIUS DASHBOARD – Nigerian Green Identity (Dark Default)
-   Light mode toggled via [data-theme="dark"] attribute (JS‑driven)
+   Light mode toggled via [data-theme="dark"] attribute
    ============================================================ */
 
 /* ===== SHARED DESIGN TOKENS ===== */
 :root {
-    /* Colors */
     --color-primary: #0B8A3D;          /* Nigerian green – CTAs, accents, active states */
     --color-primary-hover: #0A7A35;
     --color-gold: #F59E0B;             /* Coins, achievements, rank medals */
@@ -28,17 +27,6 @@
     --text-primary: #FFFFFF;
     --text-secondary: #A0A0A0;
     --text-muted: #6B7280;
-
-    /* Light‑mode overrides (used when [data-theme="dark"] is NOT set) */
-    --light-bg-page: #F3F4F6;
-    --light-bg-card: #FFFFFF;
-    --light-bg-card-hover: #F0F0F5;
-    --light-bg-header: rgba(243, 244, 246, 0.92);
-    --light-bg-nav: #FFFFFF;
-    --light-bg-skeleton: rgba(0,0,0,0.04);
-    --light-text-primary: #0A1A12;
-    --light-text-secondary: #4A5A50;
-    --light-text-muted: #6B7280;
 
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
@@ -502,7 +490,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;   /* text sits at bottom over scrim */
+    justify-content: flex-end;
     cursor: pointer;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     aspect-ratio: 3 / 4;
@@ -549,7 +537,6 @@ body {
 #oneChanceBtn  { background-image: url('../assets/one-chance.jpeg'); }
 
 .mode-card:active { transform: scale(0.96); }
-
 .mode-card-icon { display: none; }
 
 .mode-card-name {
@@ -589,7 +576,6 @@ body {
 }
 .whatsapp-share-btn i { color: #25D366; font-size: 1.1rem; }
 .whatsapp-share-btn:active { border-color: #25D366; }
-
 .whatsapp-share-btn--compact { margin-bottom: var(--space-4); }
 
 /* Tips section */
@@ -1237,18 +1223,18 @@ body {
 }
 
 /* ============================================================
-   LIGHT‑MODE OVERRIDES ([data-theme="dark"] absence means light)
+   LIGHT‑MODE OVERRIDES
    ============================================================ */
 :root:not([data-theme="dark"]) {
-    --bg-page: var(--light-bg-page);
-    --bg-card: var(--light-bg-card);
-    --bg-card-hover: var(--light-bg-card-hover);
-    --bg-header: var(--light-bg-header);
-    --bg-nav: var(--light-bg-nav);
-    --bg-skeleton: var(--light-bg-skeleton);
-    --text-primary: var(--light-text-primary);
-    --text-secondary: var(--light-text-secondary);
-    --text-muted: var(--light-text-muted);
+    --bg-page: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F0F0F5;
+    --bg-header: rgba(243,244,246,0.92);
+    --bg-nav: #FFFFFF;
+    --bg-skeleton: rgba(0,0,0,0.04);
+    --text-primary: #0A1A12;
+    --text-secondary: #4A5A50;
+    --text-muted: #6B7280;
 }
 
 :root:not([data-theme="dark"]) .app-header {
@@ -1257,15 +1243,6 @@ body {
 
 :root:not([data-theme="dark"]) .mode-card-overlay {
     background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0) 100%);
-}
-
-:root:not([data-theme="dark"]) .tip-streak {
-    color: var(--color-primary);
-}
-
-:root:not([data-theme="dark"]) .stat-detail-icon {
-    color: var(--color-gold);
-    background: rgba(245,158,11,0.2);
 }
 
 /* ============================================================
