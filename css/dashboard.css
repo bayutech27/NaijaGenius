@@ -65,6 +65,88 @@ body {
 }
 
 /* ============================================================
+   SKELETAL LOADER (home page)
+   ============================================================ */
+.skeleton-home {
+    padding: 0 0 1rem 0;
+    width: 100%;
+}
+
+.skeleton-block,
+.skeleton-avatar,
+.skeleton-stat,
+.skeleton-mode {
+    background: linear-gradient(90deg, rgba(48, 38, 84, 0.4) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(48, 38, 84, 0.4) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius: 10px;
+}
+
+.skeleton-greeting {
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-greeting .skeleton-block {
+    margin-left: 0;
+}
+
+.skeleton-level {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.skeleton-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-level-text {
+    flex: 1;
+}
+
+.skeleton-level-text .skeleton-block {
+    margin-bottom: 0.4rem;
+}
+
+.skeleton-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-stat {
+    flex: 1;
+    height: 70px;
+    border-radius: 16px;
+}
+
+.skeleton-challenges {
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-mode {
+    height: 180px;
+    border-radius: 18px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ============================================================
    UNIVERSAL CARD STYLE – exactly like game result/comment modals
    ============================================================ */
 .level-display,
@@ -919,7 +1001,7 @@ body {
 /* ----- SECTION HEADER (Shop / Leaderboard) ----- */
 .section-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
     margin-bottom: 1rem;
@@ -932,6 +1014,7 @@ body {
     font-size: 1.2rem;
     font-weight: 800;
     color: #FFFFFF;
+    flex-shrink: 0;
 }
 .section-header .section-title i { font-size: 1rem; }
 
@@ -1240,6 +1323,20 @@ body {
 @keyframes pulseFade {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
+}
+
+/* Rank display (overtake message) – ensure text wraps fully */
+#userRankDisplay {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #FFD700;
+    margin-left: 0.5rem;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    display: inline-block;
+    line-height: 1.4;
 }
 
 /* ----- PICK YOUR LANE (in-page tab) ----- */
