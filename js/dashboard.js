@@ -95,7 +95,7 @@ let isDataReady = false;
 
 function showHomeSkeleton() {
   if (skeletonHome) {
-    skeletonHome.style.display = 'flex';  // use flex to allow internal layout
+    skeletonHome.style.display = 'flex';
   }
 }
 
@@ -509,8 +509,11 @@ onAuthStateChanged(auth, async (user) => {
       }
       const initials = displayName.slice(0, 2).toUpperCase();
       if (userInitialsSpan) userInitialsSpan.textContent = initials;
-      isDataReady = true;
-      hideHomeSkeleton();
+      // Data ready (even if minimal), hide skeleton after a tiny delay so user sees it
+      setTimeout(() => {
+        isDataReady = true;
+        hideHomeSkeleton();
+      }, 300);
       return;
     }
     const userData = userSnap.data();
@@ -631,9 +634,11 @@ onAuthStateChanged(auth, async (user) => {
       }
     });
 
-    // Mark data as ready and hide the skeleton
-    isDataReady = true;
-    hideHomeSkeleton();
+    // Mark data as ready and hide skeleton after a guaranteed minimum 300ms
+    setTimeout(() => {
+      isDataReady = true;
+      hideHomeSkeleton();
+    }, 300);
 
     // AVATAR UPLOAD HANDLERS
     avatarFileInput.addEventListener("change", async (e) => {
@@ -706,8 +711,10 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
     if (greetingName) greetingName.textContent = "Player";
-    isDataReady = true;
-    hideHomeSkeleton();
+    setTimeout(() => {
+      isDataReady = true;
+      hideHomeSkeleton();
+    }, 300);
   }
 });
 
@@ -872,10 +879,11 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
       // Show skeleton when navigating to home
       if (target === "home") {
         showHomeSkeleton();
-        // If data is already loaded, hide skeleton after a short delay
         if (isDataReady) {
-          setTimeout(hideHomeSkeleton, 300);
+          // Data already loaded, hide after a short pause so the skeleton is seen
+          setTimeout(hideHomeSkeleton, 350);
         }
+        // If data not ready, skeleton stays until hideHomeSkeleton is called in onAuthStateChanged
       }
     }
   });
@@ -1011,5 +1019,5 @@ function setupLeaderboardShareButton() {
   });
 }
 
-// Show skeleton on initial load (before auth data arrives)
+// Show skeleton immediately when the script runs (before any data)
 showHomeSkeleton();
