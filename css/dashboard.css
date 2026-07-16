@@ -571,7 +571,7 @@ body {
 }
 .tip-streak {
     font-weight: 600;
-    color: #FFFFFF;                    /* white / whitesmoke */
+    color: var(--accent-purple);
 }
 .tip-reward {
     font-weight: 700;
