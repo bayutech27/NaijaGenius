@@ -643,7 +643,14 @@ body {
 .lane-card:active { transform: scale(0.96); box-shadow: var(--shadow-sm); }
 
 .lane-icon { font-size: 2rem; }
-.lane-name { font-weight: 700; font-size: var(--font-size-sm); color: var(--text-primary); }
+
+/* CATEGORY NAMES IN PURPLE */
+.lane-name {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: var(--accent-purple);
+}
+
 .lane-desc { font-size: var(--font-size-xs); color: var(--text-muted); line-height: 1.3; }
 
 .back-arrow-btn {
@@ -950,13 +957,13 @@ body {
     background: var(--bg-card-hover);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-full);
-    padding: var(--space-1) var(--space-2);   /* reduced horizontal padding */
+    padding: var(--space-1) var(--space-2);
     color: var(--text-primary);
     font-family: var(--font-body);
     font-size: var(--font-size-xs);
     outline: none;
-    width: 140px;            /* increased width */
-    height: 36px;            /* added height */
+    width: 140px;
+    height: 36px;
 }
 .settings-name-control input:focus { border-color: var(--accent-gold); }
 .settings-name-control button {
@@ -976,12 +983,12 @@ body {
     border: none;
     box-shadow: none;
     color: var(--accent-purple);          /* purple in light mode */
-    font-size: 1.4rem;                    /* slightly bigger */
+    font-size: 1.4rem;
     width: auto;
     height: auto;
 }
 [data-theme="dark"] .back-arrow-btn.settings-close-btn {
-    color: var(--accent-gold);            /* gold in dark mode */
+    color: var(--accent-gold);
 }
 
 .btn-feedback {
