@@ -89,6 +89,24 @@ const avatarFileInput = document.getElementById("avatarFileInput");
 const userAvatarImg = document.getElementById("userAvatarImg");
 const userInitialsSpan = document.getElementById("userInitials");
 
+// ========== SKELETON LOADER ==========
+const skeletonHome = document.getElementById('skeletonHome');
+let isDataReady = false;
+
+function showHomeSkeleton() {
+  if (skeletonHome) {
+    skeletonHome.style.display = 'block';
+    // Hide the real home content until skeleton is removed (optional but keeps it tidy)
+    // We don't need to hide anything else; skeleton sits on top.
+  }
+}
+
+function hideHomeSkeleton() {
+  if (skeletonHome) {
+    skeletonHome.style.display = 'none';
+  }
+}
+
 // ========== HEADER TOGGLE ==========
 const appHeader = document.querySelector(".app-header");
 
@@ -269,10 +287,6 @@ async function computeUserRank(uid, filter) {
   }
 }
 
-/**
- * Fetch the immediate higher‑ranked user for a given filter and score.
- * Returns null if the user is already #1.
- */
 async function getNextHigherUser(filter, userScore) {
   try {
     const field = getScoreField(filter);
@@ -497,6 +511,8 @@ onAuthStateChanged(auth, async (user) => {
       }
       const initials = displayName.slice(0, 2).toUpperCase();
       if (userInitialsSpan) userInitialsSpan.textContent = initials;
+      isDataReady = true;
+      hideHomeSkeleton();
       return;
     }
     const userData = userSnap.data();
@@ -617,6 +633,10 @@ onAuthStateChanged(auth, async (user) => {
       }
     });
 
+    // Mark data as ready and hide the skeleton
+    isDataReady = true;
+    hideHomeSkeleton();
+
     // AVATAR UPLOAD HANDLERS
     avatarFileInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
@@ -688,6 +708,8 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Error loading user data:", error);
     if (greetingText) greetingText.textContent = "Good Day, Player";
     if (greetingName) greetingName.textContent = "Player";
+    isDataReady = true;
+    hideHomeSkeleton();
   }
 });
 
@@ -848,6 +870,15 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
       });
       btn.classList.add("active");
       toggleHeaderVisibility(target);
+
+      // Show skeleton when navigating to home
+      if (target === "home") {
+        showHomeSkeleton();
+        // If data is already loaded, hide skeleton after a short delay
+        if (isDataReady) {
+          setTimeout(hideHomeSkeleton, 300);
+        }
+      }
     }
   });
 });
@@ -981,3 +1012,6 @@ function setupLeaderboardShareButton() {
     if (!waWindow) alert("Share via WhatsApp:\n\n" + rankText);
   });
 }
+
+// Show skeleton on initial load (before auth data arrives)
+showHomeSkeleton();
