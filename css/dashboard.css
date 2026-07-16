@@ -24,7 +24,7 @@
     --accent-red: #EF4444;
 
     --border-subtle: rgba(0,0,0,0.06);
-    --border-card: rgba(109, 40, 217, 0.15);   /* purple tint */
+    --border-card: rgba(109, 40, 217, 0.35);   /* purple outline for cards */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
     --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
@@ -59,7 +59,7 @@
     --text-muted: #8E8EA0;
 
     --border-subtle: rgba(255,255,255,0.06);
-    --border-card: rgba(245, 158, 11, 0.35);
+    --border-card: rgba(245, 158, 11, 0.35);  /* keep gold outline in dark mode */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
     --shadow-lg: 0 8px 30px rgba(0,0,0,0.6);
@@ -181,10 +181,11 @@ body {
 
 .stat-add-btn { display: none; }   /* hidden but kept in DOM */
 
+/* ── GEAR ICON NOW PURPLE ── */
 .icon-btn {
     background: var(--bg-card);
     border: 1px solid var(--border-card);
-    color: var(--accent-gold);
+    color: var(--accent-purple);   /* changed from gold */
     font-size: 1.1rem;
     cursor: pointer;
     width: 38px; height: 38px;
@@ -193,7 +194,7 @@ body {
     transition: border-color var(--transition-fast);
     box-shadow: var(--shadow-sm);
 }
-.icon-btn:active { border-color: var(--accent-gold); }
+.icon-btn:active { border-color: var(--accent-purple); }
 
 /* ============================================================
    MAIN LAYOUT
@@ -293,7 +294,7 @@ body {
 .skeleton-greeting { margin-bottom: 0; }
 
 /* ============================================================
-   CARD BASE STYLE
+   CARD BASE STYLE (now with visible purple outline)
    ============================================================ */
 .profile-card,
 .stats-row,
@@ -304,7 +305,7 @@ body {
 .tips-section,
 .shop-item {
     background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    border: 1px solid var(--border-card);    /* purple outline */
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
 }
@@ -469,6 +470,7 @@ body {
    ============================================================ */
 .mode-section { margin-bottom: var(--space-5); }
 
+/* ── SECTION TITLE NOW PURPLE ── */
 .mode-title {
     display: flex; align-items: center; justify-content: center;
     gap: var(--space-3);
@@ -477,7 +479,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-muted);
+    color: var(--accent-purple);            /* changed from muted */
 }
 .mode-title i { color: var(--accent-gold); font-size: 1rem; }
 .title-line { flex: 1; max-width: 40px; height: 1px; background: var(--border-subtle); }
@@ -541,6 +543,7 @@ body {
 
 .whatsapp-share-btn--compact { margin-bottom: var(--space-4); }
 
+/* ── TIPS SECTION: purple accents ── */
 .tips-section {
     padding: var(--space-4);
     margin-bottom: var(--space-4);
@@ -550,7 +553,7 @@ body {
 .tips-title {
     font-size: var(--font-size-sm);
     font-weight: 700;
-    color: var(--accent-gold);
+    color: var(--accent-purple);          /* changed from gold */
     display: flex; align-items: center; gap: var(--space-2);
     margin-bottom: var(--space-3);
 }
@@ -560,12 +563,16 @@ body {
 .tip-item {
     display: flex; align-items: center; justify-content: space-between;
     padding: var(--space-2) var(--space-3);
-    background: var(--bg-card-hover);
+    background: rgba(109, 40, 217, 0.1);        /* purple tint */
+    border: 1px solid rgba(109, 40, 217, 0.25); /* purple outline */
     border-radius: var(--radius-sm);
     font-size: var(--font-size-xs);
     color: var(--text-secondary);
 }
-.tip-streak { font-weight: 600; }
+.tip-streak {
+    font-weight: 600;
+    color: #FFFFFF;                    /* white / whitesmoke */
+}
 .tip-reward {
     font-weight: 700;
     color: var(--accent-gold);
@@ -577,7 +584,7 @@ body {
 .ad-container { margin-top: var(--space-4); min-height: 50px; }
 
 /* ============================================================
-   SECTION HEADERS
+   SECTION HEADERS – all purple now
    ============================================================ */
 .section-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -589,7 +596,7 @@ body {
 .section-title--page {
     font-size: var(--font-size-lg);
     font-weight: 800;
-    color: var(--text-primary);
+    color: var(--accent-purple);          /* section titles purple */
     display: flex; align-items: center; gap: var(--space-2);
 }
 
@@ -732,6 +739,7 @@ body {
 .shop-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .shop-buy-btn:not(:disabled):hover { background: #7C3AED; }
 
+/* Watch Ad container – intentionally kept without purple outline */
 .ad-life-container {
     margin-top: var(--space-6);
     text-align: center;
@@ -740,7 +748,7 @@ body {
     border-radius: var(--radius-xl);
     max-width: 280px;
     margin-left: auto; margin-right: auto;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    border: 1px solid rgba(245, 158, 11, 0.3);   /* gold, not purple */
 }
 
 .ad-life-btn {
@@ -759,7 +767,7 @@ body {
 .ad-life-note { font-size: 0.6rem; color: rgba(255,255,255,0.8); margin-top: var(--space-1); }
 
 /* ============================================================
-   LEADERBOARD
+   LEADERBOARD – purple overrides
    ============================================================ */
 .filter-select {
     background: var(--bg-card);
@@ -801,10 +809,11 @@ body {
 .rank-2 { background: linear-gradient(135deg, #C0C0C0, #9CA3AF); color: #0A0A0F; }
 .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); color: #fff; }
 
+/* ── Overtake message, level name, and score in deep purple ── */
 #userRankDisplay {
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--accent-gold) !important;
+    color: var(--accent-purple) !important;   /* deep purple */
     margin-left: var(--space-2);
     white-space: normal !important;
     word-break: break-word;
@@ -812,6 +821,15 @@ body {
     max-width: 100%;
     display: inline-block;
     line-height: 1.4;
+}
+
+/* Override inline styles from dashboard.js for leaderboard level and score */
+.leaderboard-item .leaderboard-level,
+.leaderboard-item .leaderboard-score {
+    color: var(--accent-purple) !important;
+}
+.leaderboard-item .leaderboard-name {
+    color: var(--text-primary);   /* keep name readable */
 }
 
 .loading-skeleton {
