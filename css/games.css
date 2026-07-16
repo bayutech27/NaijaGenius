@@ -1,6 +1,7 @@
 /* ============================================================
    NAIJAGENIUS GAME – Nigerian Green Identity (Dark Default)
    Same design tokens as dashboard, coherent visual system
+   Light mode toggled via [data-theme="light"] attribute on <html>
    ============================================================ */
 
 /* ===== SHARED DESIGN TOKENS (identical to dashboard) ===== */
@@ -43,7 +44,7 @@
     --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
 
     /* Typography */
-    --font-body: 'Poppins', 'Exo 2', sans-serif;
+    --font-body: 'Poppins', 'Inter', sans-serif;
     --font-display: 'Orbitron', monospace;
     --font-size-xs: 0.7rem; --font-size-sm: 0.8rem;
     --font-size-base: 0.95rem; --font-size-lg: 1.15rem;
@@ -493,9 +494,12 @@ body {
 }
 
 /* ============================================================
-   LIGHT‑MODE OVERRIDES
+   LIGHT‑MODE OVERRIDE
+   Activated ONLY by explicitly adding [data-theme="light"] to <html>.
+   Absence of the attribute = dark mode (the :root defaults above).
+   Matches the same fix applied in dashboard.css.
    ============================================================ */
-:root:not([data-theme="dark"]) {
+[data-theme="light"] {
     --bg-page: #F3F4F6;
     --bg-card: #FFFFFF;
     --bg-card-hover: #F0F0F5;
@@ -507,31 +511,31 @@ body {
     --text-muted: #6B7280;
 }
 
-:root:not([data-theme="dark"]) .app-header {
+[data-theme="light"] .app-header {
     border-bottom-color: rgba(0,0,0,0.06);
 }
 
-:root:not([data-theme="dark"]) .timer-bg {
+[data-theme="light"] .timer-bg {
     stroke: rgba(0,0,0,0.08);
 }
 
-:root:not([data-theme="dark"]) .option-btn {
+[data-theme="light"] .option-btn {
     border-color: rgba(0,0,0,0.08);
 }
-:root:not([data-theme="dark"]) .option-btn:hover {
+[data-theme="light"] .option-btn:hover {
     border-color: var(--color-primary);
 }
 
-:root:not([data-theme="dark"]) .question-box {
+[data-theme="light"] .question-box {
     background: var(--bg-card);
     border-color: rgba(11,138,61,0.2);
 }
 
-:root:not([data-theme="dark"]) .progress-wrapper {
+[data-theme="light"] .progress-wrapper {
     background-color: rgba(0,0,0,0.06);
 }
 
-:root:not([data-theme="dark"]) .crowd-percent {
+[data-theme="light"] .crowd-percent {
     background: rgba(0,0,0,0.5);
 }
 
