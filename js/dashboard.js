@@ -96,8 +96,6 @@ let isDataReady = false;
 function showHomeSkeleton() {
   if (skeletonHome) {
     skeletonHome.style.display = 'block';
-    // Hide the real home content until skeleton is removed (optional but keeps it tidy)
-    // We don't need to hide anything else; skeleton sits on top.
   }
 }
 
@@ -874,7 +872,6 @@ document.querySelectorAll("[data-nav]").forEach((btn) => {
       // Show skeleton when navigating to home
       if (target === "home") {
         showHomeSkeleton();
-        // If data is already loaded, hide skeleton after a short delay
         if (isDataReady) {
           setTimeout(hideHomeSkeleton, 300);
         }
@@ -1012,6 +1009,32 @@ function setupLeaderboardShareButton() {
     if (!waWindow) alert("Share via WhatsApp:\n\n" + rankText);
   });
 }
+
+// ========== THEME TOGGLE (Light/Dark Mode) ==========
+(function() {
+    const themeToggle = document.getElementById("themeToggle");
+    if (!themeToggle) return;
+
+    // Apply saved theme or default light (no data-theme attribute = light)
+    const savedTheme = localStorage.getItem("naijagenius-theme");
+    if (savedTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        themeToggle.checked = true;
+    } else {
+        document.documentElement.removeAttribute("data-theme");
+        themeToggle.checked = false;
+    }
+
+    themeToggle.addEventListener("change", () => {
+        if (themeToggle.checked) {
+            document.documentElement.setAttribute("data-theme", "dark");
+            localStorage.setItem("naijagenius-theme", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+            localStorage.setItem("naijagenius-theme", "light");
+        }
+    });
+})();
 
 // Show skeleton on initial load (before auth data arrives)
 showHomeSkeleton();
