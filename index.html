@@ -27,46 +27,223 @@
     <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
-    <div class="auth-container">
-        <div class="glass-card fade-in-up">
-            <div class="brand-header">
-                <h1 class="logo"><span class="naija">Naija</span><span class="genius">Genius</span></h1>
-                <p class="tagline">Welcome back, trivia champion</p>
+    <!-- No auth-container wrapper; content sits directly on body -->
+    <div class="auth-card fade-in-up">
+        <div class="brand-header">
+            <h1 class="logo"><span class="naija">Naija</span><span class="genius">Genius</span></h1>
+            <p class="tagline">Welcome back, trivia champion</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+            <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="loginEmail" placeholder="Email address" autocomplete="email" required>
             </div>
 
-            <form id="loginForm" class="auth-form">
-                <div class="input-group">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="loginEmail" placeholder="Email address" autocomplete="email" required>
-                </div>
+            <div class="input-group">
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+                <i class="fas fa-eye-slash toggle-password" data-target="loginPassword"></i>
+            </div>
 
-                <div class="input-group">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
-                    <i class="fas fa-eye-slash toggle-password" data-target="loginPassword"></i>
-                </div>
-
-                <button type="submit" id="loginBtn" class="auth-btn">
-                    <span>Login</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
-
-            <div class="divider">or</div>
-
-            <button id="googleBtn" class="auth-btn google-btn">
-                <i class="fab fa-google"></i>
-                <span>Continue with Google</span>
+            <button type="submit" id="loginBtn" class="auth-btn">
+                <span>Login</span>
+                <i class="fas fa-arrow-right"></i>
             </button>
+        </form>
 
-            <div class="auth-links">
-                <p>Not registered? <a href="signup.html" class="highlight-link">Signup here</a></p>
-                <p>Forgot password? <a href="reset-password.html" class="highlight-link">Reset here</a></p>
+        <div class="divider">or</div>
+
+        <button id="googleBtn" class="auth-btn google-btn">
+            <!-- Official Google G logo (multi‑coloured inline SVG) -->
+            <svg class="google-g" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                <path fill="#4285F4" d="M24 9.5c3.3 0 5.9 1.2 8.1 3.2l6-6C34.6 3.2 29.7 1 24 1 14.3 1 6.5 7.6 3.4 16.6l7.1 5.5C12.2 15.1 17.7 9.5 24 9.5z"/>
+                <path fill="#34A853" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.9 7.2l7.1 5.5c4.2-3.9 6.6-9.5 6.6-17.2z"/>
+                <path fill="#FBBC05" d="M10.5 28.1c-1.1-3.2-1.1-6.8 0-10l-7.1-5.5C.5 18.5-.5 24.1.5 29.5l10-1.4z"/>
+                <path fill="#EA4335" d="M24 46.5c6.5 0 11.9-2.1 15.9-5.8l-7.1-5.5c-2.1 1.4-4.8 2.2-8.8 2.2-6.3 0-11.6-4.2-13.5-10l-7.1 5.5c3.2 8.9 11.9 15.6 20.6 15.6z"/>
+            </svg>
+            <span>Continue with Google</span>
+        </button>
+
+        <!-- Terms & Privacy links (same as signup) -->
+        <div class="terms-text">
+            By logging in, you agree to our
+            <a href="#" class="terms-link" data-tab="terms">Terms of Use</a> and
+            <a href="#" class="privacy-link" data-tab="privacy">Privacy Policy</a>.
+        </div>
+
+        <div class="auth-links">
+            <p>Not registered? <a href="signup.html" class="highlight-link">Signup here</a></p>
+            <p>Forgot password? <a href="reset-password.html" class="highlight-link">Reset here</a></p>
+        </div>
+
+        <!-- Proudly Naija Footer -->
+        <div class="proudly-naija">
+            <span class="flag">🇳🇬</span> Proudly <span>Naija</span>
+        </div>
+    </div>
+
+    <!-- Terms Modal (same IDs as signup) -->
+    <div id="termsModal" class="modal-overlay">
+        <div class="modal-card">
+            <button id="closeTermsBtn" class="modal-close" aria-label="Close">&times;</button>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="terms">Terms of Use</button>
+                <button class="tab-btn" data-tab="privacy">Privacy Policy</button>
+            </div>
+            <div id="terms" class="tab-content active">
+                <!-- Full Terms of Use content -->
+                <h4>1. ACCEPTANCE OF TERMS</h4>
+                <p>These Terms of Use ("Terms") govern your access to and use of the NaijaGenius mobile application, website, and related services (collectively, the "App") operated by Lumina Tech ("we," "us," or "our"). By downloading, installing, or using the App, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, do not use the App.</p>
+
+                <h4>2. ELIGIBILITY</h4>
+                <p>You must be at least 13 years old to use the App. By using the App, you represent and warrant that you are at least 13 years of age. If you are between 13 and 18, you represent that you have obtained parental or guardian consent to use the App.</p>
+
+                <h4>3. ACCOUNT REGISTRATION AND SECURITY</h4>
+                <p>To access certain features, you must create an account. You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorised use of your account. We reserve the right to suspend or terminate accounts that violate these Terms.</p>
+
+                <h4>4. LICENSE TO USE THE APP</h4>
+                <p>Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable licence to use the App for your personal, non-commercial entertainment purposes on devices you own or control. You may not copy, modify, distribute, sell, or lease any part of the App, nor may you reverse engineer or attempt to extract the source code.</p>
+
+                <h4>5. USER CONDUCT AND PROHIBITED ACTIVITIES</h4>
+                <p>You agree not to:</p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li>Use the App for any unlawful purpose or in violation of any applicable law.</li>
+                    <li>Cheat, exploit, or abuse the App, including using automated systems (bots) or modifying the App to gain an unfair advantage.</li>
+                    <li>Interfere with or disrupt the App or servers.</li>
+                    <li>Harass, abuse, or harm other users.</li>
+                    <li>Impersonate any person or entity.</li>
+                    <li>Attempt to bypass any security measures.</li>
+                </ul>
+
+                <h4>6. INTELLECTUAL PROPERTY</h4>
+                <p>All content, features, and functionality of the App, including but not limited to text, graphics, logos, icons, images, audio clips, and software, are owned by us or our licensors and are protected by copyright, trademark, and other intellectual property laws. The NaijaGenius name, logo, and all related trademarks are our exclusive property.</p>
+
+                <h4>7. USER-GENERATED CONTENT</h4>
+                <p>The App may allow you to submit or upload content, such as usernames or profile information. You retain ownership of your content but grant us a worldwide, royalty-free, perpetual, irrevocable licence to use, reproduce, modify, and display such content in connection with the App. You are solely responsible for the content you submit and represent that you have all necessary rights to grant this licence.</p>
+
+                <h4>8. VIRTUAL ITEMS AND IN-APP CURRENCY</h4>
+                <p>The App may include virtual items, coins, or other in-app currency ("Virtual Items"). Virtual Items have no real-world value and cannot be exchanged for real currency, goods, or services. We reserve the right to manage, regulate, or eliminate Virtual Items at any time without liability. All purchases of Virtual Items are final and non-refundable.</p>
+
+                <h4>9. THIRD-PARTY SERVICES</h4>
+                <p>The App may integrate with third-party services, including but not limited to Firebase (Google) and AdMob. Your use of these services is subject to their respective terms and privacy policies. We are not responsible for the practices of third-party providers.</p>
+
+                <h4>10. DISCLAIMER OF WARRANTIES</h4>
+                <p>THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE APP WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE.</p>
+
+                <h4>11. LIMITATION OF LIABILITY</h4>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, OR USE, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE APP, WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR ANY OTHER LEGAL THEORY. OUR TOTAL LIABILITY TO YOU SHALL NOT EXCEED THE AMOUNT YOU HAVE PAID TO US, IF ANY, FOR USE OF THE APP.</p>
+
+                <h4>12. INDEMNIFICATION</h4>
+                <p>You agree to indemnify, defend, and hold harmless us and our affiliates, officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising out of or related to your use of the App, your violation of these Terms, or your infringement of any third-party rights.</p>
+
+                <h4>13. TERMINATION</h4>
+                <p>We may suspend or terminate your access to the App at any time, with or without cause, with or without notice. Upon termination, all rights granted to you under these Terms will cease, and you must stop using the App.</p>
+
+                <h4>14. GOVERNING LAW AND DISPUTE RESOLUTION</h4>
+                <p>These Terms shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria. Any dispute, controversy, or claim arising out of or relating to these Terms or the App shall be settled by binding arbitration administered by the Lagos Multi-Door Courthouse (LMDC) in accordance with its rules in force at the time of the dispute. The arbitration shall take place in Lagos, Nigeria, and the language of the arbitration shall be English. You agree that any arbitration shall be conducted on an individual basis and not as a class action. Judgment upon the award rendered by the arbitrator(s) may be entered in any court having jurisdiction thereof.</p>
+                <p><em>Explanation for users: This clause means that if we have a legal disagreement, we will resolve it through a neutral arbitration process in Lagos instead of going to court, which is faster and more cost-effective.</em></p>
+
+                <h4>15. CHANGES TO TERMS</h4>
+                <p>We reserve the right to modify these Terms at any time. We will notify you of material changes by posting the updated Terms within the App or through other reasonable means. Your continued use of the App after the effective date constitutes your acceptance of the revised Terms.</p>
+
+                <h4>16. CONTACT INFORMATION</h4>
+                <p>If you have any questions about these Terms, please contact us at:</p>
+                <p>Email: naijagenius@gmail.com<br />Company: Lumina Tech<br />Address: Lagos, Nigeria</p>
             </div>
 
-            <!-- Proudly Naija Footer -->
-            <div class="proudly-naija">
-                <span class="flag">🇳🇬</span> Proudly <span>Naija</span>
+            <div id="privacy" class="tab-content">
+                <!-- Full Privacy Policy content -->
+                <h4>1. INTRODUCTION</h4>
+                <p>This Privacy Policy explains how Lumina Tech ("we," "us," or "our") collects, uses, discloses, and protects your personal information when you use the NaijaGenius mobile application, website, and related services (collectively, the "App"). We are committed to protecting your privacy and handling your data in an open and transparent manner. This policy applies to all users of the App, regardless of their location, and complies with applicable data protection laws, including the Nigeria Data Protection Act 2023 (NDPA), the General Data Protection Regulation (GDPR), the California Consumer Privacy Act (CCPA), and other relevant regulations.</p>
+
+                <h4>2. INFORMATION WE COLLECT</h4>
+                <p>We collect the following types of information:</p>
+                <p><strong>2.1 Information You Provide Directly:</strong></p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>Account Information:</strong> When you create an account, we collect your display name, email address, phone number, state of residence, and username.</li>
+                    <li><strong>Profile Information:</strong> You may choose to provide an avatar image or other profile details.</li>
+                    <li><strong>Communications:</strong> If you contact us for support, we may collect your name, email address, and the content of your communication.</li>
+                </ul>
+                <p><strong>2.2 Information Collected Automatically:</strong></p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>Usage Data:</strong> We collect information about how you interact with the App, including game modes played, scores, correct answers, coins earned, lifelines used, and in-app purchases.</li>
+                    <li><strong>Device Information:</strong> We collect information about your device, such as device model, operating system version, unique device identifiers, and mobile network information.</li>
+                    <li><strong>Log Data:</strong> Our servers automatically record information when you use the App, including your IP address, browser type, referring URLs, and timestamps.</li>
+                </ul>
+                <p><strong>2.3 Information from Third-Party Services:</strong></p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>Firebase (Google):</strong> We use Firebase for authentication, database, and analytics. Firebase may collect data as described in Google’s Privacy Policy.</li>
+                    <li><strong>AdMob (Google):</strong> We use AdMob to serve advertisements. AdMob may collect data for ad personalisation as described in Google’s Privacy Policy.</li>
+                </ul>
+
+                <h4>3. HOW WE USE YOUR INFORMATION</h4>
+                <p>We use your information for the following purposes:</p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li>To provide, maintain, and improve the App.</li>
+                    <li>To process your transactions and manage your account.</li>
+                    <li>To personalise your experience and deliver relevant content.</li>
+                    <li>To communicate with you, including sending you updates, notifications, and promotional offers (with your consent where required).</li>
+                    <li>To analyse usage trends and improve the App’s performance and user experience.</li>
+                    <li>To enforce our Terms of Use and detect, prevent, and address fraud, security, or technical issues.</li>
+                    <li>To comply with legal obligations.</li>
+                </ul>
+
+                <h4>4. LAWFUL BASIS FOR PROCESSING</h4>
+                <p>We process your personal data on the following lawful bases, depending on the purpose:</p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>Consent:</strong> Where you have given us explicit consent to process your data for a specific purpose (e.g., for marketing communications).</li>
+                    <li><strong>Contractual Necessity:</strong> Where processing is necessary to perform our contract with you (e.g., providing the App and its features).</li>
+                    <li><strong>Legitimate Interests:</strong> Where processing is necessary for our legitimate business interests, provided such interests are not overridden by your data protection rights (e.g., improving the App, preventing fraud).</li>
+                    <li><strong>Legal Obligation:</strong> Where processing is necessary to comply with a legal obligation.</li>
+                </ul>
+
+                <h4>5. HOW WE SHARE YOUR INFORMATION</h4>
+                <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>With Service Providers:</strong> We may share data with third-party vendors who perform services on our behalf, such as hosting, analytics, payment processing, and advertising (e.g., Firebase, AdMob).</li>
+                    <li><strong>For Legal Reasons:</strong> We may disclose your information if required to do so by law, or in response to a valid legal request (e.g., court order, subpoena).</li>
+                    <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred to the new entity.</li>
+                    <li><strong>With Your Consent:</strong> We may share your information with third parties when you have given us explicit consent to do so.</li>
+                </ul>
+
+                <h4>6. INTERNATIONAL DATA TRANSFERS</h4>
+                <p>Your information may be transferred to and processed in countries outside your country of residence, including the United States and other countries where we or our service providers operate. We ensure that appropriate safeguards are in place to protect your data, such as standard contractual clauses approved by relevant authorities.</p>
+
+                <h4>7. DATA RETENTION</h4>
+                <p>We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. When we no longer need your information, we will securely delete or anonymise it.</p>
+
+                <h4>8. YOUR RIGHTS AND CHOICES</h4>
+                <p>Depending on your jurisdiction, you may have the following rights regarding your personal data:</p>
+                <ul style="margin-left:1.5rem; margin-bottom:0.8rem;">
+                    <li><strong>Access:</strong> You can request a copy of the personal information we hold about you.</li>
+                    <li><strong>Rectification:</strong> You can request that we correct or update inaccurate or incomplete information.</li>
+                    <li><strong>Deletion:</strong> You can request that we delete your personal information, subject to certain exceptions.</li>
+                    <li><strong>Restriction:</strong> You can request that we restrict the processing of your data.</li>
+                    <li><strong>Data Portability:</strong> You can request a copy of your data in a structured, machine-readable format.</li>
+                    <li><strong>Objection:</strong> You can object to the processing of your data for direct marketing purposes or on grounds relating to your particular situation.</li>
+                    <li><strong>Withdraw Consent:</strong> If we rely on your consent to process your data, you have the right to withdraw that consent at any time.</li>
+                </ul>
+                <p>To exercise any of these rights, please contact us at naijagenius@gmail.com. We will respond to your request in accordance with applicable law. For users in the European Union, you also have the right to lodge a complaint with your local data protection authority.</p>
+
+                <h4>9. CHILDREN'S PRIVACY</h4>
+                <p>The App is not directed at children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us, and we will take steps to delete such information. In jurisdictions where the age of consent is higher, we comply with the applicable local age requirements.</p>
+
+                <h4>10. COOKIES AND TRACKING TECHNOLOGIES</h4>
+                <p>We use cookies and similar tracking technologies to improve your experience and analyse usage. You can manage your cookie preferences through your device or browser settings.</p>
+
+                <h4>11. DATA SECURITY</h4>
+                <p>We implement appropriate technical and organisational measures to protect your personal information against unauthorised access, loss, alteration, or disclosure. However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.</p>
+
+                <h4>12. THIRD-PARTY LINKS AND SERVICES</h4>
+                <p>The App may contain links to third-party websites or services. This Privacy Policy does not apply to such third parties, and we are not responsible for their privacy practices. We encourage you to review the privacy policies of any third-party services you use.</p>
+
+                <h4>13. UPDATES TO THIS PRIVACY POLICY</h4>
+                <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the updated policy within the App or through other reasonable means. Your continued use of the App after the effective date constitutes your acceptance of the revised Privacy Policy.</p>
+
+                <h4>14. CONTACT INFORMATION</h4>
+                <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:</p>
+                <p>Email: naijagenius@gmail.com<br />Company: Lumina Tech<br />Address: Lagos, Nigeria</p>
             </div>
         </div>
     </div>
