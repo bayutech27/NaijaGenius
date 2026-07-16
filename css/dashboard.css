@@ -537,15 +537,26 @@ body {
     border-radius: inherit;
 }
 
-/* Content on top of overlay */
+/* Content on top of overlay – name at top, sub at bottom */
 .mode-card-content {
     position: relative;
     z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
-    text-align: center;
+    justify-content: space-between;   /* push name up, sub down */
+    width: 100%;
+    height: 100%;
+    padding: var(--space-2) 0;
+}
+
+.mode-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
 }
 
 /* Specific backgrounds for each button */
@@ -564,19 +575,26 @@ body {
 /* Hide the icons completely */
 .mode-card-icon { display: none; }
 
-.mode-card-info { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
+/* Larger, bolder text with top/bottom placement */
 .mode-card-name {
-    font-weight: 800;
-    font-size: var(--font-size-sm);
+    font-weight: 900;
+    font-size: 1rem;
     letter-spacing: -0.01em;
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    text-align: center;
+    line-height: 1.2;
+    padding-top: var(--space-2);
 }
+
 .mode-card-sub {
-    font-size: 0.6rem;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.75rem;
     color: rgba(255,255,255,0.85);
     text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    text-align: center;
+    line-height: 1.2;
+    padding-bottom: var(--space-2);
 }
 
 /* ============================================================
@@ -1290,7 +1308,9 @@ body {
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
     .shop-grid { grid-template-columns: repeat(3, 1fr); }
     .mode-grid { gap: var(--space-4); }
-    .mode-card { /* aspect-ratio + max-height inherited from base */ }
+    .mode-card { /* aspect-ratio + max-height inherited */ }
+    .mode-card-name { font-size: 1.1rem; }
+    .mode-card-sub { font-size: 0.8rem; }
 }
 
 /* ============================================================
@@ -1379,15 +1399,15 @@ body {
         height: 42px;
     }
 
-    /* Mode card – inherit aspect-ratio, keep padding adjustments */
+    /* Mode card – keep aspect-ratio, adjust text sizes */
     .mode-card {
         padding: var(--space-3) var(--space-2);
     }
     .mode-card-name {
-        font-size: 0.7rem;
+        font-size: 0.85rem;
     }
     .mode-card-sub {
-        font-size: 0.55rem;
+        font-size: 0.65rem;
     }
 
     /* Ensure level name doesn't overflow */
@@ -1448,10 +1468,10 @@ body {
         padding: var(--space-2) var(--space-1);
     }
     .mode-card-name {
-        font-size: 0.68rem;
+        font-size: 0.78rem;
     }
     .mode-card-sub {
-        font-size: 0.55rem;
+        font-size: 0.6rem;
     }
 
     .greeting-text {
