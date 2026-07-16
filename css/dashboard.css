@@ -65,17 +65,21 @@ body {
 }
 
 /* ============================================================
-   FULL-PAGE SKELETAL LOADER (overlays main-content)
+   FULL‑VIEWPORT SKELETAL LOADER (overlays main-content)
    ============================================================ */
+.main-content {
+    position: relative;  /* anchor for absolute skeleton */
+}
+
 .skeleton-home {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: inherit;  /* matches body gradient for seamless feel */
-    z-index: 10;
-    padding: 1.5rem 1rem 5rem;  /* top/bottom padding so content doesn't hit edges */
+    background: inherit;  /* blends with body gradient */
+    z-index: 50;          /* above all sections */
+    padding: 1.5rem 1rem 5rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -152,11 +156,6 @@ body {
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
-}
-
-/* Make main-content relative so absolute skeleton works */
-.main-content {
-    position: relative;
 }
 
 /* ============================================================
