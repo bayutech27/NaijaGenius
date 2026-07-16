@@ -22,7 +22,6 @@
     <!-- Header -->
     <header class="app-header">
         <div class="header-container">
-            <!-- Back arrow button with replace -->
             <button id="backBtn" class="back-btn" aria-label="Back to Dashboard">
                 <i class="fas fa-arrow-left"></i>
             </button>
@@ -143,7 +142,6 @@
     <!-- Back‑button handling -->
     <script>
         (function() {
-            // 1. Back arrow → replace with dashboard
             const backBtn = document.getElementById('backBtn');
             if (backBtn) {
                 backBtn.addEventListener('click', function(e) {
@@ -152,21 +150,18 @@
                 });
             }
 
-            // 2. Device back button → redirect to dashboard with replace
             window.addEventListener('popstate', function(event) {
                 if (window.location.pathname.includes('games.html')) {
                     window.location.replace('/app/dashboard.html');
                 }
             });
 
-            // 3. bfcache (pageshow) → redirect if restored from cache
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted && window.location.pathname.includes('games.html')) {
                     window.location.replace('/app/dashboard.html');
                 }
             });
 
-            // 4. Push a dummy state so popstate fires on back press
             if (history.state === null) {
                 history.pushState({ game: true }, document.title, window.location.href);
             } else {
