@@ -1,9 +1,9 @@
 /* ============================================================
-   NAIJAGENIUS GAME – Light Theme (Whitesmoke, Purple, Gold)
+   NAIJAGENIUS GAME – Dark Purple Background, Light Containers
    ============================================================ */
 
 :root {
-    --bg-primary: #F5F5F5;
+    --bg-primary: #1A1025;               /* dark purple background */
     --bg-card: #FFFFFF;
     --bg-card-hover: #F0F0F5;
     --text-primary: #2D1B4E;
@@ -40,18 +40,18 @@ body {
     overflow-x: hidden;
 }
 
-/* ========== HEADER (back arrow + circular timer + coins) ========== */
+/* ========== HEADER ========== */
 .app-header {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.92);
+    background: rgba(26, 16, 37, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     z-index: 1000;
     padding: 0.75rem 1rem;
     padding-top: max(0.75rem, env(safe-area-inset-top));
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .header-container {
@@ -67,15 +67,14 @@ body {
     width: 42px; height: 42px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    color: var(--accent-purple);
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #ffffff;
     font-size: 1rem;
     display: flex; align-items: center; justify-content: center;
-    transition: color 0.2s, background 0.2s;
-    box-shadow: var(--shadow-sm);
+    transition: background 0.2s, color 0.2s;
 }
-.back-btn:hover { color: var(--accent-gold); background: var(--bg-card-hover); }
+.back-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
 .header-timer-wrap { flex-shrink: 0; }
 
@@ -88,13 +87,12 @@ body {
 
 .game-coins-badge {
     display: flex; align-items: center; gap: 0.4rem;
-    background: var(--bg-card);
+    background: rgba(255,255,255,0.1);
     border: 1px solid rgba(245, 158, 11, 0.3);
     padding: 0.4rem 0.9rem;
     border-radius: 30px;
     font-size: 0.85rem; font-weight: 700;
-    color: var(--text-primary);
-    box-shadow: var(--shadow-sm);
+    color: #ffffff;
 }
 .game-coins-badge i { color: var(--accent-gold); font-size: 1rem; }
 
@@ -104,7 +102,7 @@ body {
 
 .timer-bg {
     fill: none;
-    stroke: rgba(0,0,0,0.06);
+    stroke: rgba(255,255,255,0.15);
     stroke-width: 2.6;
 }
 
@@ -116,7 +114,7 @@ body {
     stroke-dasharray: 100;
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.3s linear;
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6));
 }
 
 .timer-center {
@@ -130,13 +128,13 @@ body {
 .timer-seconds {
     font-family: var(--font-display);
     font-size: 1.5rem; font-weight: 800;
-    color: var(--text-primary);
+    color: #ffffff;
 }
 
 .timer-unit {
     font-size: 0.55rem; font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--text-muted);
+    color: #A0B3D9;
     text-transform: uppercase;
     margin-top: 0.15rem;
 }
@@ -154,35 +152,17 @@ body {
     flex: 1;
 }
 
-/* ========== QUESTION BOX ========== */
+/* ========== QUESTION BOX (Whitesmoke background) ========== */
 .question-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    background: #F5F5F5;
+    border: 1px solid rgba(109,40,217,0.2);
     border-radius: var(--radius-2xl);
     padding: 1.8rem 1.4rem 1.4rem;
     width: 100%;
     text-align: center;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1), 0 2px 8px rgba(109,40,217,0.1);
     position: relative;
 }
-
-.question-box::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(150deg, var(--accent-purple), var(--accent-gold));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.4;
-    z-index: 0;
-}
-
-.question-box > * { position: relative; z-index: 1; }
 
 .question-number-row {
     display: flex; align-items: center; justify-content: center;
@@ -208,7 +188,7 @@ body {
     width: 78%; max-width: 320px;
     margin: 1.1rem auto 0;
     height: 8px; border-radius: 8px;
-    background-color: rgba(0,0,0,0.06);
+    background-color: rgba(0,0,0,0.08);
     position: relative; overflow: hidden;
 }
 
@@ -226,7 +206,7 @@ body {
     white-space: nowrap; border: 0;
 }
 
-/* ========== OPTIONS GRID ========== */
+/* ========== OPTIONS (Whitesmoke, purple text) ========== */
 .options-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -235,8 +215,8 @@ body {
 }
 
 .option-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    background: #F5F5F5;
+    border: 1px solid rgba(109,40,217,0.15);
     border-radius: 40px;
     padding: 0.9rem 1.2rem;
     display: flex; align-items: center; gap: 0.9rem;
@@ -246,13 +226,12 @@ body {
     color: var(--text-primary);
     font-family: var(--font-body);
     font-size: 0.95rem; font-weight: 500;
-    box-shadow: var(--shadow-sm);
-    position: relative; overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .option-btn:hover {
     border-color: var(--accent-purple);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(109,40,217,0.15);
 }
 
 .option-btn .option-letter {
@@ -270,36 +249,6 @@ body {
     flex: 1; text-align: left;
     font-size: 1.575rem; font-weight: 600;
     color: var(--text-primary);
-    position: relative; z-index: 2;
-}
-
-/* In‑option Crowd Bar */
-.option-crowd {
-    display: none;
-    position: absolute; inset: 0;
-    align-items: center; padding: 0 1.2rem;
-    z-index: 1; pointer-events: none;
-}
-
-.option-crowd .crowd-bar-bg {
-    position: absolute; inset: 0;
-    border-radius: inherit; overflow: hidden;
-}
-
-.option-crowd .crowd-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, rgba(109,40,217,0.4), rgba(245,158,11,0.3));
-    transition: width 0.5s ease;
-}
-
-.option-crowd .crowd-percent {
-    position: relative; margin-left: auto;
-    font-size: 0.72rem; font-weight: 700;
-    color: var(--text-primary);
-    background: rgba(255,255,255,0.8);
-    padding: 0.2rem 0.55rem;
-    border-radius: 20px;
-    flex-shrink: 0; white-space: nowrap;
 }
 
 /* Answer states */
@@ -308,24 +257,41 @@ body {
     border-color: var(--accent-green);
     color: #065F46;
 }
-.option-btn.correct .option-letter {
-    background: var(--accent-green);
-}
+.option-btn.correct .option-letter { background: var(--accent-green); }
 .option-btn.wrong {
     background: #FEE2E2;
     border-color: var(--accent-red);
     color: #991B1B;
 }
-.option-btn.wrong .option-letter {
-    background: var(--accent-red);
+.option-btn.wrong .option-letter { background: var(--accent-red); }
+.option-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+/* Crowd bar */
+.option-crowd {
+    display: none;
+    position: absolute; inset: 0;
+    align-items: center; padding: 0 1.2rem;
+    z-index: 1; pointer-events: none;
+}
+.option-crowd .crowd-bar-bg {
+    position: absolute; inset: 0;
+    border-radius: inherit; overflow: hidden;
+}
+.option-crowd .crowd-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(109,40,217,0.3), rgba(245,158,11,0.3));
+    transition: width 0.5s ease;
+}
+.option-crowd .crowd-percent {
+    position: relative; margin-left: auto;
+    font-size: 0.72rem; font-weight: 700;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.9);
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
 }
 
-.option-btn.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* ========== LIFELINES + NEXT ========== */
+/* ========== LIFELINES + NEXT (beautiful colors) ========== */
 .lifelines-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -346,14 +312,14 @@ body {
     color: #fff;
     font-family: var(--font-body);
     position: relative;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .lifeline-btn i, .next-btn i { font-size: 2.1rem; }
 
 .lifeline-label, .next-btn-label {
     font-size: 0.7rem; font-weight: 700;
-    color: rgba(255,255,255,0.92);
+    color: rgba(255,255,255,0.95);
     text-align: center; line-height: 1.15;
 }
 
@@ -368,11 +334,11 @@ body {
     border: 2px solid #fff;
 }
 
-/* Per-card theming */
-#lifelineFiftyFifty { background: linear-gradient(160deg, #6D28D9, #4C1D95); }
-#lifelineAskCrowd   { background: linear-gradient(160deg, #E0A22E, #8A5A0F); }
-#lifelineCallFriend { background: linear-gradient(160deg, #8B5CF6, #4B2A9E); }
-#nextBtn            { background: linear-gradient(160deg, var(--accent-purple), #4C1D95); }
+/* Distinct beautiful colours */
+#lifelineFiftyFifty  { background: linear-gradient(160deg, #9333EA, #6D28D9); }
+#lifelineAskCrowd    { background: linear-gradient(160deg, #F59E0B, #D97706); }
+#lifelineCallFriend  { background: linear-gradient(160deg, #3B82F6, #2563EB); }
+#nextBtn             { background: linear-gradient(160deg, #10B981, #059669); }
 
 .lifeline-btn.disabled {
     opacity: 0.4; pointer-events: none;
@@ -382,7 +348,7 @@ body {
 .lifeline-btn:hover:not(.disabled),
 .next-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.25);
 }
 
 .next-btn:not(:disabled) {
@@ -390,9 +356,9 @@ body {
 }
 
 @keyframes pulse-glow {
-    0%   { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0.4); }
-    70%  { box-shadow: 0 0 0 10px rgba(109, 40, 217, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0); }
+    0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70%  { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .next-btn:disabled { opacity: 0.4; cursor: not-allowed; animation: none; }
@@ -436,14 +402,6 @@ body {
     .lifeline-count { width: 18px; height: 18px; font-size: 0.56rem; top: -4px; right: -4px; }
 }
 
-/* ========== UTILITIES ========== */
-.glass-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(8px);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-md);
-}
-
 /* ========== TOAST ========== */
 .toast-container {
     position: fixed;
@@ -457,14 +415,14 @@ body {
     pointer-events: none;
 }
 .toast {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
+    background: #FFFFFF;
+    border: 1px solid rgba(109,40,217,0.2);
     color: var(--text-primary);
     padding: 0.9rem 1.5rem;
     border-radius: 2rem;
     font-size: 0.9rem; font-weight: 500;
     display: flex; align-items: center; gap: 0.8rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
     border-left: 5px solid var(--accent-gold);
     pointer-events: auto;
     animation: slideInRight 0.3s ease forwards;
