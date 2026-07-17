@@ -539,6 +539,19 @@ body {
     box-shadow: 0 4px 12px rgba(11,138,61,0.3) !important;
 }
 
+/* Close button – remove background, make text visible */
+#roundEndModal > div > button:first-child,
+#commentModal > div > button:first-child,
+#callFriendModal > div > button:first-child,
+#replayModal > div > button:first-child {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+    font-size: 1.6rem;
+    width: auto;
+    height: auto;
+}
+
 /* Score loader background */
 #scoreLoader {
     background: rgba(0,0,0,0.7) !important;
