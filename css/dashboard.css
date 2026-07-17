@@ -166,12 +166,12 @@ body {
 
 .stat-add-btn { display: none; }
 
-/* Gear icon */
+/* Gear icon – white */
 .icon-btn {
     background: transparent;
     border: none;
     box-shadow: none;
-    color: var(--color-primary);
+    color: #fff;                          /* ← changed */
     font-size: 1.25rem;
     cursor: pointer;
     width: 38px; height: 38px;
@@ -315,7 +315,7 @@ body {
 .greeting-text #greetingName {
     font-size: var(--font-size-2xl);
     font-weight: 800;
-    color: var(--color-primary);
+    color: #fff;                          /* ← changed to white */
     margin-left: var(--space-1);
 }
 .greeting-sub {
@@ -376,7 +376,7 @@ body {
     font-size: var(--font-size-xs);
     font-weight: 600;
     text-transform: uppercase;
-    color: var(--color-primary);
+    color: var(--color-gold);            /* ← changed to gold */
     letter-spacing: 0.04em;
 }
 .level-name {
@@ -578,7 +578,7 @@ body {
 .whatsapp-share-btn:active { border-color: #25D366; }
 .whatsapp-share-btn--compact { margin-bottom: var(--space-4); }
 
-/* Tips section */
+/* Tips section – title + icon gold */
 .tips-section {
     padding: var(--space-4);
     margin-bottom: var(--space-4);
@@ -588,9 +588,12 @@ body {
 .tips-title {
     font-size: var(--font-size-sm);
     font-weight: 700;
-    color: var(--color-primary);
+    color: var(--color-gold);            /* ← changed */
     display: flex; align-items: center; gap: var(--space-2);
     margin-bottom: var(--space-3);
+}
+.tips-title i {
+    color: var(--color-gold);            /* ← added */
 }
 
 .tips-grid { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -604,10 +607,13 @@ body {
     font-size: var(--font-size-xs);
     color: var(--text-secondary);
 }
-.tip-streak { font-weight: 600; color: var(--color-primary); }
+.tip-streak {
+    font-weight: 600;
+    color: #fff;                         /* ← changed to white */
+}
 .tip-reward {
     font-weight: 700;
-    color: var(--color-gold);
+    color: var(--color-gold);            /* remains gold */
     font-family: var(--font-display);
     font-size: var(--font-size-xs);
 }
@@ -616,7 +622,7 @@ body {
 .ad-container { margin-top: var(--space-4); min-height: 50px; }
 
 /* ============================================================
-   SECTION HEADERS
+   SECTION HEADERS – titles and icons white
    ============================================================ */
 .section-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -628,8 +634,11 @@ body {
 .section-title--page {
     font-size: var(--font-size-lg);
     font-weight: 800;
-    color: var(--color-primary);
+    color: #fff;                          /* ← changed to white */
     display: flex; align-items: center; gap: var(--space-2);
+}
+.section-title--page i {
+    color: #fff;                          /* ← added */
 }
 
 /* ============================================================
@@ -639,7 +648,11 @@ body {
     display: flex; align-items: center; gap: var(--space-3);
     margin-bottom: var(--space-5);
 }
-.lane-top-row .page-title { font-size: var(--font-size-xl); font-weight: 800; color: var(--text-primary); }
+.lane-top-row .page-title {
+    font-size: var(--font-size-xl);
+    font-weight: 800;
+    color: #fff;                          /* ← changed to white */
+}
 .lane-top-row .page-subtitle { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: var(--space-1); }
 
 .lane-grid {
@@ -859,9 +872,12 @@ body {
     line-height: 1.4;
 }
 
-.leaderboard-item .leaderboard-level,
+/* Leaderboard level name – white, score – gold */
+.leaderboard-item .leaderboard-level {
+    color: #fff !important;              /* ← changed */
+}
 .leaderboard-item .leaderboard-score {
-    color: var(--color-primary) !important;
+    color: var(--color-gold) !important; /* ← changed */
 }
 .leaderboard-item .leaderboard-name {
     color: var(--text-primary);
@@ -1225,10 +1241,6 @@ body {
 /* ============================================================
    LIGHT‑MODE OVERRIDE
    Activated ONLY by explicitly adding [data-theme="light"] to <html>.
-   Absence of the attribute = dark mode (the :root defaults above).
-   This fixes the earlier bug where :root:not([data-theme="dark"])
-   out‑specificity'd plain :root and made light mode the accidental
-   default even with no attribute set at all.
    ============================================================ */
 [data-theme="light"] {
     --bg-page: #F3F4F6;
@@ -1282,7 +1294,7 @@ body {
 }
 
 /* ============================================================
-   ANNOUNCEMENT
+   ANNOUNCEMENT – text now white
    ============================================================ */
 #announcementContainer { margin-bottom: var(--space-4); }
 
@@ -1296,7 +1308,7 @@ body {
 }
 
 .announcement-text {
-    color: var(--color-primary);
+    color: #fff;                          /* ← changed to white */
     font-size: var(--font-size-sm);
     flex: 1;
     text-align: center;
