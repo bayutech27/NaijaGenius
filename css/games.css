@@ -99,18 +99,19 @@ body {
     gap: 0.6rem;
 }
 
+/* Back button – no background, white arrow */
 .back-btn {
     width: 42px; height: 42px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: var(--bg-card);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--color-primary);
+    background: transparent;
+    border: none;
+    color: #fff;                        /* white */
     font-size: 1rem;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.2s, color 0.2s;
 }
-.back-btn:hover { background: var(--bg-card-hover); }
+.back-btn:hover { color: var(--color-gold); }
 
 .header-timer-wrap { flex-shrink: 0; }
 
@@ -205,12 +206,16 @@ body {
     gap: 0.45rem; margin-bottom: 0.7rem;
 }
 
-.question-number-icon { font-size: 1rem; color: var(--color-primary); }
+/* Question number and icon – gold */
+.question-number-icon {
+    font-size: 1rem;
+    color: var(--color-gold);
+}
 
 .question-number {
     font-size: 0.85rem; font-weight: 700;
     letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--color-primary);
+    color: var(--color-gold);
 }
 
 .question-text {
@@ -289,19 +294,25 @@ body {
     color: var(--text-primary);
 }
 
-/* Answer states */
+/* Answer states – mint green for correct, crimson red for wrong, white text */
 .option-btn.correct {
-    background: #D1FAE5;
-    border-color: var(--color-primary);
-    color: #065F46;
+    background: #A8E6CF;                 /* mint green */
+    border-color: #7BC8A4;
+    color: #fff;                         /* white text */
 }
-.option-btn.correct .option-letter { background: var(--color-primary); }
+.option-btn.correct .option-letter {
+    background: var(--color-primary);    /* keep green letter circle */
+}
+
 .option-btn.wrong {
-    background: #FEE2E2;
-    border-color: var(--color-red);
-    color: #991B1B;
+    background: #DC143C;                 /* crimson red */
+    border-color: #B22222;
+    color: #fff;                         /* white text */
 }
-.option-btn.wrong .option-letter { background: var(--color-red); }
+.option-btn.wrong .option-letter {
+    background: #B22222;                 /* darker crimson for letter */
+}
+
 .option-btn.disabled { opacity: 0.5; pointer-events: none; }
 
 /* Crowd bar */
@@ -494,10 +505,69 @@ body {
 }
 
 /* ============================================================
+   MODAL OVERRIDES – green, white, gold theme for all game modals
+   ============================================================ */
+/* Common modal card styles */
+#roundEndModal > div,
+#commentModal > div,
+#callFriendModal > div,
+#replayModal > div {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--color-primary) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+}
+
+/* Modal headings and paragraphs */
+#roundEndModal h2,
+#roundEndModal p,
+#commentModal p,
+#callFriendModal p,
+#replayModal h3,
+#replayModal p {
+    color: var(--text-primary) !important;
+}
+
+/* Modal buttons – primary green */
+#roundEndModal button,
+#commentModal button,
+#callFriendModal button,
+#replayModal button {
+    background: var(--color-primary) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(11,138,61,0.3) !important;
+}
+
+/* Score loader background */
+#scoreLoader {
+    background: rgba(0,0,0,0.7) !important;
+    backdrop-filter: blur(6px);
+}
+#scoreLoader p {
+    color: var(--text-primary) !important;
+}
+#scoreLoader > div:first-child {
+    border-top-color: var(--color-primary) !important;
+}
+
+/* Call friend answer text – gold/primary gradient */
+#callFriendModal p:last-of-type {
+    background: linear-gradient(135deg, var(--color-gold), var(--color-primary)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+}
+
+/* Round end score value – gold */
+#roundEndModal > div > div:nth-child(3) {
+    background: none !important;
+    color: var(--color-gold) !important;
+}
+
+/* ============================================================
    LIGHT‑MODE OVERRIDE
    Activated ONLY by explicitly adding [data-theme="light"] to <html>.
-   Absence of the attribute = dark mode (the :root defaults above).
-   Matches the same fix applied in dashboard.css.
    ============================================================ */
 [data-theme="light"] {
     --bg-page: #F3F4F6;
