@@ -1323,8 +1323,9 @@ body {
 [data-theme="light"] .leaderboard-item .leaderboard-score {
     color: #0A1A12 !important;   /* black */
 }
-[data-theme="light"] #userRankDisplay {
-    color: #0A1A12 !important;
+[data-theme="light"] #userRankDisplay,
+[data-theme="light"] #userRankDisplay span {
+    color: #0A1A12 !important;   /* black overtake text */
 }
 
 /* 9. Settings controls green outline + visible toggle */
