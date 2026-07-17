@@ -1010,27 +1010,31 @@ function setupLeaderboardShareButton() {
   });
 }
 
-// ========== THEME TOGGLE (Light/Dark Mode) ==========
+// ========== THEME TOGGLE (Light/Dark Mode) – FIXED ==========
 (function() {
     const themeToggle = document.getElementById("themeToggle");
     if (!themeToggle) return;
 
-    // Apply saved theme or default light (no data-theme attribute = light)
+    // Apply saved theme or default dark (no data-theme attribute)
     const savedTheme = localStorage.getItem("naijagenius-theme");
-    if (savedTheme === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-        themeToggle.checked = true;
-    } else {
-        document.documentElement.removeAttribute("data-theme");
+    if (savedTheme === "light") {
+        // Light mode active
+        document.documentElement.setAttribute("data-theme", "light");
         themeToggle.checked = false;
+    } else {
+        // Dark mode (default) – no attribute needed
+        document.documentElement.removeAttribute("data-theme");
+        themeToggle.checked = true;
     }
 
     themeToggle.addEventListener("change", () => {
         if (themeToggle.checked) {
-            document.documentElement.setAttribute("data-theme", "dark");
+            // Dark mode
+            document.documentElement.removeAttribute("data-theme");
             localStorage.setItem("naijagenius-theme", "dark");
         } else {
-            document.documentElement.removeAttribute("data-theme");
+            // Light mode
+            document.documentElement.setAttribute("data-theme", "light");
             localStorage.setItem("naijagenius-theme", "light");
         }
     });
