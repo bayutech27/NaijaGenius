@@ -171,7 +171,7 @@ body {
     background: transparent;
     border: none;
     box-shadow: none;
-    color: #fff;                          /* ← changed */
+    color: #fff;
     font-size: 1.25rem;
     cursor: pointer;
     width: 38px; height: 38px;
@@ -315,7 +315,7 @@ body {
 .greeting-text #greetingName {
     font-size: var(--font-size-2xl);
     font-weight: 800;
-    color: #fff;                          /* ← changed to white */
+    color: #fff;
     margin-left: var(--space-1);
 }
 .greeting-sub {
@@ -376,7 +376,7 @@ body {
     font-size: var(--font-size-xs);
     font-weight: 600;
     text-transform: uppercase;
-    color: var(--color-gold);            /* ← changed to gold */
+    color: var(--color-gold);
     letter-spacing: 0.04em;
 }
 .level-name {
@@ -588,13 +588,11 @@ body {
 .tips-title {
     font-size: var(--font-size-sm);
     font-weight: 700;
-    color: var(--color-gold);            /* ← changed */
+    color: var(--color-gold);
     display: flex; align-items: center; gap: var(--space-2);
     margin-bottom: var(--space-3);
 }
-.tips-title i {
-    color: var(--color-gold);            /* ← added */
-}
+.tips-title i { color: var(--color-gold); }
 
 .tips-grid { display: flex; flex-direction: column; gap: var(--space-2); }
 
@@ -609,11 +607,11 @@ body {
 }
 .tip-streak {
     font-weight: 600;
-    color: #fff;                         /* ← changed to white */
+    color: #fff;
 }
 .tip-reward {
     font-weight: 700;
-    color: var(--color-gold);            /* remains gold */
+    color: var(--color-gold);
     font-family: var(--font-display);
     font-size: var(--font-size-xs);
 }
@@ -634,12 +632,10 @@ body {
 .section-title--page {
     font-size: var(--font-size-lg);
     font-weight: 800;
-    color: #fff;                          /* ← changed to white */
+    color: #fff;
     display: flex; align-items: center; gap: var(--space-2);
 }
-.section-title--page i {
-    color: #fff;                          /* ← added */
-}
+.section-title--page i { color: #fff; }
 
 /* ============================================================
    PICK YOUR LANE
@@ -651,7 +647,7 @@ body {
 .lane-top-row .page-title {
     font-size: var(--font-size-xl);
     font-weight: 800;
-    color: #fff;                          /* ← changed to white */
+    color: #fff;
 }
 .lane-top-row .page-subtitle { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: var(--space-1); }
 
@@ -874,10 +870,10 @@ body {
 
 /* Leaderboard level name – white, score – gold */
 .leaderboard-item .leaderboard-level {
-    color: #fff !important;              /* ← changed */
+    color: #fff !important;
 }
 .leaderboard-item .leaderboard-score {
-    color: var(--color-gold) !important; /* ← changed */
+    color: var(--color-gold) !important;
 }
 .leaderboard-item .leaderboard-name {
     color: var(--text-primary);
@@ -1262,6 +1258,96 @@ body {
     background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0) 100%);
 }
 
+/* 1. Gear icon green */
+[data-theme="light"] .icon-btn {
+    color: var(--color-primary);
+}
+
+/* 2. User name green */
+[data-theme="light"] .greeting-text #greetingName {
+    color: var(--color-primary);
+}
+
+/* 3. Current level text green + progress bar outline green */
+[data-theme="light"] .level-label {
+    color: var(--color-primary);
+}
+[data-theme="light"] .xp-progress {
+    border: 1px solid var(--color-primary);
+    background: rgba(0,0,0,0.04);
+}
+
+/* 4. Announcement text green */
+[data-theme="light"] .announcement-text {
+    color: var(--color-primary);
+}
+
+/* 5. Tips section */
+[data-theme="light"] .tips-title,
+[data-theme="light"] .tips-title i {
+    color: var(--color-primary);
+}
+[data-theme="light"] .tip-streak {
+    color: #fff;
+}
+[data-theme="light"] .tip-item {
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}
+[data-theme="light"] .tip-reward {
+    color: var(--color-gold);
+}
+
+/* 6. Section titles + back arrows green */
+[data-theme="light"] .section-title--page,
+[data-theme="light"] .section-title--page i,
+[data-theme="light"] .lane-top-row .page-title {
+    color: var(--color-primary);
+}
+[data-theme="light"] .back-arrow-btn {
+    color: var(--color-primary);
+}
+
+/* 7. Shop, categories, my stats cards main texts green */
+[data-theme="light"] .stat-detail-value,
+[data-theme="light"] .lane-name,
+[data-theme="light"] .shop-item-info h4 {
+    color: var(--color-primary);
+}
+
+/* 8. Leaderboard overrides */
+[data-theme="light"] .leaderboard-item .leaderboard-name,
+[data-theme="light"] .leaderboard-item .leaderboard-level {
+    color: var(--color-primary) !important;
+}
+[data-theme="light"] .leaderboard-item .leaderboard-score {
+    color: #0A1A12 !important;   /* black */
+}
+[data-theme="light"] #userRankDisplay {
+    color: #0A1A12 !important;
+}
+
+/* 9. Settings controls green outline + visible toggle */
+[data-theme="light"] .toggle-label {
+    border: 1px solid var(--color-primary);
+    background: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .toggle-label::before {
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}
+[data-theme="light"] .toggle-switch input:checked + .toggle-label::before {
+    background: #fff;
+}
+[data-theme="light"] .settings-control input[type="range"] {
+    background: rgba(0,0,0,0.08);
+    border: 1px solid var(--color-primary);
+    border-radius: 2px;
+}
+[data-theme="light"] .settings-control input[type="range"]::-webkit-slider-thumb {
+    background: var(--color-primary);
+}
+
 /* ============================================================
    TOAST
    ============================================================ */
@@ -1294,7 +1380,7 @@ body {
 }
 
 /* ============================================================
-   ANNOUNCEMENT – text now white
+   ANNOUNCEMENT
    ============================================================ */
 #announcementContainer { margin-bottom: var(--space-4); }
 
@@ -1308,7 +1394,7 @@ body {
 }
 
 .announcement-text {
-    color: #fff;                          /* ← changed to white */
+    color: #fff;
     font-size: var(--font-size-sm);
     flex: 1;
     text-align: center;
