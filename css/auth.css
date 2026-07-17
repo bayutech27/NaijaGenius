@@ -82,12 +82,12 @@ body {
 }
 
 .naija {
-    color: var(--text-primary);           /* deep green‑black */
+    color: var(--color-primary);         /* green */
 }
 
-/* Genius – gold */
+/* Genius – deeper gold */
 .genius {
-    color: var(--color-gold);
+    color: #D97706;                      /* deeper gold */
 }
 
 .tagline {
