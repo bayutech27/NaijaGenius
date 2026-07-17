@@ -1,18 +1,18 @@
 /* ============================================================
-   NAIJAGENIUS AUTH – Light Theme (Whitesmoke, Purple, Gold)
+   NAIJAGENIUS AUTH – Green, White & Gold (Light Theme)
+   Matches dashboard light‑mode identity
    ============================================================ */
 
 :root {
-    --bg-primary: #F5F5F5;
+    --bg-primary: #F5F5F5;               /* same soft gray as dashboard light */
     --bg-card: #FFFFFF;
-    --text-primary: #2D1B4E;
-    --text-secondary: #5A4A7A;
-    --text-muted: #8E8EA0;
-    --accent-purple: #6D28D9;
-    --accent-gold: #F59E0B;
-    --accent-green: #10B981;
+    --text-primary: #0A1A12;             /* deep green‑black */
+    --text-secondary: #4A5A50;
+    --text-muted: #6B7280;
+    --color-primary: #0B8A3D;            /* Nigerian green */
+    --color-gold: #F59E0B;
     --border-subtle: rgba(0,0,0,0.06);
-    --border-card: rgba(109, 40, 217, 0.25);
+    --border-card: rgba(11, 138, 61, 0.25); /* green tint */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
     --radius-md: 12px;
@@ -55,7 +55,7 @@ body {
     position: relative;
 }
 
-/* Subtle left purple accent */
+/* Left green accent */
 .auth-card::before {
     content: '';
     position: absolute;
@@ -63,7 +63,7 @@ body {
     top: 2rem;
     bottom: 2rem;
     width: 4px;
-    background: var(--accent-purple);
+    background: var(--color-primary);
     border-radius: 4px 0 0 4px;
 }
 
@@ -82,12 +82,12 @@ body {
 }
 
 .naija {
-    color: #2D1B4E;
+    color: var(--text-primary);           /* deep green‑black */
 }
 
-/* Genius now purple */
+/* Genius – gold */
 .genius {
-    color: var(--accent-purple);
+    color: var(--color-gold);
 }
 
 .tagline {
@@ -113,7 +113,7 @@ body {
 .input-icon {
     position: absolute;
     left: 1rem;
-    color: var(--accent-purple);
+    color: var(--color-primary);
     font-size: 1rem;
     pointer-events: none;
     opacity: 0.7;
@@ -133,8 +133,8 @@ input {
 }
 
 input:focus {
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(11, 138, 61, 0.1);
     background: #FFFFFF;
 }
 
@@ -147,7 +147,7 @@ input::placeholder {
 .toggle-password {
     position: absolute;
     right: 1rem;
-    color: var(--accent-purple);
+    color: var(--color-primary);
     cursor: pointer;
     font-size: 1rem;
     transition: color 0.2s;
@@ -155,12 +155,12 @@ input::placeholder {
 }
 
 .toggle-password:hover {
-    color: var(--accent-gold);
+    color: var(--color-gold);
 }
 
 /* ----- BUTTONS ----- */
 .auth-btn {
-    background: linear-gradient(160deg, var(--accent-purple), #4C1D95);
+    background: linear-gradient(160deg, var(--color-primary), #065F2C);
     border: none;
     padding: 0.9rem;
     font-size: 1rem;
@@ -174,7 +174,7 @@ input::placeholder {
     gap: 0.6rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    box-shadow: 0 4px 12px rgba(11, 138, 61, 0.3);
     margin-top: 0.3rem;
 }
 
@@ -185,7 +185,7 @@ input::placeholder {
 
 .auth-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(109, 40, 217, 0.4);
+    box-shadow: 0 6px 18px rgba(11, 138, 61, 0.4);
 }
 
 .auth-btn:active {
@@ -254,14 +254,14 @@ input::placeholder {
 }
 
 .highlight-link {
-    color: var(--accent-purple);
+    color: var(--color-primary);
     font-weight: 600;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .highlight-link:hover {
-    color: var(--accent-gold);
+    color: var(--color-gold);
     text-decoration: underline;
 }
 
@@ -275,14 +275,14 @@ input::placeholder {
 }
 
 .terms-text a {
-    color: var(--accent-purple);
+    color: var(--color-primary);
     text-decoration: none;
     font-weight: 500;
 }
 
 .terms-text a:hover {
     text-decoration: underline;
-    color: var(--accent-gold);
+    color: var(--color-gold);
 }
 
 /* ----- TOAST ----- */
@@ -311,7 +311,7 @@ input::placeholder {
     align-items: center;
     gap: 0.8rem;
     box-shadow: var(--shadow-md);
-    border-left: 5px solid var(--accent-gold);
+    border-left: 5px solid var(--color-gold);
     pointer-events: auto;
     animation: slideInRight 0.3s ease forwards;
 }
@@ -321,12 +321,12 @@ input::placeholder {
 }
 
 .toast.success {
-    border-left-color: #10B981;
+    border-left-color: var(--color-primary);
 }
 
 @keyframes slideInRight {
     from { opacity: 0; transform: translateX(60px); }
-    to { opacity: 1; transform: translateX(0); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 /* ----- MODALS ----- */
@@ -365,7 +365,7 @@ input::placeholder {
     background: transparent;
 }
 .modal-card::-webkit-scrollbar-thumb {
-    background: var(--accent-purple);
+    background: var(--color-primary);
     border-radius: 4px;
 }
 
@@ -383,7 +383,7 @@ input::placeholder {
 }
 
 .modal-close:hover {
-    color: var(--accent-purple);
+    color: var(--color-primary);
 }
 
 /* Tabs */
@@ -409,12 +409,12 @@ input::placeholder {
 }
 
 .tab-btn.active {
-    background: rgba(109, 40, 217, 0.1);
-    color: var(--accent-purple);
+    background: rgba(11, 138, 61, 0.1);
+    color: var(--color-primary);
 }
 
 .tab-btn:hover {
-    color: var(--accent-purple);
+    color: var(--color-primary);
 }
 
 /* Tab content */
@@ -433,7 +433,7 @@ input::placeholder {
 }
 
 .tab-content h4 {
-    color: var(--accent-purple);
+    color: var(--color-primary);
     margin: 1.2rem 0 0.5rem;
     font-weight: 700;
     font-size: 1rem;
@@ -450,7 +450,7 @@ input::placeholder {
 /* Reset modal specific */
 .modal-icon {
     font-size: 3.5rem;
-    color: var(--accent-gold);
+    color: var(--color-gold);
     margin-bottom: 1rem;
     display: block;
     text-align: center;
@@ -468,7 +468,7 @@ input::placeholder {
 }
 
 .modal-btn {
-    background: linear-gradient(160deg, var(--accent-purple), #4C1D95);
+    background: linear-gradient(160deg, var(--color-primary), #065F2C);
     border: none;
     padding: 0.9rem;
     font-size: 1rem;
@@ -478,12 +478,12 @@ input::placeholder {
     cursor: pointer;
     transition: all 0.25s ease;
     width: 100%;
-    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    box-shadow: 0 4px 12px rgba(11, 138, 61, 0.3);
 }
 
 .modal-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(109, 40, 217, 0.4);
+    box-shadow: 0 6px 18px rgba(11, 138, 61, 0.4);
 }
 
 /* ----- PROUDLY NAIJA FOOTER ----- */
@@ -503,7 +503,7 @@ input::placeholder {
 }
 
 .proudly-naija span {
-    color: var(--accent-purple);
+    color: var(--color-primary);
     font-weight: 700;
 }
 
@@ -514,7 +514,7 @@ input::placeholder {
 
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ----- RESPONSIVE ----- */
